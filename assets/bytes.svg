@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 250" width="800" height="250" role="img" aria-label="Bytes read per forward pass: attention 16.96 GB, MLP 10.40 GB, head 2.82 GB">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .lab { font: 500 14px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .sub { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .val { font: 700 15px ui-monospace, Menlo, monospace; fill: #dfe6ee; text-anchor: end; }
+    .track { fill: #232d39; }
+    .bar { transform-box: fill-box; transform-origin: left; animation: grow 1.2s cubic-bezier(.2,.8,.2,1) both; }
+    .attn { fill: #f2a541; }
+    .mlp  { fill: #5aa9e6; }
+    .head { fill: #8a97a6; }
+    .bar.mlp  { animation-delay: .15s; }
+    .bar.head { animation-delay: .3s; }
+    @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .tot { font: 600 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .totv { font: 700 13px ui-monospace, Menlo, monospace; fill: #dfe6ee; text-anchor: end; }
+    .line { stroke: #2e3a47; stroke-width: 1; }
+  </style>
+  <rect class="bg" width="800" height="250" rx="6"/>
+  <text class="h" x="24" y="34">Bytes read per target forward pass</text>
+  <text class="t" x="776" y="34" text-anchor="end">FROM THE CHECKPOINT DIMS</text>
+
+  <!-- attention -->
+  <text class="lab" x="24" y="72">Attention</text>
+  <text class="sub" x="24" y="88">8.48 B params · BF16 · not quantized</text>
+  <rect class="track" x="230" y="60" width="440" height="24" rx="3"/>
+  <rect class="bar attn" x="230" y="60" width="440" height="24" rx="3"/>
+  <text class="val" x="776" y="78">16.96 GB</text>
+
+  <!-- mlp -->
+  <text class="lab" x="24" y="120">MLP</text>
+  <text class="sub" x="24" y="136">20.81 B params · NVFP4 · the quantized part</text>
+  <rect class="track" x="230" y="108" width="440" height="24" rx="3"/>
+  <rect class="bar mlp" x="230" y="108" width="270" height="24" rx="3"/>
+  <text class="val" x="776" y="126">10.40 GB</text>
+
+  <!-- head -->
+  <text class="lab" x="24" y="168">lm_head / embed</text>
+  <text class="sub" x="24" y="184">1.41 B params · BF16 · tied</text>
+  <rect class="track" x="230" y="156" width="440" height="24" rx="3"/>
+  <rect class="bar head" x="230" y="156" width="73" height="24" rx="3"/>
+  <text class="val" x="776" y="174">2.82 GB</text>
+
+  <line class="line" x1="24" y1="204" x2="776" y2="204"/>
+  <text class="tot" x="24" y="228">Total weights per forward</text>
+  <text class="totv" x="776" y="228">30.18 GB  →  4.41 ms at 6.85 TB/s</text>
+</svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420" role="img" aria-label="Nine walls hit in sequence, each cleared by one fix">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .step { fill: #232d39; stroke: #2e3a47; stroke-width: 1; }
+    .n { font: 800 18px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
+    .err { font: 500 10.5px ui-monospace, Menlo, monospace; fill: #e5646c; }
+    .fix { font: 600 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .w9 .step { fill: #3a2c14; stroke: #f2a541; animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { stroke-opacity: .6; } 50% { stroke-opacity: 1; } }
+    .w9 .n { fill: #f2a541; }
+    .w9 .err { fill: #5cc48a; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+  </style>
+  <rect class="bg" width="800" height="420" rx="6"/>
+  <text class="h" x="24" y="34">Nine walls, in the order they were hit</text>
+  <text class="t" x="776" y="34" text-anchor="end">EACH FIX ADVANCED STRICTLY FURTHER</text>
+
+  <g class="w w1" transform="translate(24,52)"><rect class="step" width="752" height="36" rx="4"/><text class="n" x="20" y="24">1</text><text class="err" x="44" y="16">tie_weights NotImplementedError</text><text class="fix" x="44" y="29">patch 01 · plain tensor tie for the unquantized lm_head</text></g>
+  <g class="w w2" transform="translate(24,92)"><rect class="step" width="752" height="36" rx="4"/><text class="n" x="20" y="24">2</text><text class="err" x="44" y="16">weight-shape AssertionError (gemma4_mtp.py)</text><text class="fix" x="44" y="29">patch 03 · MTP centroids → quant-aware ReplicatedLinear</text></g>
+  <g class="w w3" transform="translate(24,132)"><rect class="step" width="752" height="36" rx="4"/><text class="n" x="20" y="24">3</text><text class="err" x="44" y="16">Marlin: output dim 8608 not divisible by 64</text><text class="fix" x="44" y="29">patch 04 · skip Marlin in NVFP4 auto-select → Blackwell FP4 tensor-core GEMM</text></g>
+  <g class="w w4" transform="translate(24,172)"><rect class="step" width="752" height="36" rx="4"/><text class="n" x="20" y="24">4</text><text class="err" x="44" y="16">Trtllm-gen kernels not found: headDimQk=512</text><text class="fix" x="44" y="29">patch 02 · route head_dim=512 groups to FlashInfer's native FA2 path</text></g>
+  <g class="w w5" transform="translate(24,212)"><rect class="step" width="752" height="36" rx="4"/><text class="n" x="20" y="24">5</text><text class="err" x="44" y="16">fp8 tensor core is not supported in fa2 backend</text><text class="fix" x="44" y="29">patch 05 · BF16 KV on only the ten 512 layers, FP8 on the other fifty</text></g>
+  <g class="w w6" transform="translate(24,252)"><rect class="step" width="752" height="36" rx="4"/><text class="n" x="20" y="24">6</text><text class="err" x="44" y="16">maybe_quant_query: assert query.dtype in [fp16, bf16]</text><text class="fix" x="44" y="29">patch 06 · same fix for the MTP drafter's own 512 layer</text></g>
+  <g class="w w7" transform="translate(24,292)"><rect class="step" width="752" height="36" rx="4"/><text class="n" x="20" y="24">7</text><text class="err" x="44" y="16">prefill.cuh: Invalid configuration (CTA_TILE_Q=64)</text><text class="fix" x="44" y="29">FlashInfer 0.6.13 → 0.6.14 · the head_dim≥512 tile chooser (PR #3576). Not our code.</text></g>
+  <g class="w w8" transform="translate(24,332)"><rect class="step" width="752" height="36" rx="4"/><text class="n" x="20" y="24">8</text><text class="err" x="44" y="16">Buffer overflow: batch_prefill_tmp_v (767 MiB &gt; 394 MiB)</text><text class="fix" x="44" y="29">env · VLLM_FLASHINFER_WORKSPACE_BUFFER_SIZE = 2 GiB</text></g>
+  <g class="w w9" transform="translate(24,372)"><rect class="step" width="752" height="36" rx="4"/><text class="n" x="20" y="24">9</text><text class="err" x="44" y="16">CUDA illegal memory access — real requests only, eager was fine</text><text class="fix" x="44" y="29">patch 07 + cudagraph_mode=PIECEWISE · attention eager, everything else graphed → 145.9 tok/s</text></g>
+</svg>

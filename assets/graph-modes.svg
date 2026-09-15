@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="One forward pass run three ways: eager, FULL cudagraph, PIECEWISE">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .mode { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .res  { font: 800 20px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; text-anchor: end; }
+    .desc { font: 400 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .lt { font: 600 9px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .04em; }
+    .lt.g { fill: #f2a541; }
+    .op { rx: 3; stroke-width: 1; }
+    .ol { font: 600 9.5px ui-monospace, Menlo, monospace; text-anchor: middle; pointer-events: none; }
+    /* states */
+    .eag { fill: #3a2c14; stroke: #f2a541; } .eag + .ol { fill: #f2a541; }
+    .cap { fill: #16314a; stroke: #5aa9e6; } .cap + .ol { fill: #5aa9e6; }
+    .box { fill: none; stroke: #5aa9e6; stroke-width: 1.5; stroke-dasharray: 4 3; rx: 5; }
+    /* eager row: cursor sweeps every op */
+    .r1 .op { animation: lit 6s linear infinite; }
+    @keyframes lit { 0%,100% { stroke-width: 1; } }
+    .r1 .o1  { animation-name: hit; animation-delay: 0.0s; }
+    .r1 .o2  { animation-name: hit; animation-delay: 0.2s; }
+    .r1 .o3  { animation-name: hit; animation-delay: 0.4s; }
+    .r1 .o4  { animation-name: hit; animation-delay: 0.6s; }
+    .r1 .o5  { animation-name: hit; animation-delay: 0.8s; }
+    .r1 .o6  { animation-name: hit; animation-delay: 1.0s; }
+    .r1 .o7  { animation-name: hit; animation-delay: 1.2s; }
+    .r1 .o8  { animation-name: hit; animation-delay: 1.4s; }
+    .r1 .o9  { animation-name: hit; animation-delay: 1.6s; }
+    .r1 .o10 { animation-name: hit; animation-delay: 1.8s; }
+    .r1 .o11 { animation-name: hit; animation-delay: 2.0s; }
+    .r1 .o12 { animation-name: hit; animation-delay: 2.2s; }
+    @keyframes hit { 0% { stroke-width: 1; } 1% { stroke-width: 3; } 3.5% { stroke-width: 1; } 100% { stroke-width: 1; } }
+    /* full row: box, then the 512 attn goes red */
+    .r2 .boom { animation: boom 6s linear infinite; }
+    @keyframes boom { 0%,40% { fill: #16314a; stroke: #5aa9e6; } 45%,100% { fill: #3f1c20; stroke: #e5646c; } }
+    .r2 .boom + .ol { animation: boomt 6s linear infinite; }
+    @keyframes boomt { 0%,40% { fill: #5aa9e6; } 45%,100% { fill: #e5646c; } }
+    .r2 .fault { animation: faultt 6s linear infinite; font: 700 11px ui-monospace, Menlo, monospace; fill: #e5646c; }
+    @keyframes faultt { 0%,44% { opacity: 0; } 46%,100% { opacity: 1; } }
+    /* piecewise row: only attention pulses */
+    .r3 .o2 { animation: hit 6s linear infinite; animation-delay: 0.3s; }
+    .r3 .o8 { animation: hit 6s linear infinite; animation-delay: 1.1s; }
+  </style>
+  <rect class="bg" width="800" height="400" rx="6"/>
+  <text class="h" x="24" y="34">One forward pass, three ways to run it</text>
+  <text class="t" x="776" y="34" text-anchor="end">LAYER 4 (SLIDING) → LAYER 5 (GLOBAL 512)</text>
+
+  <!-- shared op geometry, reused per row via translate. 12 ops, 58 wide, 4 gap -->
+  <!-- ===== ROW 1: EAGER ===== -->
+  <g class="r1" transform="translate(24,58)">
+    <text class="mode" x="0" y="0">--enforce-eager</text>
+    <text class="res" x="752" y="0" style="fill:#e5646c">46.7 tok/s</text>
+    <text class="desc" x="0" y="15">Every kernel launched from Python, one at a time. The GPU idles between launches. Correct — this is how the 512 kernel was proven — but slow.</text>
+    <text class="lt" x="0" y="34">L4 SLIDING</text><text class="lt g" x="376" y="34">L5 GLOBAL 512</text>
+    <g transform="translate(0,40)">
+      <rect class="op eag o1" x="0"   y="0" width="58" height="26"/><text class="ol" x="29"  y="17">norm</text>
+      <rect class="op eag o2" x="62"  y="0" width="58" height="26"/><text class="ol" x="91"  y="17">attn 256</text>
+      <rect class="op eag o3" x="124" y="0" width="58" height="26"/><text class="ol" x="153" y="17">norm</text>
+      <rect class="op eag o4" x="186" y="0" width="58" height="26"/><text class="ol" x="215" y="17">gate</text>
+      <rect class="op eag o5" x="248" y="0" width="58" height="26"/><text class="ol" x="277" y="17">up</text>
+      <rect class="op eag o6" x="310" y="0" width="58" height="26"/><text class="ol" x="339" y="17">down</text>
+      <rect class="op eag o7" x="376" y="0" width="58" height="26"/><text class="ol" x="405" y="17">norm</text>
+      <rect class="op eag o8" x="438" y="0" width="58" height="26"/><text class="ol" x="467" y="17">attn 512</text>
+      <rect class="op eag o9" x="500" y="0" width="58" height="26"/><text class="ol" x="529" y="17">norm</text>
+      <rect class="op eag o10" x="562" y="0" width="58" height="26"/><text class="ol" x="591" y="17">gate</text>
+      <rect class="op eag o11" x="624" y="0" width="58" height="26"/><text class="ol" x="653" y="17">up</text>
+      <rect class="op eag o12" x="686" y="0" width="58" height="26"/><text class="ol" x="715" y="17">down</text>
+    </g>
+  </g>
+
+  <!-- ===== ROW 2: FULL ===== -->
+  <g class="r2" transform="translate(24,170)">
+    <text class="mode" x="0" y="0">FULL cudagraph</text>
+    <text class="res" x="752" y="0" style="fill:#e5646c">fault</text>
+    <text class="desc" x="0" y="15">Capture the whole pass, replay it. Capture succeeds. Warmup succeeds. The first real request faults on the 512 attention.</text>
+    <text class="lt" x="0" y="34">L4 SLIDING</text><text class="lt g" x="376" y="34">L5 GLOBAL 512</text>
+    <g transform="translate(0,40)">
+      <rect class="box" x="-4" y="-4" width="752" height="34"/>
+      <rect class="op cap" x="0"   y="0" width="58" height="26"/><text class="ol" x="29"  y="17">norm</text>
+      <rect class="op cap" x="62"  y="0" width="58" height="26"/><text class="ol" x="91"  y="17">attn 256</text>
+      <rect class="op cap" x="124" y="0" width="58" height="26"/><text class="ol" x="153" y="17">norm</text>
+      <rect class="op cap" x="186" y="0" width="58" height="26"/><text class="ol" x="215" y="17">gate</text>
+      <rect class="op cap" x="248" y="0" width="58" height="26"/><text class="ol" x="277" y="17">up</text>
+      <rect class="op cap" x="310" y="0" width="58" height="26"/><text class="ol" x="339" y="17">down</text>
+      <rect class="op cap" x="376" y="0" width="58" height="26"/><text class="ol" x="405" y="17">norm</text>
+      <rect class="op cap boom" x="438" y="0" width="58" height="26"/><text class="ol" x="467" y="17">attn 512</text>
+      <rect class="op cap" x="500" y="0" width="58" height="26"/><text class="ol" x="529" y="17">norm</text>
+      <rect class="op cap" x="562" y="0" width="58" height="26"/><text class="ol" x="591" y="17">gate</text>
+      <rect class="op cap" x="624" y="0" width="58" height="26"/><text class="ol" x="653" y="17">up</text>
+      <rect class="op cap" x="686" y="0" width="58" height="26"/><text class="ol" x="715" y="17">down</text>
+      <text class="fault" x="467" y="46" text-anchor="middle">illegal memory access</text>
+    </g>
+  </g>
+
+  <!-- ===== ROW 3: PIECEWISE ===== -->
+  <g class="r3" transform="translate(24,290)">
+    <text class="mode" x="0" y="0">PIECEWISE</text>
+    <text class="res" x="752" y="0" style="fill:#f2a541">145.9 tok/s</text>
+    <text class="desc" x="0" y="15">Attention is a graph split point and runs eager on the proven path. The FP4 GEMMs and norms between stay graphed. Nearly all the speedup, none of the crash.</text>
+    <text class="lt" x="0" y="34">L4 SLIDING</text><text class="lt g" x="376" y="34">L5 GLOBAL 512</text>
+    <g transform="translate(0,40)">
+      <rect class="box" x="-4" y="-4" width="66" height="34"/>
+      <rect class="box" x="120" y="-4" width="252" height="34"/>
+      <rect class="box" x="496" y="-4" width="252" height="34"/>
+      <rect class="op cap" x="0"   y="0" width="58" height="26"/><text class="ol" x="29"  y="17">norm</text>
+      <rect class="op eag o2" x="62"  y="0" width="58" height="26"/><text class="ol" x="91"  y="17">attn 256</text>
+      <rect class="op cap" x="124" y="0" width="58" height="26"/><text class="ol" x="153" y="17">norm</text>
+      <rect class="op cap" x="186" y="0" width="58" height="26"/><text class="ol" x="215" y="17">gate</text>
+      <rect class="op cap" x="248" y="0" width="58" height="26"/><text class="ol" x="277" y="17">up</text>
+      <rect class="op cap" x="310" y="0" width="58" height="26"/><text class="ol" x="339" y="17">down</text>
+      <rect class="op cap" x="376" y="0" width="58" height="26"/><text class="ol" x="405" y="17">norm</text>
+      <rect class="op eag o8" x="438" y="0" width="58" height="26"/><text class="ol" x="467" y="17">attn 512</text>
+      <rect class="op cap" x="500" y="0" width="58" height="26"/><text class="ol" x="529" y="17">norm</text>
+      <rect class="op cap" x="562" y="0" width="58" height="26"/><text class="ol" x="591" y="17">gate</text>
+      <rect class="op cap" x="624" y="0" width="58" height="26"/><text class="ol" x="653" y="17">up</text>
+      <rect class="op cap" x="686" y="0" width="58" height="26"/><text class="ol" x="715" y="17">down</text>
+    </g>
+  </g>
+  <g transform="translate(24,384)">
+    <rect x="0" y="-9" width="10" height="10" rx="2" fill="#16314a" stroke="#5aa9e6"/><text class="desc" x="16" y="0">captured in a CUDA graph</text>
+    <rect x="180" y="-9" width="10" height="10" rx="2" fill="#3a2c14" stroke="#f2a541"/><text class="desc" x="196" y="0">eager launch</text>
+    <rect x="300" y="-9" width="10" height="10" rx="2" fill="#3f1c20" stroke="#e5646c"/><text class="desc" x="316" y="0">fault</text>
+  </g>
+</svg>

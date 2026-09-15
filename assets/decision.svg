@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 470" width="800" height="470" role="img" aria-label="Decision flow when a stock inference setup fails">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .node { fill: #232d39; stroke: #2e3a47; stroke-width: 1; rx: 5; }
+    .node.q { fill: #1c242e; stroke: #5aa9e6; }
+    .node.fix { fill: #3a2c14; stroke: #f2a541; }
+    .node.ok { fill: #17311f; stroke: #5cc48a; }
+    .nt { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; text-anchor: middle; }
+    .ns { font: 400 10.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
+    .ns.w { fill: #f2a541; font-weight: 600; }
+    .e { stroke: #3d4956; stroke-width: 1.5; fill: none; }
+    .el { font: 600 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .el.y { fill: #5cc48a; } .el.n { fill: #e5646c; }
+    /* the path this project actually took */
+    .took { stroke: #f2a541; stroke-width: 2.5; fill: none; stroke-dasharray: 700; stroke-dashoffset: 700; animation: trace 5s ease-in-out infinite; }
+    @keyframes trace { 0% { stroke-dashoffset: 700; opacity: 1; } 70% { stroke-dashoffset: 0; opacity: 1; } 85% { opacity: 0; } 100% { stroke-dashoffset: 700; opacity: 0; } }
+  </style>
+  <rect class="bg" width="800" height="470" rx="6"/>
+  <text class="h" x="24" y="34">When the stock setup fails</text>
+  <text class="t" x="776" y="34" text-anchor="end">THE ROUTE THIS PROJECT TOOK, TRACED IN AMBER</text>
+
+  <!-- edges -->
+  <path class="e" d="M 400 84 v 22"/>
+  <path class="e" d="M 400 140 v 22"/>
+  <path class="e" d="M 400 196 h -260 v 26"/>
+  <path class="e" d="M 400 196 v 26"/>
+  <path class="e" d="M 400 196 h 260 v 26"/>
+  <path class="e" d="M 660 278 v 22"/>
+  <path class="e" d="M 660 356 h -120 v 22"/>
+  <path class="e" d="M 660 356 h 120 v 22"/>
+  <path class="e" d="M 520 140 h 140 v 22" />
+
+  <!-- the amber trace: stock fails -> kernel not found -> route -> crash -> works eager? yes -> PIECEWISE -->
+  <path class="took" d="M 400 84 V 196 H 660 V 356 H 540 V 378"/>
+
+  <!-- start -->
+  <rect class="node" x="300" y="52" width="200" height="32"/>
+  <text class="nt" x="400" y="72">Stock engine, stock config</text>
+
+  <!-- q1 -->
+  <rect class="node q" x="300" y="106" width="200" height="34"/>
+  <text class="nt" x="400" y="122">Does it load and serve?</text>
+  <text class="ns" x="400" y="134">run a real request, not just startup</text>
+  <text class="el y" x="524" y="132">yes →</text>
+  <rect class="node ok" x="560" y="106" width="200" height="34"/>
+  <text class="nt" x="660" y="122">Benchmark it. That's your floor.</text>
+  <text class="ns" x="660" y="134">then try the next engine / quant / drafter</text>
+
+  <!-- q2 -->
+  <text class="el n" x="406" y="156">no</text>
+  <rect class="node q" x="300" y="162" width="200" height="34"/>
+  <text class="nt" x="400" y="178">What kind of failure?</text>
+  <text class="ns" x="400" y="190">the error string tells you which subsystem</text>
+
+  <!-- three branches -->
+  <rect class="node fix" x="40" y="222" width="200" height="56"/>
+  <text class="nt" x="140" y="240">Load / shape / tie error</text>
+  <text class="ns" x="140" y="254">read the checkpoint config, not the docs</text>
+  <text class="ns w" x="140" y="268">patch the model file · walls 1–3</text>
+
+  <rect class="node fix" x="300" y="222" width="200" height="56"/>
+  <text class="nt" x="400" y="240">Kernel wants a dtype it can't read</text>
+  <text class="ns" x="400" y="254">only the layers that use it need changing</text>
+  <text class="ns w" x="400" y="268">per-layer dtype split · walls 5–6</text>
+
+  <rect class="node fix" x="560" y="222" width="200" height="56"/>
+  <text class="nt" x="660" y="240">"Kernel not found" for a shape</text>
+  <text class="ns" x="660" y="254">any kernel support it? which version?</text>
+  <text class="ns w" x="660" y="268">route to it · walls 4, 7, 8</text>
+
+  <!-- crash after routing -->
+  <rect class="node q" x="560" y="300" width="200" height="56"/>
+  <text class="nt" x="660" y="318">It crashes on real input</text>
+  <text class="ns" x="660" y="332">the one question that isolates it:</text>
+  <text class="ns w" x="660" y="346">does it work with --enforce-eager?</text>
+
+  <text class="el y" x="548" y="372">yes</text>
+  <rect class="node fix" x="440" y="378" width="200" height="56"/>
+  <text class="nt" x="540" y="396">Graph-safety bug, not a kernel bug</text>
+  <text class="ns" x="540" y="410">keep that op eager, graph the rest</text>
+  <text class="ns w" x="540" y="424">cudagraph_mode=PIECEWISE · wall 9</text>
+
+  <text class="el n" x="770" y="372">no</text>
+  <rect class="node" x="680" y="378" width="100" height="56"/>
+  <text class="nt" x="730" y="396">Kernel bug</text>
+  <text class="ns" x="730" y="410">config, workspace,</text>
+  <text class="ns" x="730" y="424">or file upstream</text>
+
+  <text class="ns" x="400" y="458">Every box on the amber path was a different error. None of the fixes were kernel rewrites.</text>
+</svg>

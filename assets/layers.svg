@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 210" width="800" height="210" role="img" aria-label="Sixty layers of Gemma-4-31B; the ten global head_dim=512 layers highlighted">
+  <style>
+    .bg { fill: #161d26; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .s  { fill: #5aa9e6; opacity: .5; }
+    .g  { fill: #f2a541; }
+    .n  { font: 700 10px ui-monospace, Menlo, monospace; fill: #1a1207; text-anchor: middle; }
+    .k  { font: 500 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .kg { fill: #f2a541; font-weight: 700; }
+    .g { animation: glow 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes glow { 0%,100% { opacity: .78; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
+    .g:nth-of-type(1)  { animation-delay: 0s; }
+  </style>
+  <rect class="bg" width="800" height="210" rx="6"/>
+  <text class="h" x="24" y="34">Sixty layers, ten troublemakers</text>
+  <text class="t" x="776" y="34" text-anchor="end">GEMMA-4-31B</text>
+
+  <!-- row 1: layers 0-29 -->
+  <g transform="translate(24,56)">
+    <rect class="s" x="0"   y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="25"  y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="50"  y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="75"  y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="100" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="125" y="0" width="20" height="20" rx="2" style="animation-delay:0s"/><text class="n" x="135" y="14">5</text>
+    <rect class="s" x="150" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="175" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="200" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="225" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="250" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="275" y="0" width="20" height="20" rx="2" style="animation-delay:.24s"/><text class="n" x="285" y="14">11</text>
+    <rect class="s" x="300" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="325" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="350" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="375" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="400" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="425" y="0" width="20" height="20" rx="2" style="animation-delay:.48s"/><text class="n" x="435" y="14">17</text>
+    <rect class="s" x="450" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="475" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="500" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="525" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="550" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="575" y="0" width="20" height="20" rx="2" style="animation-delay:.72s"/><text class="n" x="585" y="14">23</text>
+    <rect class="s" x="600" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="625" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="650" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="675" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="700" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="725" y="0" width="20" height="20" rx="2" style="animation-delay:.96s"/><text class="n" x="735" y="14">29</text>
+  </g>
+  <!-- row 2: layers 30-59 -->
+  <g transform="translate(24,82)">
+    <rect class="s" x="0"   y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="25"  y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="50"  y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="75"  y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="100" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="125" y="0" width="20" height="20" rx="2" style="animation-delay:1.2s"/><text class="n" x="135" y="14">35</text>
+    <rect class="s" x="150" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="175" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="200" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="225" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="250" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="275" y="0" width="20" height="20" rx="2" style="animation-delay:1.44s"/><text class="n" x="285" y="14">41</text>
+    <rect class="s" x="300" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="325" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="350" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="375" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="400" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="425" y="0" width="20" height="20" rx="2" style="animation-delay:1.68s"/><text class="n" x="435" y="14">47</text>
+    <rect class="s" x="450" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="475" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="500" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="525" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="550" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="575" y="0" width="20" height="20" rx="2" style="animation-delay:1.92s"/><text class="n" x="585" y="14">53</text>
+    <rect class="s" x="600" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="625" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="650" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="675" y="0" width="20" height="20" rx="2"/>
+    <rect class="s" x="700" y="0" width="20" height="20" rx="2"/>
+    <rect class="g" x="725" y="0" width="20" height="20" rx="2" style="animation-delay:2.16s"/><text class="n" x="735" y="14">59</text>
+  </g>
+
+  <g transform="translate(24,140)">
+    <rect class="s" x="0" y="0" width="12" height="12" rx="2"/><text class="k" x="18" y="11">50 sliding-window · head_dim 256 · 16 KV heads</text>
+    <rect class="g" x="0" y="24" width="12" height="12" rx="2" style="animation:none"/><text class="k kg" x="18" y="35">10 global · head_dim 512 · 4 KV heads · every sixth layer</text>
+  </g>
+  <text class="k" x="24" y="196" style="fill:#8a97a6">head_dim 512 is a trained weight shape, not a setting. Most attention kernels stop at 256.</text>
+</svg>

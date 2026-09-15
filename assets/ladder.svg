@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 330" width="800" height="330" role="img" aria-label="Results ladder: 46.7, 115.7, 145.9, 150.0 tok/s, with SGLang's 139.6 exact as a reference line">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .bar { transform-box: fill-box; transform-origin: bottom; animation: rise 1s cubic-bezier(.2,.8,.2,1) both; }
+    .b1 { fill: #5aa9e6; animation-delay: 0s; }
+    .b2 { fill: #5aa9e6; animation-delay: .15s; }
+    .b3 { fill: #5aa9e6; animation-delay: .3s; }
+    .b4 { fill: #f2a541; animation-delay: .45s; }
+    @keyframes rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    .v { font: 800 18px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; text-anchor: middle; }
+    .v.best { fill: #f2a541; }
+    .l { font: 500 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
+    .ref { stroke: #8a97a6; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .refl { font: 600 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: end; }
+    .base { stroke: #2e3a47; stroke-width: 1; }
+  </style>
+  <rect class="bg" width="800" height="330" rx="6"/>
+  <text class="h" x="24" y="34">Same model, same harness, single stream</text>
+  <text class="t" x="776" y="34" text-anchor="end">EXACT OUTPUT ONLY</text>
+
+  <!-- chart: baseline y=270, top y=60 => 210px for 0..160 tok/s => 1.3125 px per tok/s -->
+  <line class="base" x1="60" y1="270" x2="760" y2="270"/>
+  <!-- SGLang exact 139.6 -> y = 270 - 139.6*1.3125 = 86.8 -->
+  <line class="ref" x1="60" y1="86.8" x2="760" y2="86.8"/>
+  <text class="refl" x="758" y="82">SGLang best exact · 139.6 (Triton attention)</text>
+
+  <!-- bar 1: 46.7 -> h=61.3 -->
+  <rect class="bar b1" x="110" y="208.7" width="90" height="61.3" rx="3"/>
+  <text class="v" x="155" y="200">46.7</text>
+  <text class="l" x="155" y="290">FA2-512</text><text class="l" x="155" y="304">all eager</text>
+
+  <!-- bar 2: 115.7 -> h=151.9 -->
+  <rect class="bar b2" x="280" y="118.1" width="90" height="151.9" rx="3"/>
+  <text class="v" x="325" y="110">115.7</text>
+  <text class="l" x="325" y="290">Triton fallback</text><text class="l" x="325" y="304">for the 512 layers</text>
+
+  <!-- bar 3: 145.9 -> h=191.5 -->
+  <rect class="bar b3" x="450" y="78.5" width="90" height="191.5" rx="3"/>
+  <text class="v" x="495" y="70">145.9</text>
+  <text class="l" x="495" y="290">FA2-512 PIECEWISE</text><text class="l" x="495" y="304">k=6</text>
+
+  <!-- bar 4: 150.0 -> h=196.9 -->
+  <rect class="bar b4" x="620" y="73.1" width="90" height="196.9" rx="3"/>
+  <text class="v best" x="665" y="65">150.0</text>
+  <text class="l" x="665" y="290">FA2-512 PIECEWISE</text><text class="l" x="665" y="304">k=8, block 16</text>
+</svg>
