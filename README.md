@@ -1,9 +1,12 @@
 # Better Inference
 
-Write-ups on inference performance work, published at
+Articles on hosting LLMs and improving their token speed, published at
 https://abhijithneilabraham.github.io/better_inference.github.io/
 
-Each post lives in its own folder with its figures:
+Each article lives in its own folder with its figures:
 
-- [`gemma/`](gemma/) — **What I learned getting Gemma-4-31B to 150 tok/s on one B300.**
-  Code and patches in [benchmark_gemma](https://github.com/abhijithneilabraham/benchmark_gemma).
+- [`gemma/`](gemma/blog.md): **Learning inference: How to host and improve the token speed of an LLM.**
+  Gemma 4 31B on one B300, from 46.7 to 150 tokens per second.
+  Code in [benchmark_gemma](https://github.com/abhijithneilabraham/benchmark_gemma).
+
+To enable the site: Settings, then Pages, then Source: deploy from branch, `main`, root.
