@@ -40,11 +40,18 @@ I want to be precise about the setup, because every number in this article comes
 
 **Engines.** I used two inference servers, vLLM and SGLang. Both are open source and both serve an OpenAI compatible API. I tried several versions of vLLM, including a release version, a nightly build and eventually my own patched build, because as you will see the stock versions could not run the configuration I wanted.
 
-**The benchmark client.** Before touching any engine I wrote a small script that sends the 30 prompts, streams the response, and records the output speed in tokens per second along with time to first token and whether the request succeeded. It reports the median, which is called p50, because the median is what a typical user sees and it is not thrown off by one slow request. The prompts are frozen in a file called `longctx30.jsonl`, built by a script called `make_longctx_dataset.py` from twelve public domain nonfiction books, with each prompt being two passages of about 5,000 tokens each followed by one of five tasks such as summarise, outline or extract facts. If you build your own benchmark set, the two things to hold fixed across every run are the token count and the mix of tasks. The actual text matters less than you would think.
+**The benchmark client.** Before touching any engine I wrote a small script that sends the 30 prompts, streams the response, and records the output speed in tokens per second along with time to first token and whether the request succeeded. It reports the median, which is called p50, because the median is what a typical user sees and it is not thrown off by one slow request. The prompts are frozen in a dataset called [longctx30](https://huggingface.co/datasets/abhijithneilabraham/longctx30) on Hugging Face, built from twelve public domain nonfiction books, with each prompt being two passages of about 5,000 tokens each followed by one of five tasks such as summarise, outline or extract facts. The script that generates it is included in the same repository, so you can rebuild it or change the books. Loading it takes two lines:
+
+```python
+from datasets import load_dataset
+ds = load_dataset("abhijithneilabraham/longctx30", split="train")
+```
+
+Each row has a `prompt` and a `max_out`, which is all the benchmark client needs. If you build your own benchmark set, the two things to hold fixed across every run are the token count and the mix of tasks. The actual text matters less than you would think.
 
 **The correctness check.** Every configuration, before I looked at its speed, was asked one greedy request: write a Python function for the nth Fibonacci number, then compute 17 times 23. If the answer was not coherent or did not say 391, I stopped there. A configuration that produces garbage quickly is worse than one that is slow, because it looks like a win, and this check caught real problems more than once.
 
-One honest note about the dataset. The numbers in this article were measured on an earlier prompt set of exactly this shape. The `longctx30.jsonl` file in the repository is the public reproduction set, with the same token budget, the same five tasks and the same two passage structure but different source text. I would expect it to land within a few percent, but I have not re-run the full set of experiments on it.
+One honest note about the dataset. The numbers in this article were measured on an earlier prompt set of exactly this shape. The longctx30 dataset on Hugging Face is the public reproduction set, with the same token budget, the same five tasks and the same two passage structure but different source text. I would expect it to land within a few percent, but I have not re-run the full set of experiments on it.
 
 ## The two ideas that do most of the work
 
@@ -228,6 +235,6 @@ Three things I would do differently. Compute the roofline on the first day, beca
 
 ## Where the code is
 
-The seven patches, the self checking Dockerfile, the correctness script, the benchmark client and the dataset are all in the [benchmark_gemma](https://github.com/abhijithneilabraham/benchmark_gemma) repository. The full engineering log, with every error and every fix in sequence, is in [FPA4FIX.md](https://github.com/abhijithneilabraham/benchmark_gemma/blob/main/FPA4FIX.md), and the mechanism level detail, with the file and line for every change plus the roofline arithmetic, is in [TECHNICAL_DEEP_DIVE.md](https://github.com/abhijithneilabraham/benchmark_gemma/blob/main/TECHNICAL_DEEP_DIVE.md).
+The seven patches, the self checking Dockerfile, the correctness script and the benchmark client are all in the [benchmark_gemma](https://github.com/abhijithneilabraham/benchmark_gemma) repository. The benchmark dataset is on Hugging Face at [abhijithneilabraham/longctx30](https://huggingface.co/datasets/abhijithneilabraham/longctx30), along with the script that builds it. The full engineering log, with every error and every fix in sequence, is in [FPA4FIX.md](https://github.com/abhijithneilabraham/benchmark_gemma/blob/main/FPA4FIX.md), and the mechanism level detail, with the file and line for every change plus the roofline arithmetic, is in [TECHNICAL_DEEP_DIVE.md](https://github.com/abhijithneilabraham/benchmark_gemma/blob/main/TECHNICAL_DEEP_DIVE.md).
 
 *Every number in this article is from the benchmark runs recorded in that repository. Nothing is estimated or extrapolated. Where a mechanism is my best current understanding rather than something confirmed, the text says so.*
