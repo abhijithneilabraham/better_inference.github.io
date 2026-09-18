@@ -13,7 +13,7 @@
     .v.best { fill: #f2a541; }
     .l { font: 500 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
     .ref { stroke: #8a97a6; stroke-width: 1.5; stroke-dasharray: 5 4; }
-    .refl { font: 600 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: end; }
+    .refl { font: 600 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: start; }
     .base { stroke: #2e3a47; stroke-width: 1; }
   </style>
   <rect class="bg" width="800" height="330" rx="6"/>
@@ -24,7 +24,7 @@
   <line class="base" x1="60" y1="270" x2="760" y2="270"/>
   <!-- SGLang exact 139.6 -> y = 270 - 139.6*1.3125 = 86.8 -->
   <line class="ref" x1="60" y1="86.8" x2="760" y2="86.8"/>
-  <text class="refl" x="758" y="82">SGLang best exact · 139.6 (Triton attention)</text>
+  <text class="refl" x="64" y="82">SGLang best exact · 139.6 (Triton attention)</text>
 
   <!-- bar 1: 46.7 -> h=61.3 -->
   <rect class="bar b1" x="110" y="208.7" width="90" height="61.3" rx="3"/>
