@@ -122,13 +122,25 @@ docker run -d --name gemma --gpus all --shm-size 32g -p 127.0.0.1:8000:8000 \
     --trust-remote-code --host 0.0.0.0 --port 8000
 ```
 
-The image tags are pinned to exact digests because both projects move fast and I wanted the numbers to be reproducible. Once the server answers on port 8000, the benchmark is the same for every configuration in this article:
+The image tags are pinned to exact digests because both projects move fast and I wanted the numbers to be reproducible.
+
+The benchmark client and the prompts live together in one Hugging Face repository. Get them once, on the machine that will send the requests:
+
+```bash
+git clone https://huggingface.co/datasets/abhijithneilabraham/longctx30
+cd longctx30
+pip install aiohttp tiktoken
+```
+
+Then, once a server is answering on port 8000, run the benchmark. This exact command is used for every configuration in the article; only the `--model` value changes to match whatever the server is serving.
 
 ```bash
 python3 bench_client.py --url http://localhost:8000/v1/chat/completions \
   --model google/gemma-4-31B-it --dataset longctx30.jsonl \
   --concurrency 1 --warmup 2 --json-out result.json
 ```
+
+It reads the 30 prompts from `longctx30.jsonl`, sends two warmup requests that are not counted, then sends each prompt one at a time and streams the reply. At the end it prints a small table of p10, p50 and p90 for several metrics. The number quoted everywhere in this article is the `p50` on the line that starts `Output speed (tok/s)`. It is the median across the 30 prompts of output tokens divided by the time from the first streamed chunk to the last, so it measures decode and excludes the time spent reading the prompt.
 
 SGLang gave 122.4 tokens per second and vLLM gave 139.4. Both are in the same range, and both are far above what you get with no drafter at all. When I ran vLLM with the drafter turned off, plain BF16 and nothing else, it gave 60.6. So the drafter alone is worth more than double, before any quantisation is involved. That was the first thing I did not expect.
 
@@ -146,17 +158,17 @@ docker run -d --name gemma --gpus all --shm-size 32g -p 127.0.0.1:8000:8000 \
     --kv-cache-dtype fp8_e4m3 --mem-fraction-static 0.85 --trust-remote-code --host 0.0.0.0 --port 8000"
 ```
 
+For this and every other NVFP4 configuration, the benchmark command is the same with `--model nvidia/Gemma-4-31B-IT-NVFP4`.
+
 This gave 139.6 tokens per second, which is the best exact result I could get out of SGLang. Notice that it is almost the same number as vLLM on plain BF16. Going from 16 bit weights to 4 bit weights bought SGLang about 17 tokens per second over its own BF16 run, and did not put it ahead of vLLM at all. I will explain why near the end of the article, when we compute how much of each step is actually spent reading weights.
 
 The natural next thing to try is the same combination on vLLM, since vLLM was already ahead in BF16. That is where it stopped working. The release version of vLLM failed to load the NVFP4 checkpoint with `tie_weights NotImplementedError`, and the nightly build loaded it but failed as soon as the drafter was enabled with `Trtllm-gen kernels not found: headDimQk=512`. Two different errors, in two different parts of the engine.
 
 ## Patching vLLM: the 150 configuration
 
-The rest of this article is about those two errors and the seven others that followed them. But here is where it ends up, so you can see the destination before the route. The patches, the Dockerfile that applies them and the benchmark client are all in one place on Hugging Face:
+The rest of this article is about those two errors and the seven others that followed them. But here is where it ends up, so you can see the destination before the route. The patches and the Dockerfile that applies them are in the same Hugging Face repository you cloned for the benchmark client, in the `fpa4fix` folder:
 
 ```bash
-git clone https://huggingface.co/datasets/abhijithneilabraham/longctx30
-cd longctx30
 docker build -f fpa4fix/Dockerfile.patched -t vllm-gemma4-nvfp4-mtp:latest fpa4fix/
 ```
 
@@ -176,7 +188,7 @@ docker run -d --name gemma --gpus all --ipc=host --shm-size 32g -p 127.0.0.1:800
   --compilation-config '{"cudagraph_mode":"PIECEWISE"}' --port 8000
 ```
 
-This gives 150.0 tokens per second, with exactly the same output as the unpatched model would produce. That is 7.5 percent ahead of SGLang's best, on the same GPU, the same prompts and the same client.
+Benchmark it with `--model nvidia/Gemma-4-31B-IT-NVFP4` as before. This gives 150.0 tokens per second, with exactly the same output as the unpatched model would produce. That is 7.5 percent ahead of SGLang's best, on the same GPU, the same prompts and the same client.
 
 Three things in that command are not optional, and each one is a story. The `--compilation-config` flag with PIECEWISE is the fix for a kernel that is correct but crashes inside CUDA graphs. The three environment variables are there because of specific failures with kernel selection and buffer sizes. And the model runs on FlashInfer's FA2 attention kernel for the ten head size 512 layers, which stock vLLM cannot do. Take any of them away and you get either a crash or a much slower number: with `--enforce-eager` instead of PIECEWISE it is 46.7, and with the 512 layers sent to a Triton kernel instead of FA2 it is 115.7.
 
