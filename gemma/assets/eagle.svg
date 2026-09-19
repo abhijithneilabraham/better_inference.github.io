@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="800" height="360" role="img" aria-label="EAGLE: a small separate head drafts tokens from the main model's hidden features, then the main model verifies them">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .lab { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .sub { font: 400 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .big { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.5; rx: 5; }
+    .bigl { font: 700 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #5aa9e6; text-anchor: middle; }
+    .bigs { font: 400 9.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
+    .small { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.5; rx: 4; }
+    .smalll { font: 700 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; text-anchor: middle; }
+    .feat { fill: #5cc48a; opacity: .85; rx: 2; }
+    .featl { font: 600 9px ui-monospace, Menlo, monospace; fill: #1a1207; text-anchor: middle; }
+    .tok { rx: 3; } .guess { fill: #3a2c14; stroke: #f2a541; stroke-dasharray: 3 2; } .out { fill: #f2a541; }
+    .tokl { font: 600 10px ui-monospace, Menlo, monospace; text-anchor: middle; } .guess + .tokl { fill: #f2a541; } .out + .tokl { fill: #1a1207; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.5; fill: none; marker-end: url(#ah); }
+    .loop { stroke: #f2a541; stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; marker-end: url(#ahg); }
+    .key { font: 500 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .num { font: 700 11.5px ui-monospace, Menlo, monospace; fill: #dfe6ee; }
+    .pulse { animation: p 2.2s ease-in-out infinite; }
+    @keyframes p { 0%,100% { opacity: .85; } 50% { opacity: 1; } }
+    .d1 { animation: a .5s ease-out both .6s; } .d2 { animation: a .5s ease-out both 1.0s; } .d3 { animation: a .5s ease-out both 1.4s; }
+    @keyframes a { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+  </defs>
+  <rect class="bg" width="800" height="360" rx="6"/>
+  <text class="h" x="24" y="34">EAGLE: draft from features, not from tokens</text>
+  <text class="t" x="776" y="34" text-anchor="end">SEPARATE HEAD · TRAINED AFTER THE MODEL</text>
+
+  <!-- main model -->
+  <rect class="big" x="24" y="70" width="170" height="150"/>
+  <text class="bigl" x="109" y="98">Main model</text>
+  <text class="bigs" x="109" y="114">31B, all layers</text>
+  <text class="bigs" x="109" y="150">runs ONCE per round:</text>
+  <text class="bigs" x="109" y="164">verifies the drafts and</text>
+  <text class="bigs" x="109" y="178">emits fresh features</text>
+  <text class="bigs" x="109" y="204" style="fill:#5aa9e6">expensive</text>
+
+  <!-- feature vector out -->
+  <path class="arrow" d="M 194 120 H 236"/>
+  <g class="pulse" transform="translate(240,104)">
+    <rect class="feat" x="0" y="0" width="112" height="32"/>
+    <text class="featl" x="56" y="14">hidden feature</text>
+    <text class="featl" x="56" y="26">of the last token</text>
+  </g>
+  <text class="sub" x="240" y="152">not a token: the vector the</text>
+  <text class="sub" x="240" y="166">model had just before choosing one</text>
+
+  <!-- eagle head -->
+  <path class="arrow" d="M 352 120 H 368"/>
+  <rect class="small" x="372" y="84" width="118" height="72"/>
+  <text class="smalll" x="431" y="106">EAGLE head</text>
+  <text class="bigs" x="431" y="122" style="fill:#f2a541">about 1 layer</text>
+  <text class="bigs" x="431" y="138">+ the main model's</text>
+  <text class="bigs" x="431" y="150">own LM head, reused</text>
+
+  <!-- drafts -->
+  <path class="arrow" d="M 490 120 H 526"/>
+  <g transform="translate(530,105)">
+    <g class="d1"><rect class="tok guess" x="0"   y="0" width="40" height="30"/><text class="tokl" x="20"  y="19">t+1</text></g>
+    <g class="d2"><rect class="tok guess" x="48"  y="0" width="40" height="30"/><text class="tokl" x="68"  y="19">t+2</text></g>
+    <g class="d3"><rect class="tok guess" x="96"  y="0" width="40" height="30"/><text class="tokl" x="116" y="19">t+3</text></g>
+    <text class="sub" x="144" y="19">… k drafts</text>
+  </g>
+  <!-- loop: each draft's feature feeds the next draft -->
+  <path class="loop" d="M 550 140 v 18 h -119 v -1"/>
+  <text class="sub" x="440" y="176" style="fill:#f2a541">the head predicts the NEXT feature too, and feeds it back to itself</text>
+  <text class="sub" x="440" y="190" style="fill:#f2a541">so drafting k tokens costs k tiny passes, not k big ones</text>
+
+  <!-- verify arrow back -->
+  <path class="arrow" d="M 550 220 v 30 H 110 V 224"/>
+  <text class="sub" x="330" y="266" text-anchor="middle">all k drafts go back to the main model and are verified in one pass</text>
+
+  <!-- why it's good / the data -->
+  <text class="key" x="24" y="300">Why features instead of tokens: a token throws away everything the model knew except its final pick. The feature keeps it,</text>
+  <text class="key" x="24" y="316">so a very small head can extrapolate it well. The head is trained afterwards on any frozen model, which is EAGLE's main selling point.</text>
+  <text class="num" x="24" y="344">Measured (vLLM 0.24, BF16): EAGLE-3, k=3 → <tspan style="fill:#f2a541">68.7 tok/s, acceptance 1.74</tspan>. A generic head; the model's own drafter did far better.</text>
+</svg>

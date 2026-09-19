@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" width="800" height="340" role="img" aria-label="NextN: predict the next N tokens in one step and use them as drafts; SGLang's name for running the model's MTP module as the drafter">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .lab { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .sub { font: 400 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .big { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.5; rx: 5; }
+    .bigl { font: 700 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #5aa9e6; text-anchor: middle; }
+    .bigs { font: 400 9.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
+    .mod { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.5; rx: 4; }
+    .modl { font: 700 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; text-anchor: middle; }
+    .tok { rx: 3; } .guess { fill: #3a2c14; stroke: #f2a541; stroke-dasharray: 3 2; } .ok { fill: #17311f; stroke: #5cc48a; stroke-width: 1.5; } .bad { fill: #3f1c20; stroke: #e5646c; stroke-width: 1.5; } .out { fill: #f2a541; }
+    .tokl { font: 600 10px ui-monospace, Menlo, monospace; text-anchor: middle; } .guess + .tokl { fill: #f2a541; } .ok + .tokl { fill: #5cc48a; } .bad + .tokl { fill: #e5646c; } .out + .tokl { fill: #1a1207; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.5; fill: none; marker-end: url(#ah); }
+    .fan { stroke: #f2a541; stroke-width: 1.2; fill: none; }
+    .key { font: 500 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .num { font: 700 11.5px ui-monospace, Menlo, monospace; fill: #dfe6ee; }
+    .step { font: 600 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .f1 { animation: a .4s ease-out both .4s; } .f2 { animation: a .4s ease-out both .6s; } .f3 { animation: a .4s ease-out both .8s; } .f4 { animation: a .4s ease-out both 1.0s; } .f5 { animation: a .4s ease-out both 1.2s; } .f6 { animation: a .4s ease-out both 1.4s; }
+    .v { animation: a .5s ease-out both 2.2s; }
+    @keyframes a { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+  <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker></defs>
+  <rect class="bg" width="800" height="340" rx="6"/>
+  <text class="h" x="24" y="34">NextN: the next N tokens in one drafting step</text>
+  <text class="t" x="776" y="34" text-anchor="end">SGLANG'S NAME FOR MTP AS THE DRAFTER</text>
+
+  <!-- step 1: one drafting step fans out N tokens -->
+  <text class="step" x="24" y="72" style="fill:#f2a541">1. one drafting step, N = 6 tokens ahead</text>
+  <rect class="mod" x="24" y="84" width="130" height="64"/>
+  <text class="modl" x="89" y="108">NextN module</text>
+  <text class="bigs" x="89" y="124">the model's own MTP</text>
+  <text class="bigs" x="89" y="138">head, run as a drafter</text>
+  <g transform="translate(200,101)">
+    <path class="fan" d="M -46 15 H -6"/>
+    <g class="f1"><rect class="tok guess" x="0"   y="0" width="40" height="30"/><text class="tokl" x="20"  y="19">t+1</text></g>
+    <g class="f2"><rect class="tok guess" x="48"  y="0" width="40" height="30"/><text class="tokl" x="68"  y="19">t+2</text></g>
+    <g class="f3"><rect class="tok guess" x="96"  y="0" width="40" height="30"/><text class="tokl" x="116" y="19">t+3</text></g>
+    <g class="f4"><rect class="tok guess" x="144" y="0" width="40" height="30"/><text class="tokl" x="164" y="19">t+4</text></g>
+    <g class="f5"><rect class="tok guess" x="192" y="0" width="40" height="30"/><text class="tokl" x="212" y="19">t+5</text></g>
+    <g class="f6"><rect class="tok guess" x="240" y="0" width="40" height="30"/><text class="tokl" x="260" y="19">t+6</text></g>
+    <text class="sub" x="290" y="19">← N drafts from one cheap step</text>
+  </g>
+
+  <!-- step 2: verify -->
+  <text class="step" x="24" y="184" style="fill:#5aa9e6">2. main model verifies all N in one pass</text>
+  <rect class="big" x="24" y="196" width="130" height="40"/>
+  <text class="bigl" x="89" y="220">ONE 31B forward</text>
+  <g class="v" transform="translate(200,201)">
+    <path class="arrow" d="M -46 15 H -6"/>
+    <rect class="tok ok" x="0"   y="0" width="40" height="30"/><text class="tokl" x="20"  y="19">t+1</text>
+    <rect class="tok ok" x="48"  y="0" width="40" height="30"/><text class="tokl" x="68"  y="19">t+2</text>
+    <rect class="tok ok" x="96"  y="0" width="40" height="30"/><text class="tokl" x="116" y="19">t+3</text>
+    <rect class="tok ok" x="144" y="0" width="40" height="30"/><text class="tokl" x="164" y="19">t+4</text>
+    <rect class="tok bad" x="192" y="0" width="40" height="30"/><text class="tokl" x="212" y="19">t+5</text>
+    <rect class="tok out" x="240" y="0" width="40" height="30"/><text class="tokl" x="260" y="19">t+5′</text>
+    <text class="sub" x="290" y="19">4 kept, 1 fixed, 1 discarded → 5 tokens</text>
+  </g>
+
+  <text class="key" x="24" y="272">N is the same knob the article calls k. Larger N attempts more per step; acceptance decides how many survive. In practice around 4 of 6 did.</text>
+  <text class="key" x="24" y="288">The name is SGLang's: --speculative-algorithm NEXTN runs the model's MTP module as the drafter. Same idea as MTP on vLLM, different engine.</text>
+  <text class="num" x="24" y="316">Measured (SGLang, NVFP4, Triton attention): NextN, k=6 → <tspan style="fill:#f2a541">139.6 tok/s, acceptance ~4.1</tspan>. SGLang's exact best.</text>
+  <text class="sub" x="24" y="332">A lossy variant relaxes the acceptance check and reached 159.4, but that changes the output, so the article compares only the exact numbers.</text>
+</svg>
