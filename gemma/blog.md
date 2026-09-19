@@ -95,30 +95,92 @@ One thing that turned out to matter a lot, which I will come back to, is that no
 
 <img src="assets/quantisation.svg" alt="BF16 uses 16 bits per weight; NVFP4 uses 4 bits plus a shared scale; only the MLP layers of this checkpoint are quantised" width="800">
 
-## First results with the stock engines
+## Running the baseline: BF16 on both engines
 
-I started by trying every combination I could with unmodified engines. Here is what that first pass looked like, measured with the setup above.
+The starting point is the model exactly as Google released it, in BF16, with the MTP drafter, on each engine in turn. Both engines run as one Docker container serving an OpenAI compatible API on port 8000.
 
-| Engine | Weights | Drafter | tok/s | What happened |
-|---|---|---|---|---|
-| SGLang | NVFP4 | MTP, k=6 | 139.6 | worked out of the box |
-| SGLang | NVFP4 | none | 78.9 | the floor without speculation |
-| SGLang | BF16 | MTP, k=6 | 122.4 | worked |
-| vLLM 0.24 | BF16 | MTP, k=6 | 139.4 | worked |
-| vLLM 0.24 | BF16 | none | 60.6 | the floor without speculation |
-| vLLM 0.24 | NVFP4 | any | failed | `tie_weights NotImplementedError` |
-| vLLM nightly | NVFP4 | none | 80.9 | loads, but no speculation |
-| vLLM nightly | NVFP4 | MTP | failed | `Trtllm-gen kernels not found: headDimQk=512` |
+SGLang:
 
-There are two things in this table that I did not expect going in, and both of them shaped the rest of the work.
+```bash
+docker run -d --name gemma --gpus all --shm-size 32g -p 127.0.0.1:8000:8000 \
+  lmsysorg/sglang@sha256:5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3 \
+  bash -c "pip install -q transformers==5.12.1; python3 -m sglang.launch_server \
+    --model-path google/gemma-4-31B-it --tp 1 --attention-backend triton \
+    --speculative-algorithm NEXTN --speculative-draft-model-path google/gemma-4-31B-it-assistant \
+    --speculative-num-steps 5 --speculative-num-draft-tokens 6 --speculative-eagle-topk 1 \
+    --kv-cache-dtype fp8_e4m3 --mem-fraction-static 0.85 --trust-remote-code --host 0.0.0.0 --port 8000"
+```
 
-The first is that speculative decoding is doing most of the work. NVFP4 without a drafter gives about 80 tokens per second on either engine. Adding the drafter takes it to about 140. The quantisation on its own matters much less than the drafter does at concurrency 1. I had assumed the opposite.
+vLLM:
 
-The second is that vLLM with plain BF16 weights and the drafter was already at 139.4, which is essentially the same as SGLang with quantised weights. So the combination I wanted, NVFP4 plus MTP on vLLM, was worth chasing precisely because each half worked on its own and only the combination failed.
+```bash
+docker run -d --name gemma --gpus all --shm-size 32g -p 127.0.0.1:8000:8000 \
+  --entrypoint vllm vllm/vllm-openai@sha256:251eba5cc7c12fed0b75da22a9240e582b1c9e39f6fbc064f86781b963bd814f \
+  serve google/gemma-4-31B-it --tensor-parallel-size 1 \
+    --gpu-memory-utilization 0.90 \
+    --speculative-config '{"method":"mtp","model":"google/gemma-4-31B-it-assistant","num_speculative_tokens":6}' \
+    --trust-remote-code --host 0.0.0.0 --port 8000
+```
 
-The other thing to take from this table is to write down the failures exactly as they appear. Those two error strings are the first and fourth of nine problems I had to solve, and having the exact text saved a lot of re-running later.
+The image tags are pinned to exact digests because both projects move fast and I wanted the numbers to be reproducible. Once the server answers on port 8000, the benchmark is the same for every configuration in this article:
 
-A small correction to something I nearly wrote wrong when I first summarised this work. Every SGLang run above used SGLang's Triton attention backend. I never ran SGLang with FlashInfer. So when I compare vLLM against SGLang at the end, I am comparing vLLM on a patched FlashInfer path against SGLang on Triton, and that is a fair comparison to make but it is not the same as saying both engines used the same attention library.
+```bash
+python3 bench_client.py --url http://localhost:8000/v1/chat/completions \
+  --model google/gemma-4-31B-it --dataset longctx30.jsonl \
+  --concurrency 1 --warmup 2 --json-out result.json
+```
+
+SGLang gave 122.4 tokens per second and vLLM gave 139.4. Both are in the same range, and both are far above what you get with no drafter at all. When I ran vLLM with the drafter turned off, plain BF16 and nothing else, it gave 60.6. So the drafter alone is worth more than double, before any quantisation is involved. That was the first thing I did not expect.
+
+## Adding quantisation: the 139.6 configuration
+
+The next step is the NVFP4 checkpoint, still with the MTP drafter. On SGLang this is one flag away from the baseline: change the model path and keep everything else.
+
+```bash
+docker run -d --name gemma --gpus all --shm-size 32g -p 127.0.0.1:8000:8000 \
+  lmsysorg/sglang@sha256:5027e95bf6ec536856b1b52a91d1f35ff5c564ab83e8a94758a169ff09bb8df3 \
+  bash -c "pip install -q transformers==5.12.1; python3 -m sglang.launch_server \
+    --model-path nvidia/Gemma-4-31B-IT-NVFP4 --tp 1 --attention-backend triton \
+    --speculative-algorithm NEXTN --speculative-draft-model-path google/gemma-4-31B-it-assistant \
+    --speculative-num-steps 5 --speculative-num-draft-tokens 6 --speculative-eagle-topk 1 \
+    --kv-cache-dtype fp8_e4m3 --mem-fraction-static 0.85 --trust-remote-code --host 0.0.0.0 --port 8000"
+```
+
+This gave 139.6 tokens per second, which is the best exact result I could get out of SGLang. Notice that it is almost the same number as vLLM on plain BF16. Going from 16 bit weights to 4 bit weights bought SGLang about 17 tokens per second over its own BF16 run, and did not put it ahead of vLLM at all. I will explain why near the end of the article, when we compute how much of each step is actually spent reading weights.
+
+The natural next thing to try is the same combination on vLLM, since vLLM was already ahead in BF16. That is where it stopped working. The release version of vLLM failed to load the NVFP4 checkpoint with `tie_weights NotImplementedError`, and the nightly build loaded it but failed as soon as the drafter was enabled with `Trtllm-gen kernels not found: headDimQk=512`. Two different errors, in two different parts of the engine.
+
+## Patching vLLM: the 150 configuration
+
+The rest of this article is about those two errors and the seven others that followed them. But here is where it ends up, so you can see the destination before the route. The patches, the Dockerfile that applies them and the benchmark client are all in one place on Hugging Face:
+
+```bash
+git clone https://huggingface.co/datasets/abhijithneilabraham/longctx30
+cd longctx30
+docker build -f fpa4fix/Dockerfile.patched -t vllm-gemma4-nvfp4-mtp:latest fpa4fix/
+```
+
+The build takes a few minutes. It upgrades FlashInfer to 0.6.14, applies the seven patches, and then checks itself, so if the head size 512 support is missing it fails there instead of at runtime. Then the launch:
+
+```bash
+docker run -d --name gemma --gpus all --ipc=host --shm-size 32g -p 127.0.0.1:8000:8000 \
+  -v ~/.cache/huggingface:/root/.cache/huggingface -e HF_TOKEN="${HF_TOKEN:-}" \
+  -e FLASHINFER_DISABLE_VERSION_CHECK=1 \
+  -e VLLM_DISABLED_KERNELS=MarlinNvFp4LinearKernel \
+  -e VLLM_FLASHINFER_WORKSPACE_BUFFER_SIZE=2147483648 \
+  vllm-gemma4-nvfp4-mtp:latest \
+  --model nvidia/Gemma-4-31B-IT-NVFP4 --served-model-name nvidia/Gemma-4-31B-IT-NVFP4 \
+  --quantization modelopt --kv-cache-dtype fp8 \
+  --speculative-config '{"method":"mtp","model":"google/gemma-4-31B-it-assistant","num_speculative_tokens":8}' \
+  --max-model-len 16384 --block-size 16 --no-enable-prefix-caching \
+  --compilation-config '{"cudagraph_mode":"PIECEWISE"}' --port 8000
+```
+
+This gives 150.0 tokens per second, with exactly the same output as the unpatched model would produce. That is 7.5 percent ahead of SGLang's best, on the same GPU, the same prompts and the same client.
+
+Three things in that command are not optional, and each one is a story. The `--compilation-config` flag with PIECEWISE is the fix for a kernel that is correct but crashes inside CUDA graphs. The three environment variables are there because of specific failures with kernel selection and buffer sizes. And the model runs on FlashInfer's FA2 attention kernel for the ten head size 512 layers, which stock vLLM cannot do. Take any of them away and you get either a crash or a much slower number: with `--enforce-eager` instead of PIECEWISE it is 46.7, and with the 512 layers sent to a Triton kernel instead of FA2 it is 115.7.
+
+To understand why, we have to look at the model itself.
 
 ## Understanding the model before touching the engine
 
