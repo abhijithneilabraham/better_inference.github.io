@@ -73,21 +73,19 @@ The important thing to understand is that this is exact. The output is the same 
 
 MTP stands for multi token prediction. It is the name for the kind of drafter Google shipped for Gemma 4, where the drafter is a small set of extra layers trained alongside the main model to predict ahead. It shares the main model's KV cache, which makes it cheap to run.
 
-There are a few different ways to build the drafter, and the results table below has three of them, so it is worth knowing how they differ.
+There are a few different ways to build the drafter, and three of them appear in the results below.
 
-**EAGLE** uses a separate lightweight draft head to generate future tokens. What makes it different is what the head reads: not the previous token, but the main model's hidden feature vector, which is the state the model had just before it picked a token. A small head can extrapolate that vector well, so it drafts several tokens cheaply, and then the expensive main model verifies them in one pass. The head is trained afterwards on a frozen model, which is convenient, but it is also why it knows the model less well than a drafter trained with it.
+**EAGLE** uses a separate lightweight draft model to guess the next few tokens. The expensive main model then checks those guesses in one pass and keeps the ones that match. The main model runs once to verify several tokens instead of once per token, and that is where the saving comes from.
 
-<img src="assets/eagle.svg" alt="EAGLE: a small separate head drafts tokens from the main model's hidden features, then the main model verifies them" width="800">
+<img src="assets/eagle.svg" alt="EAGLE: a small separate draft model guesses the next tokens, the main model checks them in one pass" width="800">
 
-**MTP**, multi token prediction, lets the model predict several future tokens in one step. The main model has additional small prediction modules attached to it, trained together with it, and each module takes the trunk's final hidden state plus the next token's embedding and predicts one token further. The modules are small, so drafting costs a fraction of a full forward pass, and no separate draft model has to be loaded into memory. Because they were trained with the model, their guesses match it far more often.
+**MTP**, multi token prediction, lets the model predict several future tokens in one step. Instead of a separate draft model, the main model itself has extra prediction heads attached to it, trained together with it, and each head predicts one token further ahead. The heads are small, so the extra work is cheap, and nothing extra has to be loaded into memory.
 
-<img src="assets/mtp.svg" alt="MTP: prediction modules attached to the main model, trained with it, each predicting one token further" width="800">
+<img src="assets/mtp.svg" alt="MTP: the main model has extra prediction heads that produce several future tokens in one step" width="800">
 
-**NextN** predicts the next N tokens ahead instead of only the next one, and uses those N predictions as drafts for the main model to verify. It is SGLang's name for running a model's MTP module as the drafter, so it is the same idea as MTP on vLLM, implemented in a different engine. N is the same knob this article calls k.
+**NextN** predicts the next N tokens ahead in one step instead of only the next one. Those N predictions are used as draft tokens, and the main model verifies them and keeps the ones that are right.
 
-<img src="assets/nextn.svg" alt="NextN: the model's MTP module drafts the next N tokens in one step, then the main model verifies them" width="800">
-
-The measured difference between these on this model was large. On vLLM 0.24 with BF16 weights, EAGLE-3 at k=3 gave 68.7 tokens per second with an acceptance of 1.74, while MTP at k=6 gave 139.4 with an acceptance of 3.79. A drafter that was trained with the model is worth about twice the speed of a generic one here.
+<img src="assets/nextn.svg" alt="NextN: predict the next N tokens in one step, then the main model verifies them" width="800">
 
 ### Quantisation and NVFP4
 
