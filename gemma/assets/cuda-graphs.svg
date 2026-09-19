@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="Without CUDA graphs the CPU launches each kernel and the GPU idles between; with a graph the whole sequence replays as one launch">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .lab { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .sub { font: 400 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .lane { font: 600 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .05em; text-anchor: end; }
+    .axis { stroke: #2e3a47; stroke-width: 1; }
+    .cpu { fill: #3a2c14; stroke: #f2a541; stroke-width: 1; rx: 2; }
+    .k { fill: #16314a; stroke: #5aa9e6; stroke-width: 1; rx: 2; }
+    .idle { fill: #3f1c20; opacity: .7; rx: 2; }
+    .kl { font: 600 9px ui-monospace, Menlo, monospace; fill: #5aa9e6; text-anchor: middle; }
+    .il { font: 600 8.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #e5646c; text-anchor: middle; }
+    .graph { fill: none; stroke: #5aa9e6; stroke-width: 1.5; stroke-dasharray: 4 3; rx: 4; }
+    .cursor { stroke: #f2a541; stroke-width: 2; animation: sweep 3s linear infinite; }
+    @keyframes sweep { from { transform: translateX(0); } to { transform: translateX(560px); } }
+    .res { font: 700 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; text-anchor: end; }
+  </style>
+  <rect class="bg" width="800" height="320" rx="6"/>
+  <text class="h" x="24" y="34">What a CUDA graph removes</text>
+  <text class="t" x="776" y="34" text-anchor="end">SAME SIX KERNELS, TWO WAYS</text>
+
+  <!-- ===== eager ===== -->
+  <text class="lab" x="24" y="72">Without a graph (eager)</text>
+  <text class="res" x="776" y="72" style="fill:#e5646c">GPU idles between every kernel</text>
+  <text class="lane" x="150" y="98">CPU launches</text>
+  <text class="lane" x="150" y="130">GPU runs</text>
+  <g transform="translate(160,86)">
+    <!-- cpu launch blips -->
+    <rect class="cpu" x="0"   y="0" width="14" height="16"/><rect class="cpu" x="92"  y="0" width="14" height="16"/><rect class="cpu" x="184" y="0" width="14" height="16"/><rect class="cpu" x="276" y="0" width="14" height="16"/><rect class="cpu" x="368" y="0" width="14" height="16"/><rect class="cpu" x="460" y="0" width="14" height="16"/>
+    <!-- gpu: kernel, idle, kernel, idle ... -->
+    <rect class="k" x="16"  y="32" width="52" height="18"/><text class="kl" x="42"  y="44">norm</text>
+    <rect class="idle" x="70" y="32" width="38" height="18"/><text class="il" x="89" y="44">idle</text>
+    <rect class="k" x="108" y="32" width="52" height="18"/><text class="kl" x="134" y="44">gemm</text>
+    <rect class="idle" x="162" y="32" width="38" height="18"/><text class="il" x="181" y="44">idle</text>
+    <rect class="k" x="200" y="32" width="52" height="18"/><text class="kl" x="226" y="44">attn</text>
+    <rect class="idle" x="254" y="32" width="38" height="18"/><text class="il" x="273" y="44">idle</text>
+    <rect class="k" x="292" y="32" width="52" height="18"/><text class="kl" x="318" y="44">norm</text>
+    <rect class="idle" x="346" y="32" width="38" height="18"/><text class="il" x="365" y="44">idle</text>
+    <rect class="k" x="384" y="32" width="52" height="18"/><text class="kl" x="410" y="44">gemm</text>
+    <rect class="idle" x="438" y="32" width="38" height="18"/><text class="il" x="457" y="44">idle</text>
+    <rect class="k" x="476" y="32" width="52" height="18"/><text class="kl" x="502" y="44">gemm</text>
+    <line class="cursor" x1="0" y1="-4" x2="0" y2="54"/>
+  </g>
+  <text class="sub" x="160" y="158">Thousands of these per token. The red gaps are pure waste, and they add up to most of the step.</text>
+
+  <line class="axis" x1="24" y1="176" x2="776" y2="176"/>
+
+  <!-- ===== graph ===== -->
+  <text class="lab" x="24" y="206">With a CUDA graph</text>
+  <text class="res" x="776" y="206" style="fill:#5aa9e6">one launch, kernels run back to back</text>
+  <text class="lane" x="150" y="232">CPU launches</text>
+  <text class="lane" x="150" y="264">GPU runs</text>
+  <g transform="translate(160,220)">
+    <rect class="cpu" x="0" y="0" width="14" height="16"/>
+    <rect class="graph" x="14" y="28" width="330" height="26"/>
+    <rect class="k" x="18"  y="32" width="52" height="18"/><text class="kl" x="44"  y="44">norm</text>
+    <rect class="k" x="72"  y="32" width="52" height="18"/><text class="kl" x="98"  y="44">gemm</text>
+    <rect class="k" x="126" y="32" width="52" height="18"/><text class="kl" x="152" y="44">attn</text>
+    <rect class="k" x="180" y="32" width="52" height="18"/><text class="kl" x="206" y="44">norm</text>
+    <rect class="k" x="234" y="32" width="52" height="18"/><text class="kl" x="260" y="44">gemm</text>
+    <rect class="k" x="288" y="32" width="52" height="18"/><text class="kl" x="314" y="44">gemm</text>
+    <text class="sub" x="356" y="45">← same work, no gaps</text>
+  </g>
+  <text class="sub" x="24" y="292">The sequence is recorded once and replayed. The catch: every kernel inside it must behave identically on every replay.</text>
+  <text class="sub" x="24" y="308">A kernel whose launch shape depends on the input can be correct in eager mode and still fault here. That is what happened.</text>
+</svg>

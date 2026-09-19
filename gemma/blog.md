@@ -26,6 +26,8 @@ If those 500 words can be generated in as little time as possible, the user will
 
 One more thing worth knowing before we start. There are two phases when a model answers a request. The first is reading the prompt, which is called prefill, and the second is producing the answer one token at a time, which is called decode. The time to the first token is mostly prefill, and the TPS number is mostly about decode. Everything in this article is about decode, because that is where the user spends most of their time waiting when the answer is long.
 
+<img src="assets/prefill-decode.svg" alt="Prefill reads the whole prompt in one pass; decode produces one token per pass, and that is where tokens per second is measured" width="800">
+
 ## Experiment Setup
 
 I want to be precise about the setup, because every number in this article comes from it, and if you change any part of it the numbers will move.
@@ -61,7 +63,11 @@ Before the results, two concepts need explaining, because almost all of the spee
 
 A normal decode step produces exactly one token. The model reads all of its weights from memory, does a forward pass, and out comes one token. For a 31B model in BF16 that is about 60 GB of weights read for every single token, and at 6.85 TB/s that read alone takes about 9 milliseconds. So even if everything else were free, you could not get much past 110 tokens per second this way.
 
+<img src="assets/memory-bound.svg" alt="Every decode step reads all the weights from memory; bandwidth divided by bytes sets the ceiling" width="800">
+
 Speculative decoding changes the arithmetic. A small fast model, the drafter, guesses the next several tokens. Then the big model checks all of those guesses in one forward pass, which costs about the same as producing one token. Every guess that was correct is kept, and the first wrong one is replaced with what the big model would have said. So for one expensive forward pass you might get four or five tokens instead of one.
+
+<img src="assets/speculative-decoding.svg" alt="A drafter guesses four tokens, the big model verifies all four in one pass, three are kept and the fourth is replaced" width="800">
 
 The important thing to understand is that this is exact. The output is the same as if the big model had generated every token itself, because the big model verifies every one. The drafter only changes how fast you get there, never what you get. The number of tokens the drafter attempts per step is called k, and the average number that get accepted is called the acceptance rate. In this article, with a good drafter, the acceptance was around 4 tokens per step.
 
@@ -72,6 +78,8 @@ MTP stands for multi token prediction. It is the name for the kind of drafter Go
 The other idea is to make the weights smaller so there is less to read. The BF16 checkpoint stores each weight in 16 bits. NVFP4 stores most of them in 4 bits, with a small scaling factor shared across groups of 16 weights. That is four times fewer bytes for the layers that are quantised, and Blackwell GPUs have tensor cores that can multiply in this format directly.
 
 One thing that turned out to matter a lot, which I will come back to, is that not every layer in this checkpoint is quantised. Only the feed forward layers, the MLPs, are in 4 bits. The attention layers and the output head are left in BF16. That is a decision NVIDIA made when they made the checkpoint, and it has consequences for both the speed and the engineering.
+
+<img src="assets/quantisation.svg" alt="BF16 uses 16 bits per weight; NVFP4 uses 4 bits plus a shared scale; only the MLP layers of this checkpoint are quantised" width="800">
 
 ## First results with the stock engines
 
@@ -107,6 +115,8 @@ Gemma 4 with 31B parameters has 60 transformer layers. Fifty of them use sliding
 <img src="assets/layers.svg" alt="Sixty layers, ten of them with head size 512 highlighted" width="800">
 
 That head size of 512 is the root of almost everything that follows. Most attention kernels are written and tested for head sizes up to 256. The kernel library that vLLM picks automatically for decode on Blackwell, which is called trtllm-gen, does not have a 512 kernel at all. And this is not a setting you can lower. The size 512 is baked into the trained weights of those ten layers, because their query, key and value projections were trained to produce 512 wide heads. If you told the engine to treat them as 256 you would be reading the weights incorrectly and the output would be nonsense. The only way through is a kernel that genuinely computes attention at head size 512.
+
+<img src="assets/head-dim.svg" alt="Attention splits the hidden vector into heads; sliding layers use 256-wide heads, global layers use 512-wide heads that most kernels cannot handle" width="800">
 
 The second fact came from the quantisation config. It has a list called `exclude_modules`, and that list contains every attention module, plus the output head, plus the vision layers. So the attention is not quantised at all. Only the MLP layers are in NVFP4. The queries, keys, values and outputs of attention are all BF16.
 
@@ -148,6 +158,8 @@ The fourth is the important one. On Blackwell, vLLM's FlashInfer backend chooses
 
 The fifth and sixth are the same problem twice. The FA2 kernel cannot read a KV cache stored in FP8. But only the ten 512 layers use FA2. So only those ten layers get a BF16 KV cache, using a vLLM setting called `kv_cache_dtype_skip_layers`, and the other fifty stay in FP8. Then the same thing again for the drafter, which has its own 512 layer. I think this is the most reusable trick in the whole project: choosing the cache precision per layer based on which kernel that layer needs, rather than based on accuracy.
 
+<img src="assets/kv-split.svg" alt="Fifty layers keep an FP8 KV cache; the ten head-size-512 layers get BF16 because the FA2 kernel cannot read FP8" width="800">
+
 The seventh was not in my code at all. The FlashInfer version bundled with vLLM was 0.6.13, and the fix that lets FA2 handle head size 512 arrived in 0.6.14. Without it, the code that picks the tile size returns a configuration that fails a register budget check, and you get an alarming looking `Invalid configuration` error from deep inside a CUDA file. The fix was a version bump. There was a complication, which is that there is no 0.6.14 build of the precompiled kernel package, because the 512 entry was removed to keep the package under GitHub's size limit. So you install the 0.6.14 Python package with the 0.6.13 kernel package and tell FlashInfer to ignore the version mismatch. This is safe, and it took me a while to be sure it was safe, because the 512 kernel is compiled on first use from headers in the Python package and never touches the precompiled package at all.
 
 The eighth is a buffer size. FA2 at head size 512 needs about 767 MB of scratch space and the default is 394 MB. You set it to 2 GB and move on.
@@ -163,6 +175,8 @@ If I started the server with `--enforce-eager`, which turns CUDA graphs off enti
 So the kernel was numerically correct. It just was not safe to run inside a CUDA graph on this GPU. And the lesson that I want to underline is that warmup and graph capture use dummy data. A kernel can pass all of that and still crash on real inputs. The server starting successfully tells you nothing. Only a real request does.
 
 This needs a short explanation of what a CUDA graph is. Normally, every operation in the model, every matrix multiply and every normalisation, is launched from Python one at a time, and the GPU sits idle for a moment between each launch. For a big model that is thousands of launches per token and the idle gaps add up to a large fraction of the step time. A CUDA graph records the whole sequence of launches once and then replays it as a single unit, which removes almost all of that overhead. It is one of the biggest single speedups in serving, which is why turning it off cost so much.
+
+<img src="assets/cuda-graphs.svg" alt="Without a CUDA graph the GPU idles between every kernel launch; with one, the whole sequence replays as a single launch" width="800">
 
 <img src="assets/graph-modes.svg" alt="The same forward pass run in eager mode, in a full CUDA graph, and in piecewise mode" width="800">
 

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" width="800" height="280" role="img" aria-label="Fifty layers keep an FP8 KV cache; the ten head-size-512 layers get BF16 because the FA2 kernel cannot read FP8">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .sub { font: 400 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .key { font: 500 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .fp8  { fill: #5aa9e6; opacity: .55; }
+    .bf16 { fill: #f2a541; }
+    .n { font: 700 9px ui-monospace, Menlo, monospace; fill: #1a1207; text-anchor: middle; }
+    .base { stroke: #2e3a47; stroke-width: 1; }
+    .lane { font: 600 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .05em; }
+    .bf16 { animation: rise .8s cubic-bezier(.2,.8,.2,1) both; transform-box: fill-box; transform-origin: bottom; }
+    @keyframes rise { from { transform: scaleY(.5); } }
+    .arrow { font: 600 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; }
+  </style>
+  <rect class="bg" width="800" height="280" rx="6"/>
+  <text class="h" x="24" y="34">Per-layer KV cache precision, chosen by kernel</text>
+  <text class="t" x="776" y="34" text-anchor="end">PATCHES 05 AND 06</text>
+
+  <text class="lane" x="24" y="66">KV CACHE, ONE COLUMN PER LAYER</text>
+  <line class="base" x1="24" y1="140" x2="776" y2="140"/>
+  <!-- 60 columns, 12.3 wide; global at 5,11,...,59 -->
+  <g transform="translate(24,80)">
+    <rect class="fp8" x="0"    y="30" width="10" height="30"/><rect class="fp8" x="12.5" y="30" width="10" height="30"/><rect class="fp8" x="25"   y="30" width="10" height="30"/><rect class="fp8" x="37.5" y="30" width="10" height="30"/><rect class="fp8" x="50"   y="30" width="10" height="30"/>
+    <rect class="bf16" x="62.5" y="0" width="10" height="60"/><text class="n" x="67.5" y="55">5</text>
+    <rect class="fp8" x="75"   y="30" width="10" height="30"/><rect class="fp8" x="87.5" y="30" width="10" height="30"/><rect class="fp8" x="100"  y="30" width="10" height="30"/><rect class="fp8" x="112.5" y="30" width="10" height="30"/><rect class="fp8" x="125"  y="30" width="10" height="30"/>
+    <rect class="bf16" x="137.5" y="0" width="10" height="60"/><text class="n" x="142.5" y="55">11</text>
+    <rect class="fp8" x="150"  y="30" width="10" height="30"/><rect class="fp8" x="162.5" y="30" width="10" height="30"/><rect class="fp8" x="175"  y="30" width="10" height="30"/><rect class="fp8" x="187.5" y="30" width="10" height="30"/><rect class="fp8" x="200"  y="30" width="10" height="30"/>
+    <rect class="bf16" x="212.5" y="0" width="10" height="60"/><text class="n" x="217.5" y="55">17</text>
+    <rect class="fp8" x="225"  y="30" width="10" height="30"/><rect class="fp8" x="237.5" y="30" width="10" height="30"/><rect class="fp8" x="250"  y="30" width="10" height="30"/><rect class="fp8" x="262.5" y="30" width="10" height="30"/><rect class="fp8" x="275"  y="30" width="10" height="30"/>
+    <rect class="bf16" x="287.5" y="0" width="10" height="60"/><text class="n" x="292.5" y="55">23</text>
+    <rect class="fp8" x="300"  y="30" width="10" height="30"/><rect class="fp8" x="312.5" y="30" width="10" height="30"/><rect class="fp8" x="325"  y="30" width="10" height="30"/><rect class="fp8" x="337.5" y="30" width="10" height="30"/><rect class="fp8" x="350"  y="30" width="10" height="30"/>
+    <rect class="bf16" x="362.5" y="0" width="10" height="60"/><text class="n" x="367.5" y="55">29</text>
+    <rect class="fp8" x="375"  y="30" width="10" height="30"/><rect class="fp8" x="387.5" y="30" width="10" height="30"/><rect class="fp8" x="400"  y="30" width="10" height="30"/><rect class="fp8" x="412.5" y="30" width="10" height="30"/><rect class="fp8" x="425"  y="30" width="10" height="30"/>
+    <rect class="bf16" x="437.5" y="0" width="10" height="60"/><text class="n" x="442.5" y="55">35</text>
+    <rect class="fp8" x="450"  y="30" width="10" height="30"/><rect class="fp8" x="462.5" y="30" width="10" height="30"/><rect class="fp8" x="475"  y="30" width="10" height="30"/><rect class="fp8" x="487.5" y="30" width="10" height="30"/><rect class="fp8" x="500"  y="30" width="10" height="30"/>
+    <rect class="bf16" x="512.5" y="0" width="10" height="60"/><text class="n" x="517.5" y="55">41</text>
+    <rect class="fp8" x="525"  y="30" width="10" height="30"/><rect class="fp8" x="537.5" y="30" width="10" height="30"/><rect class="fp8" x="550"  y="30" width="10" height="30"/><rect class="fp8" x="562.5" y="30" width="10" height="30"/><rect class="fp8" x="575"  y="30" width="10" height="30"/>
+    <rect class="bf16" x="587.5" y="0" width="10" height="60"/><text class="n" x="592.5" y="55">47</text>
+    <rect class="fp8" x="600"  y="30" width="10" height="30"/><rect class="fp8" x="612.5" y="30" width="10" height="30"/><rect class="fp8" x="625"  y="30" width="10" height="30"/><rect class="fp8" x="637.5" y="30" width="10" height="30"/><rect class="fp8" x="650"  y="30" width="10" height="30"/>
+    <rect class="bf16" x="662.5" y="0" width="10" height="60"/><text class="n" x="667.5" y="55">53</text>
+    <rect class="fp8" x="675"  y="30" width="10" height="30"/><rect class="fp8" x="687.5" y="30" width="10" height="30"/><rect class="fp8" x="700"  y="30" width="10" height="30"/><rect class="fp8" x="712.5" y="30" width="10" height="30"/><rect class="fp8" x="725"  y="30" width="10" height="30"/>
+    <rect class="bf16" x="737.5" y="0" width="10" height="60"/><text class="n" x="742.5" y="55">59</text>
+  </g>
+
+  <g transform="translate(24,166)">
+    <rect class="fp8" x="0" y="0" width="12" height="12"/><text class="key" x="18" y="11">50 sliding layers keep <tspan style="font-family:ui-monospace,Menlo,monospace">FP8</tspan> KV. Their kernel reads it fine and it is half the bytes.</text>
+    <rect class="bf16" x="0" y="22" width="12" height="12" style="animation:none"/><text class="key" x="18" y="33">10 global layers get <tspan style="font-family:ui-monospace,Menlo,monospace">BF16</tspan> KV. The FA2 kernel that handles head size 512 cannot read FP8, so these are the only ones that need it.</text>
+  </g>
+  <text class="arrow" x="24" y="222">The setting is kv_cache_dtype_skip_layers, and it is a list of layer indices. That is the whole patch.</text>
+  <text class="sub" x="24" y="244">The point is that the split is chosen for kernel compatibility, not for accuracy, and it is applied to exactly the layers that need it and no more.</text>
+  <text class="sub" x="24" y="262">The drafter has its own head size 512 layer that shares this cache, so patch 06 does the same thing for it.</text>
+</svg>

@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 430" width="800" height="430" role="img" aria-label="Normal decoding produces one token per forward pass; speculative decoding drafts several and verifies them in one pass">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .lab { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .sub { font: 400 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .big { fill: #5aa9e6; opacity: .35; stroke: #5aa9e6; stroke-width: 1.5; }
+    .bigl { font: 600 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #5aa9e6; text-anchor: middle; }
+    .small { fill: #f2a541; opacity: .35; stroke: #f2a541; stroke-width: 1.5; }
+    .smalll { font: 600 9px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; text-anchor: middle; }
+    .tok { rx: 3; }
+    .tokl { font: 600 10px ui-monospace, Menlo, monospace; text-anchor: middle; }
+    .out { fill: #f2a541; } .out + .tokl { fill: #1a1207; }
+    .guess { fill: #3a2c14; stroke: #f2a541; stroke-width: 1; stroke-dasharray: 3 2; } .guess + .tokl { fill: #f2a541; }
+    .ok { fill: #17311f; stroke: #5cc48a; stroke-width: 1.5; } .ok + .tokl { fill: #5cc48a; }
+    .bad { fill: #3f1c20; stroke: #e5646c; stroke-width: 1.5; } .bad + .tokl { fill: #e5646c; }
+    .fix { fill: #5cc48a; } .fix + .tokl { fill: #1a1207; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.5; fill: none; marker-end: url(#ah); }
+    .axis { stroke: #2e3a47; stroke-width: 1; }
+    .g { animation: appear .5s ease-out both; }
+    .g.d1 { animation-delay: .8s; } .g.d2 { animation-delay: 1.0s; } .g.d3 { animation-delay: 1.2s; } .g.d4 { animation-delay: 1.4s; }
+    .v { animation: appear .5s ease-out both; animation-delay: 2.4s; }
+    .r { animation: appear .5s ease-out both; animation-delay: 3.4s; }
+    @keyframes appear { from { opacity: 0; } to { opacity: 1; } }
+    .n1 { animation: appear .4s ease-out both; animation-delay: .6s; }
+    .n2 { animation: appear .4s ease-out both; animation-delay: 1.6s; }
+    .n3 { animation: appear .4s ease-out both; animation-delay: 2.6s; }
+    .n4 { animation: appear .4s ease-out both; animation-delay: 3.6s; }
+    .win { font: 800 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; }
+  </style>
+  <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker></defs>
+  <rect class="bg" width="800" height="430" rx="6"/>
+  <text class="h" x="24" y="34">Speculative decoding: more tokens per expensive pass</text>
+  <text class="t" x="776" y="34" text-anchor="end">K = 4 SHOWN</text>
+
+  <!-- ===== normal ===== -->
+  <text class="lab" x="24" y="72">Normal decoding</text>
+  <text class="sub" x="24" y="88">every token costs one full pass of the 31B model</text>
+  <g transform="translate(24,100)">
+    <g class="n1"><rect class="big" x="0" y="0" width="90" height="34" rx="4"/><text class="bigl" x="45" y="21">31B forward</text><rect class="tok out" x="98" y="4" width="36" height="26"/><text class="tokl" x="116" y="21">the</text></g>
+    <g class="n2"><rect class="big" x="150" y="0" width="90" height="34" rx="4"/><text class="bigl" x="195" y="21">31B forward</text><rect class="tok out" x="248" y="4" width="36" height="26"/><text class="tokl" x="266" y="21">cat</text></g>
+    <g class="n3"><rect class="big" x="300" y="0" width="90" height="34" rx="4"/><text class="bigl" x="345" y="21">31B forward</text><rect class="tok out" x="398" y="4" width="36" height="26"/><text class="tokl" x="416" y="21">sat</text></g>
+    <g class="n4"><rect class="big" x="450" y="0" width="90" height="34" rx="4"/><text class="bigl" x="495" y="21">31B forward</text><rect class="tok out" x="548" y="4" width="36" height="26"/><text class="tokl" x="566" y="21">on</text></g>
+  </g>
+  <text class="sub" x="624" y="122">4 passes → 4 tokens</text>
+  <line class="axis" x1="24" y1="160" x2="776" y2="160"/>
+
+  <!-- ===== speculative ===== -->
+  <text class="lab" x="24" y="192">Speculative decoding</text>
+  <text class="sub" x="24" y="208">a small drafter guesses ahead, the 31B model checks all guesses in one pass</text>
+
+  <!-- step 1: draft -->
+  <text class="sub" x="24" y="240" style="fill:#f2a541;font-weight:600">1. draft</text>
+  <g transform="translate(24,246)">
+    <g class="g d1"><rect class="small" x="0" y="0" width="52" height="26" rx="3"/><text class="smalll" x="26" y="17">drafter</text><rect class="tok guess" x="56" y="0" width="36" height="26"/><text class="tokl" x="74" y="17">the</text></g>
+    <g class="g d2"><rect class="small" x="100" y="0" width="52" height="26" rx="3"/><text class="smalll" x="126" y="17">drafter</text><rect class="tok guess" x="156" y="0" width="36" height="26"/><text class="tokl" x="174" y="17">cat</text></g>
+    <g class="g d3"><rect class="small" x="200" y="0" width="52" height="26" rx="3"/><text class="smalll" x="226" y="17">drafter</text><rect class="tok guess" x="256" y="0" width="36" height="26"/><text class="tokl" x="274" y="17">sat</text></g>
+    <g class="g d4"><rect class="small" x="300" y="0" width="52" height="26" rx="3"/><text class="smalll" x="326" y="17">drafter</text><rect class="tok guess" x="356" y="0" width="36" height="26"/><text class="tokl" x="374" y="17">by</text></g>
+  </g>
+  <text class="sub" x="424" y="263">4 cheap guesses</text>
+
+  <!-- step 2: verify -->
+  <text class="sub" x="24" y="300" style="fill:#5aa9e6;font-weight:600">2. verify, all at once</text>
+  <g class="v" transform="translate(24,306)">
+    <rect class="big" x="0" y="0" width="140" height="34" rx="4"/><text class="bigl" x="70" y="21">ONE 31B forward</text>
+    <path class="arrow" d="M 148 17 H 176"/>
+    <rect class="tok ok" x="184" y="4" width="36" height="26"/><text class="tokl" x="202" y="21">the</text>
+    <rect class="tok ok" x="228" y="4" width="36" height="26"/><text class="tokl" x="246" y="21">cat</text>
+    <rect class="tok ok" x="272" y="4" width="36" height="26"/><text class="tokl" x="290" y="21">sat</text>
+    <rect class="tok bad" x="316" y="4" width="36" height="26"/><text class="tokl" x="334" y="21">by</text>
+    <text class="sub" x="364" y="21">✓ ✓ ✓ ✗  first three match, fourth does not</text>
+  </g>
+
+  <!-- step 3: result -->
+  <text class="sub" x="24" y="366" style="fill:#5cc48a;font-weight:600">3. keep the matches, replace the miss with the big model's own token</text>
+  <g class="r" transform="translate(24,372)">
+    <rect class="tok out" x="0"   y="0" width="36" height="26"/><text class="tokl" x="18"  y="17">the</text>
+    <rect class="tok out" x="44"  y="0" width="36" height="26"/><text class="tokl" x="62"  y="17">cat</text>
+    <rect class="tok out" x="88"  y="0" width="36" height="26"/><text class="tokl" x="106" y="17">sat</text>
+    <rect class="tok fix" x="132" y="0" width="36" height="26"/><text class="tokl" x="150" y="17">on</text>
+    <text class="win" x="184" y="19">1 pass → 4 tokens</text>
+    <text class="sub" x="330" y="19">same output as normal decoding, exactly. Only the speed changed.</text>
+  </g>
+</svg>
