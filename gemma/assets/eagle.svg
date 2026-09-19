@@ -78,5 +78,5 @@
   <!-- why it's good / the data -->
   <text class="key" x="24" y="300">Why features instead of tokens: a token throws away everything the model knew except its final pick. The feature keeps it,</text>
   <text class="key" x="24" y="316">so a very small head can extrapolate it well. The head is trained afterwards on any frozen model, which is EAGLE's main selling point.</text>
-  <text class="num" x="24" y="344">Measured (vLLM 0.24, BF16): EAGLE-3, k=3 → <tspan style="fill:#f2a541">68.7 tok/s, acceptance 1.74</tspan>. A generic head; the model's own drafter did far better.</text>
+  <text class="num" x="24" y="344">Measured (vLLM 0.24, BF16): EAGLE-3, k=3 → <tspan style="fill:#f2a541">68.7 tok/s, acceptance 1.74</tspan>. MTP, trained with the model, reached 139.4.</text>
 </svg>
