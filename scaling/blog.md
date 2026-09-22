@@ -92,13 +92,31 @@ This is why large inference systems scale horizontally, many copies of the same 
 
 **Continuous batching on every replica.** This is what makes one GPU able to serve many concurrent users economically instead of one at a time. Requests that arrive close together get processed as one batch on the GPU, sharing the cost of reading the model's weights across all of them, which is why concurrency past 1 is so much cheaper per request than concurrency at 1.
 
-**Prefix caching for shared context.** When many requests share a common system prompt or repeated context, caching that shared portion once instead of recomputing it for every request cuts the work each request needs, and raises the effective concurrency ceiling for free.
+**Prefix caching for shared context.** When many requests share a common system prompt or repeated context, caching that shared portion once instead of recomputing it for every request cuts the work each request needs, and raises the effective concurrency ceiling for free. How large that effect can be is worth seeing in a real system, below.
 
 **A queue with backpressure, not unbounded fan-out.** Past the ceiling, a system should reject or delay new requests deliberately, rather than accepting everything and letting every replica's queue grow until every user times out. A controlled slowdown for a fraction of users is a better failure mode than an uncontrolled one for all of them.
 
 **Multi-region placement.** This is mainly about latency, serving users from a location close to them, and about resilience, surviving one region having a problem. Extra regions add capacity too, but that should not be the main reason for adding them.
 
 **Cold start matters more, not less, at this scale.** Autoscaling means new replicas start up during real traffic spikes, exactly when speed matters most. A replica that takes minutes to become ready arrives too late to help with the burst that triggered it. This is a large enough topic on its own to deserve its own article: [Reducing the cold start time of an LLM server](/cold-start/).
+
+## A real example
+
+Everything above shows up in a real deployment: a public load test of DeepSeek-V4-Flash-0731, a large mixture-of-experts model, on one node of 8 NVIDIA B300 GPUs running vLLM.
+
+The test itself was exactly the shape described earlier: 10k-token inputs, ramped from 50 to 2,000 requests per minute over 10 minutes, held for 5 minutes, set to abort if p95 time-to-first-token passed 4 seconds or errors passed 10%. It completed the full ramp and hold without tripping either limit.
+
+Little's Law shows up directly in the raw numbers, not just as a teaching formula. Near the end of the run, about 1,119 requests per minute were completing, about 18.65 per second, each taking around 10 seconds end to end. 18.65 × 10 is about 186, and the harness was independently tracking around 190 to 196 requests actually running at once, the small gap being a handful of requests briefly queued rather than running.
+
+Memory was the ceiling, not compute, here too. Split across 8 GPUs, the model's KV cache alone reserved about 214 GiB per GPU rank, before counting the model's own weights.
+
+Workload shape decided the outcome more than the hardware did. The same server, same GPUs, same flags were tested against three different kinds of traffic. Synthetic sessions, each with a unique 10,000-token document that had to be computed from scratch every time, started struggling around 200 requests per minute. Replayed real user conversations, where later messages in a thread share most of their tokens with earlier ones, took the identical hardware to nearly 10 million tokens per minute of offered load without aborting. Nothing about the GPUs changed between these two results, only how much of each request the KV cache had already seen.
+
+That also means the headline number needs a second look before it is trusted. At peak, the system was offered about 10.2 million tokens per minute, but 97% of that was input, and 96.7% of the input was a cache hit rather than newly computed. The actual compute, real prefill plus real decode, was closer to 10,700 tokens per second. Both numbers are genuine, but they answer different questions: the first is how much traffic this exact workload shape can absorb, the second is how much work the GPUs are doing, and only the second one transfers to a workload with a different amount of shared prefix.
+
+Cold start mattered here too. This server took about 720 seconds, twelve minutes, to become ready, almost all of it CUDA graph capture rather than loading weights. A model this size, run across many replicas, makes the cold start problem covered earlier in this series a direct part of how fast a new replica can actually help during a traffic spike.
+
+Every script and every raw result: [deepseek-v4-flash](https://github.com/abhijithneilabraham/deepseek-v4-flash).
 
 ## Putting the whole thing together
 
