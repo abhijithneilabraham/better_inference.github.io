@@ -154,6 +154,17 @@ python3 harness/run_once.py \
 
 This last one is a real trade, not a free win. Without compilation, every token generated afterwards costs somewhere between 10 and 20 percent more time, for as long as the server stays up. It is worth it for a short lived job that starts, does a small amount of work, and exits. It is usually not worth it for a server meant to stay up and serve traffic for hours, where the steady state cost adds up to far more than the 11 seconds saved at startup.
 
+Here is the full progression from cold start to the fastest restart measured:
+
+| configuration | time | what changed |
+|---|---|---|
+| cold disk, cold compile cache | 159.60s | baseline |
+| warm page cache | 72.63s | pre read the weights once |
+| warm page cache and warm compile cache | 40.24s | stopped deleting the compiled kernels |
+| + smaller CUDA graph capture list | 34.74s | captured 4 batch sizes instead of 67 |
+| + pinned KV cache, piecewise graphs, single process | 29.48s | stacked three more changes |
+| + eager execution | 18.20s | dropped compilation entirely |
+
 ## The floor, and what is actually in it
 
 18.2 seconds is close to the floor for this model on this hardware, so it is worth asking what is actually left in it once nothing can be cut further. One run was instrumented in detail, and it breaks down like this:
@@ -192,9 +203,35 @@ A restart where `max_num_seqs`, `gpu_memory_utilization`, or prefix caching chan
 
 A restart where `max_model_len` or the KV cache dtype changes costs 74 to 84 seconds, because those change the shapes or the data types the compiled kernels were built for, so the old compiled kernels no longer match and have to be rebuilt from scratch.
 
-Timing alone was not treated as sufficient evidence for this distinction, because a slow run and a cache miss can look similar. vLLM prints the exact folder name it is using for the compiled cache, and that name is a hash of everything that affects the compiled result. If two runs print the same hash, they are provably sharing the same compiled kernels. If the hash changes, it is provably a miss. Every setting above was checked this way, not just by timing it. Full detail: [`results/cache_invalidation/`](https://github.com/abhijithneilabraham/inference_research/tree/main/results/cache_invalidation).
+| setting | cost to change | why |
+|---|---|---|
+| SamplingParams: temperature, top_p, top_k, max tokens, seed | 0s | attached to the request, not the engine |
+| waking a sleeping engine | about 0.55s | covered below |
+| `max_num_seqs` | 35 to 40s | compile cache hit |
+| `gpu_memory_utilization` | 35 to 40s | compile cache hit |
+| `enable_prefix_caching` | 35 to 40s | compile cache hit |
+| `max_model_len` | 74 to 84s | compile cache miss, shapes change |
+| `kv_cache_dtype` | 74 to 84s | compile cache miss, dtypes change |
+| swapping the model itself | full reload | not measured here |
 
-One more honest note. Even a full hit is not free. It still costs 35 to 40 seconds, because part of the compilation step, the part called Dynamo tracing, is not saved to disk at all on this version of vLLM and has to be redone on every single process start, hit or miss. Only the heavier Inductor part of compilation is actually cached. This stops being true on a newer vLLM, 0.28.0, where that tracing step is itself cached and a hit drops from about 6.5 seconds to about 0.35 seconds. That same newer version also changed which settings count as a miss, `cuda_graph_sizes` became one of them, where it used to be free, so upgrading is not purely a win without re-checking existing settings against it. Full detail: [`results/vllm_latest/`](https://github.com/abhijithneilabraham/inference_research/tree/main/results/vllm_latest).
+Timing alone was not treated as sufficient evidence for this distinction, because a slow run and a cache miss can look similar. vLLM prints the exact folder name it is using for the compiled cache, and that name is a hash of everything that affects the compiled result.
+
+```
+Using cache directory: .../torch_compile_cache/16d4fb725b/... for vLLM's torch.compile
+```
+
+If two runs print the same hash, they are provably sharing the same compiled kernels. If the hash changes, it is provably a miss. Every setting above was checked this way, not just by timing it. Full detail: [`results/cache_invalidation/`](https://github.com/abhijithneilabraham/inference_research/tree/main/results/cache_invalidation).
+
+One more honest note. Even a full hit is not free. It still costs 35 to 40 seconds, because part of the compilation step, the part called Dynamo tracing, is not saved to disk at all on this version of vLLM and has to be redone on every single process start, hit or miss. Only the heavier Inductor part of compilation is actually cached. This stops being true on a newer vLLM, 0.28.0, where that tracing step is itself cached and a hit drops from about 6.5 seconds to about 0.35 seconds. That same newer version also changed which settings count as a miss, `cuda_graph_sizes` became one of them, where it used to be free, so upgrading is not purely a win without re-checking existing settings against it.
+
+| configuration | vLLM 0.11.0 | vLLM 0.28.0 |
+|---|---|---|
+| cold compile | 72.63s | 73.09s |
+| cache-hit restart | 40.24s | 39.22s |
+| pinned KV cache, piecewise graphs, single process | 29.48s | 23.48s |
+| eager execution | 18.20s | 22.12s (regressed) |
+
+Full detail: [`results/vllm_latest/`](https://github.com/abhijithneilabraham/inference_research/tree/main/results/vllm_latest).
 
 ## The thing that beats every fix above
 
