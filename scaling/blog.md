@@ -214,17 +214,17 @@ Regions add capacity as a side effect, but choosing them for capacity alone is a
 
 The run described at the top completed the full ramp and the hold without tripping either abort condition, and everything above shows up in its numbers.
 
-Little's Law shows up directly in the raw numbers, not just as a teaching formula. Near the end of the run, about 1,119 requests per minute were completing, about 18.65 per second, each taking around 10 seconds end to end. 18.65 × 10 is about 186, and the harness was independently tracking around 190 to 196 requests actually running at once, the small gap being a handful of requests briefly queued rather than running.
+Little's Law shows up directly in the raw numbers, not just as a teaching formula. Near the end of the run, roughly 1,100 requests per minute were completing, so about 18 per second, each taking around 10 seconds end to end. 18 × 10 is about 180, and the server was independently reporting close to 200 requests actually running at once, dipping lower whenever a batch of requests sat briefly in the queue instead of running.
 
-Memory was the ceiling, not compute, here too. The 214 GiB of KV cache per GPU rank listed in the setup is what decided how many of those requests could be in flight at once, before counting the model's own weights.
+Memory was the ceiling, not compute, here too. The KV cache alone reserved more than 200 GiB per GPU rank, and that is what decided how many of those requests could be in flight at once, before counting the model's own weights.
 
 Workload shape decided the outcome more than the hardware did. The same server, same GPUs, same flags were tested against three different kinds of traffic. Synthetic sessions, each with a unique 10,000-token document that had to be computed from scratch every time, started struggling around 200 requests per minute. Replayed multi-turn conversations, where later messages in a thread share most of their tokens with earlier ones, took the identical hardware to nearly 10 million tokens per minute of offered load without aborting. Nothing about the GPUs changed between these two results, only how much of each request the KV cache had already seen.
 
-![Peak input tokens per minute for four different traffic shapes on identical hardware, from 1.88 million on synthetic documents to 9.89 million on replayed real conversations](images/11-workload-shape-changes-the-answer.png)
+![Peak input tokens per minute for four different traffic shapes on identical hardware, from roughly 2 million on synthetic documents to nearly 10 million on replayed conversations](images/11-workload-shape-changes-the-answer.png)
 
-That also means the headline number needs a second look before it is trusted. At peak, the system was offered about 10.2 million tokens per minute, but 97% of that was input, and 96.7% of the input was a cache hit rather than newly computed. The actual compute, real prefill plus real decode, was closer to 10,700 tokens per second. Both numbers are genuine, but they answer different questions: the first is how much traffic this exact workload shape can absorb, the second is how much work the GPUs are doing, and only the second one transfers to a workload with a different amount of shared prefix.
+That also means the headline number needs a second look before it is trusted. At peak, the system was offered around 10 million tokens per minute, but almost all of that was input, and roughly 97% of the input was a cache hit rather than newly computed. The actual compute, real prefill plus real decode, was closer to 11,000 tokens per second. Both numbers are genuine, but they answer different questions: the first is how much traffic this exact workload shape can absorb, the second is how much work the GPUs are doing, and only the second one transfers to a workload with a different amount of shared prefix.
 
-![The 10.2 million tokens per minute headline decomposed, showing that almost all of it was cache hits and only about 10,700 tokens per second was real computation](images/12-traffic-absorbed-vs-real-compute.png)
+![The ten million tokens per minute headline decomposed, showing that almost all of it was cache hits and only around eleven thousand tokens per second was real computation](images/12-traffic-absorbed-vs-real-compute.png)
 
 Every script and every raw result: [deepseek-v4-flash](https://github.com/abhijithneilabraham/deepseek-v4-flash).
 

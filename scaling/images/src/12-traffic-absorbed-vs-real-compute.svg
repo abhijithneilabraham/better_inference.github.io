@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="The 10.2 million tokens per minute headline decomposed, showing that 96.7 percent was cache hits and only about 10,700 tokens per second was real computation">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="The ten million tokens per minute headline decomposed, showing that roughly 97 percent was cache hits and only around eleven thousand tokens per second was real computation">
   <style>
     .bg { fill: #161d26; }
     .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
@@ -21,7 +21,7 @@
 
   <!-- full bar: 170,517 tok/s total across 700px -->
   <text class="lab" x="24" y="74">offered traffic</text>
-  <text class="sub" x="24" y="90">10.2M tokens per minute</text>
+  <text class="sub" x="24" y="90">about 10M tokens per minute</text>
   <g transform="translate(24,100)">
     <!-- cached: 159787/170517 = 93.7% of 728px = 682 -->
     <rect class="cached" x="0" y="0" width="682" height="38"/>
@@ -41,18 +41,18 @@
   <g transform="translate(24,214)">
     <rect x="0" y="-9" width="12" height="12" rx="2" fill="#3d4956"/>
     <text class="key" x="20" y="1">KV cache hits, read back from memory</text>
-    <text class="num" x="420" y="1" style="fill:#8a97a6">159,787 tok/s</text>
-    <text class="key" x="560" y="1">96.7% of input</text>
+    <text class="num" x="420" y="1" style="fill:#8a97a6">~160,000 tok/s</text>
+    <text class="key" x="560" y="1">~97% of input</text>
   </g>
   <g transform="translate(24,238)">
     <rect x="0" y="-9" width="12" height="12" rx="2" fill="#f2a541"/>
     <text class="key" x="20" y="1">input actually prefilled</text>
-    <text class="num" x="420" y="1" style="fill:#f2a541">5,129 tok/s</text>
+    <text class="num" x="420" y="1" style="fill:#f2a541">~5,000 tok/s</text>
   </g>
   <g transform="translate(24,262)">
     <rect x="0" y="-9" width="12" height="12" rx="2" fill="#5cc48a"/>
     <text class="key" x="20" y="1">output actually decoded</text>
-    <text class="num" x="420" y="1" style="fill:#5cc48a">5,601 tok/s</text>
+    <text class="num" x="420" y="1" style="fill:#5cc48a">~5,600 tok/s</text>
   </g>
 
   <text class="cap" x="24" y="298">Both numbers are real, but they answer different questions. Size a different workload with the small one.</text>
