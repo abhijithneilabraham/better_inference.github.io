@@ -26,7 +26,7 @@ Plot latency against concurrency and a shape appears every time. At low concurre
 
 The knee, not the crash point, is the number that matters. A system pushed past the knee does not fail cleanly. It gets slower and slower for everyone until it looks broken, long before it actually stops responding.
 
-![Latency and throughput plotted against concurrency, with the knee marked where latency starts climbing and throughput stops improving](images/latency-vs-concurrency-the-knee.png)
+![Latency and throughput plotted against concurrency, with the knee marked where latency starts climbing and throughput stops improving](images/01-latency-vs-concurrency-the-knee.png)
 
 ## Experiment Setup
 
@@ -60,7 +60,7 @@ Suppose a load test shows throughput levels off at 20 requests per second once a
 
 This one formula is the whole tool. Everything else in this article is either measuring the two numbers that go into it, or using the concurrency it produces to plan capacity.
 
-![Little's Law: concurrency equals throughput times latency, with a worked example and a real measured check](images/littles-law-concurrency-throughput-latency.png)
+![Little's Law: concurrency equals throughput times latency, with a worked example and a real measured check](images/02-littles-law-concurrency-throughput-latency.png)
 
 ## What actually limits concurrency on one GPU
 
@@ -76,7 +76,7 @@ The 2 is for the K and V tensors. Longer conversations and larger models need bi
 
 As a worked example, not a claim about any specific measured system: an 80 GB GPU running a model whose weights take 15 GB leaves about 60 GB for KV cache and working memory. If one request's KV cache at a typical conversation length works out to around 300 MB, that GPU has room for roughly 60,000 MB ÷ 300 MB, about 200 concurrent requests, before it runs out of memory rather than compute. This is why increasing context length or switching to a bigger model can shrink concurrency sharply even when the GPU itself has not changed.
 
-![GPU memory split between model weights and the KV cache pool, where the pool divided by the per-request slice sets the maximum concurrency](images/kv-cache-sets-the-concurrency-ceiling.png)
+![GPU memory split between model weights and the KV cache pool, where the pool divided by the per-request slice sets the maximum concurrency](images/03-kv-cache-sets-the-concurrency-ceiling.png)
 
 ## Building a system for X users on one GPU
 
@@ -96,7 +96,7 @@ Millions of registered users almost never mean millions of concurrent requests. 
 
 Little's Law works in this direction too. If each active user's session involves one request that takes 2 seconds, and the product sees 5,000 requests per second at its busiest moment, peak concurrency is 5,000 × 2 = 10,000 requests in flight. Millions of customers and ten thousand peak concurrent requests are completely different sizing problems, and the second one is what a system actually has to be built for. Getting this number right, from real usage data or a conservative worst case, matters more than any other decision in the whole design.
 
-![A funnel converting millions of registered users down to the peak concurrency number a system is actually sized for](images/millions-of-users-to-peak-concurrency.png)
+![A funnel converting millions of registered users down to the peak concurrency number a system is actually sized for](images/04-millions-of-users-to-peak-concurrency.png)
 
 ## The design: many copies of the small system, not one big one
 
@@ -110,7 +110,7 @@ If peak concurrency is 10,000 and one GPU handles 160 concurrent requests comfor
 
 This is why large inference systems scale horizontally, many copies of the same model behind a router, rather than by making one enormous GPU cluster answer every request together. The model does not get bigger to serve more users. The same small system gets repeated.
 
-![Requests entering a queue-aware router which spreads them across many identical GPU replicas, with the replica count formula](images/one-router-many-replicas.png)
+![Requests entering a queue-aware router which spreads them across many identical GPU replicas, with the replica count formula](images/05-one-router-many-replicas.png)
 
 ## The pieces that make many replicas behave like one system
 
@@ -136,11 +136,11 @@ Memory was the ceiling, not compute, here too. The 214 GiB of KV cache per GPU r
 
 Workload shape decided the outcome more than the hardware did. The same server, same GPUs, same flags were tested against three different kinds of traffic. Synthetic sessions, each with a unique 10,000-token document that had to be computed from scratch every time, started struggling around 200 requests per minute. Replayed real user conversations, where later messages in a thread share most of their tokens with earlier ones, took the identical hardware to nearly 10 million tokens per minute of offered load without aborting. Nothing about the GPUs changed between these two results, only how much of each request the KV cache had already seen.
 
-![Peak input tokens per minute for four different traffic shapes on identical hardware, from 1.88 million on synthetic documents to 9.89 million on replayed real conversations](images/workload-shape-changes-the-answer.png)
+![Peak input tokens per minute for four different traffic shapes on identical hardware, from 1.88 million on synthetic documents to 9.89 million on replayed real conversations](images/06-workload-shape-changes-the-answer.png)
 
 That also means the headline number needs a second look before it is trusted. At peak, the system was offered about 10.2 million tokens per minute, but 97% of that was input, and 96.7% of the input was a cache hit rather than newly computed. The actual compute, real prefill plus real decode, was closer to 10,700 tokens per second. Both numbers are genuine, but they answer different questions: the first is how much traffic this exact workload shape can absorb, the second is how much work the GPUs are doing, and only the second one transfers to a workload with a different amount of shared prefix.
 
-![The 10.2 million tokens per minute headline decomposed, showing that almost all of it was cache hits and only about 10,700 tokens per second was real computation](images/traffic-absorbed-vs-real-compute.png)
+![The 10.2 million tokens per minute headline decomposed, showing that almost all of it was cache hits and only about 10,700 tokens per second was real computation](images/07-traffic-absorbed-vs-real-compute.png)
 
 Every script and every raw result: [deepseek-v4-flash](https://github.com/abhijithneilabraham/deepseek-v4-flash).
 
