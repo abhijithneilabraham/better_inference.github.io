@@ -21,6 +21,6 @@ Using vLLM serving a 14B model on a single H100 to go from a 159.6 second cold s
 
 Code and every measured result: [inference_research](https://github.com/abhijithneilabraham/inference_research).
 
-### [From one GPU to ten million users](scaling/)
+### [From one GPU to millions of users](scaling/)
 
 How to size an inference system, starting from a load test instead of a guess. Covers what a load test measures, Little's Law as the one formula connecting concurrency, throughput and latency, the KV cache memory math that usually caps concurrency before compute does, and how to turn a customer count into the peak concurrency number a system actually has to be built for. Ends with the pieces that make many GPU replicas behave like one system: routing, autoscaling, continuous batching, prefix caching, and backpressure.

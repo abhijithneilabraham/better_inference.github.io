@@ -1,14 +1,14 @@
 ---
 layout: default
-title: "From one GPU to ten million users"
+title: "From one GPU to millions of users"
 permalink: /scaling/
 ---
 
-# From one GPU to ten million users
+# From one GPU to millions of users
 
-Serving a model to one user is easy. Serving it to ten million is a different problem, but not a different kind of problem. It is the same problem, solved once on one GPU, then repeated. Almost all of the difficulty in inference system design comes from skipping the first step: nobody knows the real number for how many users one GPU can serve, so nobody can compute how many GPUs the whole system needs.
+Serving a model to one user is easy. Serving it to millions is a different problem, but not a different kind of problem. It is the same problem, solved once on one GPU, then repeated. Almost all of the difficulty in inference system design comes from skipping the first step: nobody knows the real number for how many users one GPU can serve, so nobody can compute how many GPUs the whole system needs.
 
-This article starts with the load test, because that is where the one real number comes from. Then it shows how to size a single GPU for a target number of users. Then it shows how that same number scales up to ten million customers on the same frontier model, without changing the model at all.
+This article starts with the load test, because that is where the one real number comes from. Then it shows how to size a single GPU for a target number of users. Then it shows how that same number scales up to millions of customers on the same frontier model, without changing the model at all.
 
 ## Start with a load test, not a design
 
@@ -66,11 +66,11 @@ Then leave headroom. Design for about 70 to 80 percent of the measured ceiling, 
 
 Past the knee, requests arrive faster than the GPU can finish them, so they start queueing. The queue does not shrink back down on its own once it starts growing, because the system is still receiving new requests faster than it clears old ones. Latency keeps rising, timeouts start happening, and from the outside this looks identical to an outage even though the GPU is still running and still making progress. This is the actual failure mode to design against, not a crash.
 
-## Scaling to ten million customers
+## Scaling to millions of customers
 
-Ten million registered users almost never means ten million concurrent requests. Most of those users are not sending a request at any given moment. The number that matters for capacity is peak concurrency, the most requests ever in flight at the same time, not the size of the customer base.
+Millions of registered users almost never mean millions of concurrent requests. Most of those users are not sending a request at any given moment. The number that matters for capacity is peak concurrency, the most requests ever in flight at the same time, not the size of the customer base.
 
-Little's Law works in this direction too. If each active user's session involves one request that takes 2 seconds, and the product sees 5,000 requests per second at its busiest moment, peak concurrency is 5,000 × 2 = 10,000 requests in flight. Ten million customers and ten thousand peak concurrent requests are completely different sizing problems, and the second one is what a system actually has to be built for. Getting this number right, from real usage data or a conservative worst case, matters more than any other decision in the whole design.
+Little's Law works in this direction too. If each active user's session involves one request that takes 2 seconds, and the product sees 5,000 requests per second at its busiest moment, peak concurrency is 5,000 × 2 = 10,000 requests in flight. Millions of customers and ten thousand peak concurrent requests are completely different sizing problems, and the second one is what a system actually has to be built for. Getting this number right, from real usage data or a conservative worst case, matters more than any other decision in the whole design.
 
 ## The design: many copies of the small system, not one big one
 
@@ -118,4 +118,4 @@ Every script and every raw result: [deepseek-v4-flash](https://github.com/abhiji
 
 The whole discipline comes down to a loop. Load test one instance to find where latency breaks down. Use Little's Law to turn that into a concurrency ceiling, checked against the KV cache math. Turn the real user base into a peak concurrency number, not a customer count. Divide to get a replica count, with headroom. Put those replicas behind a router and an autoscaler that react to queue depth, with continuous batching and prefix caching to make each replica cheap, and backpressure so the system degrades on purpose instead of by accident.
 
-Nothing about serving ten million customers requires a fundamentally different design than serving forty. It requires doing the same arithmetic at a different scale, and building the automation, routing, autoscaling, batching, that makes running many replicas as easy as running one.
+Nothing about serving millions of customers requires a fundamentally different design than serving forty. It requires doing the same arithmetic at a different scale, and building the automation, routing, autoscaling, batching, that makes running many replicas as easy as running one.
