@@ -98,33 +98,117 @@ Little's Law works in this direction too. If each active user's session involves
 
 ![A funnel converting millions of registered users down to the peak concurrency number a system is actually sized for](images/04-millions-of-users-to-peak-concurrency.png)
 
-## The design: many copies of the small system, not one big one
+## The unit of scaling is a replica, not a GPU
 
-Once peak concurrency is known, and the per-GPU concurrency ceiling from the load test is known, the number of GPU replicas needed is just:
+The first thing to get straight is what actually gets duplicated when the system grows.
+
+A replica is one complete, independent copy of the model, together with however many GPUs that copy needs. For a small model that is one GPU. For a frontier model that does not fit in one GPU's memory, a replica is a whole node of 8 GPUs working as a single server. Either way, the replica is the smallest thing that can answer a request on its own, and it is the unit that gets repeated.
+
+This matters because there are two completely different reasons to add GPUs, and they are easy to confuse.
+
+**Adding GPUs inside a replica** is called tensor parallelism. The model's weight matrices are cut into pieces and spread across the GPUs, so every GPU holds a slice of every layer and they all work on the same token at the same time. This is done to make the model fit, and to make a single request faster. It has a cost: after every layer the GPUs must exchange and combine their partial results, twice per layer, and a model with 60 layers does that more than a hundred times for every single token. Those exchanges only stay cheap over a very fast link. Inside one node, GPUs are connected by NVLink and the exchange is nearly free. Between nodes, even on good networking, the link is roughly an order of magnitude slower, and every token pays that penalty. This is why tensor parallelism normally stops at the edge of one node.
+
+**Adding more replicas** is how capacity grows. Each replica is a full copy and needs to talk to no other replica to answer a request, so replicas scale out over ordinary networking without any of that penalty.
+
+So the shape of the answer is fixed: go as wide as the fast interconnect inside a node, then stop, then repeat the node.
+
+![Tensor parallelism splits one model across the GPUs inside a node over NVLink, while capacity is added by repeating whole nodes over ordinary networking](images/05-tensor-parallel-inside-replicate-across.png)
 
 ```
-replicas = peak concurrency ÷ per-GPU concurrency (with headroom)
+replicas = peak concurrency ÷ per-replica concurrency (with headroom)
 ```
 
-If peak concurrency is 10,000 and one GPU handles 160 concurrent requests comfortably, that is roughly 63 replicas, rounded up with margin.
+If peak concurrency is 10,000 and one replica holds 160 concurrent requests comfortably, that is about 63 replicas, rounded up with margin. This is why serving millions of users does not require a bigger model or one enormous cluster answering every request together. The model stays exactly the same size. The same small system gets repeated, and the interesting engineering moves to what sits in front of the copies.
 
-This is why large inference systems scale horizontally, many copies of the same model behind a router, rather than by making one enormous GPU cluster answer every request together. The model does not get bigger to serve more users. The same small system gets repeated.
+![Requests entering a queue-aware router which spreads them across many identical GPU replicas, with the replica count formula](images/06-one-router-many-replicas.png)
 
-![Requests entering a queue-aware router which spreads them across many identical GPU replicas, with the replica count formula](images/05-one-router-many-replicas.png)
+## What a request passes through on the way in
 
-## The pieces that make many replicas behave like one system
+At fleet scale the path from a user to a GPU has a few distinct layers, and each one exists to solve a different problem.
 
-**A router that knows the state of each replica.** Spreading requests round robin across replicas ignores that some of them are already near their knee and others are idle. Routing based on each replica's current queue length keeps every replica closer to its own optimal concurrency instead of some being overloaded while others sit idle.
+**Global entry.** DNS or anycast sends the user to the nearest healthy region. This is a latency and availability decision, made before anything knows what the request contains.
 
-**Autoscaling on queue depth or latency, not CPU.** A GPU running inference can show low CPU usage while it is completely saturated on GPU memory and compute. Scaling rules built around CPU usage will not react to the thing that is actually happening.
+**The gateway.** Authentication, per-user rate limits, quota and priority tier, and admission control. This layer is where the system says no. It is cheap, stateless, and it protects everything behind it, so it should be the only place that has to make that decision.
 
-**Continuous batching on every replica.** This is what makes one GPU able to serve many concurrent users economically instead of one at a time. Requests that arrive close together get processed as one batch on the GPU, sharing the cost of reading the model's weights across all of them, which is why concurrency past 1 is so much cheaper per request than concurrency at 1.
+**The router.** Picks which replica answers. This is the layer that decides most of the system's real performance, and it gets its own section below.
 
-**Prefix caching for shared context.** When many requests share a common system prompt or repeated context, caching that shared portion once instead of recomputing it for every request cuts the work each request needs, and raises the effective concurrency ceiling for free. How large that effect can be is worth seeing in a real system, below.
+**The replica.** Runs continuous batching, holding many requests in flight and merging them into shared GPU work. This is what makes one replica serve hundreds of users economically rather than one at a time. Requests running together share the cost of reading the model's weights, which is why the per-request cost at concurrency 100 is a small fraction of the cost at concurrency 1.
 
-**A queue with backpressure, not unbounded fan-out.** Past the ceiling, a system should reject or delay new requests deliberately, rather than accepting everything and letting every replica's queue grow until every user times out. A controlled slowdown for a fraction of users is a better failure mode than an uncontrolled one for all of them.
+**The control plane.** Health checks, autoscaling, weight distribution and rollouts. It sits beside the request path rather than in it, so a slow control plane never slows down a user's request.
 
-**Multi-region placement.** This is mainly about latency, serving users from a location close to them, and about resilience, surviving one region having a problem. Extra regions add capacity too, but that should not be the main reason for adding them.
+![The layers a request passes through at fleet scale, from global entry through the gateway and router to a replica, with the control plane sitting beside the request path](images/07-the-layers-a-request-passes-through.png)
+
+## Routing decides most of the performance
+
+The obvious way to spread work across replicas is round robin, one request each in turn. For inference this is close to the worst option, for two separate reasons.
+
+The first is load. Replicas do not finish requests at the same rate, because a request generating 2,000 tokens occupies a slot far longer than one generating 50. Round robin keeps handing work to replicas that are already deep past their knee while others sit idle. Routing on each replica's current queue depth, sending the next request to whoever has the least work in flight, keeps every replica near its own best operating point instead.
+
+The second reason is the cache, and it is the bigger one. When a user sends the next message in a conversation, almost all of that prompt is text the model already processed on the previous turn. If the request lands on the replica that handled the previous turn, that work is already sitting in that replica's KV cache and is read back instead of recomputed. If it lands anywhere else, the cache is cold and the full prompt is computed from scratch.
+
+That single routing choice changes the amount of work the fleet has to do by a large multiple, and it does not show up in any single node benchmark, because with one replica every request is always in the right place.
+
+So a real router tries to do two things that pull against each other. It wants to send a conversation back to the replica that already holds its cache, usually by hashing the conversation id or the prompt's prefix so the same key consistently maps to the same replica. It also wants to avoid overloading whichever replica happens to own a popular conversation. The usual resolution is to treat cache ownership as a strong preference rather than a rule: send the request to the replica holding the cache, unless that replica's queue is already above a threshold, in which case take the cache miss and go somewhere idle. Cache aware routing of this kind is built into the SGLang and vLLM production routers and into NVIDIA Dynamo.
+
+![Round robin routing sends each turn of a conversation to a different replica and recomputes the whole prompt, while cache aware routing sends it back to the replica already holding the conversation](images/08-cache-aware-routing-vs-round-robin.png)
+
+## Splitting prefill from decode
+
+Inside a replica, a request has two phases that want opposite things from the hardware.
+
+**Prefill** is reading the prompt. All of its tokens are processed at once, so it is a short, heavy burst of arithmetic that saturates the GPU's compute. A 10,000 token prompt is a lot of work arriving in one lump.
+
+**Decode** is generating the answer, one token at a time. Each step does very little arithmetic but must read the entire model's weights from memory to produce one token, so it is limited by memory bandwidth, not compute, and it runs for as long as the answer is long.
+
+Put both on the same GPU and they interfere. A large prefill arriving mid-stream takes the GPU for itself, and every user currently receiving tokens stalls until it finishes. That shows up as a time to first token spike for the new request and a stutter in output speed for everyone else. Tuning one of those numbers pushes the other one the wrong way.
+
+Disaggregated serving separates them. One pool of GPUs does nothing but prefill, another pool does nothing but decode, and when prefill finishes it hands the computed KV cache over the fast interconnect to a decode worker, which streams the answer. The two pools are then sized independently: the prefill pool against input tokens per second, the decode pool against the number of streams being generated at once. Each pool is also tuned for what it actually does, since the batching strategy that suits a compute bound burst is not the one that suits a steady memory bound stream.
+
+The cost is that the KV cache for every request now crosses a network link, which needs to be fast, and the system has more moving parts. For a small deployment that tradeoff is not worth it. At fleet scale, where prefill and decode demand rarely grow in the same proportion, it usually is.
+
+![Prefill is a short compute bound burst and decode is a long memory bandwidth bound stream, so sharing one GPU lets a large prefill stall everyone's decode, which separate pools fix](images/09-prefill-and-decode-want-different-machines.png)
+
+## Making the cache outlive a single replica
+
+Prefix caching only helps while the cached tokens are still somewhere useful. In a single replica, the KV cache lives in GPU memory, which is the scarcest memory in the system, so old entries are evicted quickly to make room for active requests. A user who comes back after ten minutes finds nothing left.
+
+Larger systems treat the cache as a tiered store rather than as something that lives and dies in GPU memory. The hot tier stays in GPU memory. Entries pushed out of it move to host RAM, which is far larger and still fast to read back. Beyond that they can go to local NVMe. Some designs go one step further and pool that memory across the whole cluster, so a cached prefix written by one replica can be read back by any other.
+
+That last step quietly removes the routing tension described earlier. If any replica can fetch a cached prefix, affinity stops being a correctness concern and becomes a pure optimisation. This is the central idea in KV cache centric designs such as Mooncake.
+
+## Cells, headroom and blast radius
+
+A fleet of hundreds of replicas is not run as one flat pool. One router tracking every replica becomes both a bottleneck and a single point of failure, and one bad model rollout reaching every replica at once is an outage for everybody.
+
+The usual answer is to group replicas into cells. A cell is a self contained copy of the whole pattern: its own router, its own set of replicas, its own autoscaler, sized to some manageable number. Traffic is divided across cells at the gateway. A cell that breaks takes out its own share of traffic and nothing else, and a new model version is rolled out one cell at a time, with the option to stop after the first one.
+
+Two more numbers matter at this level.
+
+**Headroom.** Replicas should not be sized to sit exactly at the knee, because the knee is where things stop degrading gracefully. Running at around 70% of measured capacity leaves room to absorb a spike without latency moving. That spare capacity is not waste, it is the thing that makes the system feel stable.
+
+**Failure capacity.** If losing a cell is survivable, the fleet needs enough spare capacity to absorb that cell's traffic. Sizing for exactly peak demand means the first failure becomes an outage, because the remaining cells were already full.
+
+Headroom matters more than it does for a stateless web service, because adding GPU capacity is slow. A new replica has to be provisioned, then load the model's weights, then be ready before it takes traffic, and that is minutes, not seconds. Autoscaling handles the slow, predictable shape of the day. Headroom handles everything faster than that.
+
+For the same reason, autoscaling has to watch the right signal. A GPU running flat out on inference can show low CPU usage, so a scaling rule written around CPU will not react at all. Queue depth, time to first token, or the number of requests waiting are the signals that actually move when the system is in trouble.
+
+![Replicas grouped into independent cells so a failure or a rollout is contained, with each replica run below the knee and spare capacity kept to absorb a lost cell](images/10-cells-headroom-and-blast-radius.png)
+
+## Saying no on purpose
+
+Every system has a ceiling, and traffic does not agree to stay under it. The only real choice is whether the system fails deliberately or accidentally.
+
+Accidental failure is accepting everything. Queues grow at every replica, latency climbs for every user, requests start timing out, clients retry, the retries add load, and the system delivers a bad experience to one hundred percent of users while still running.
+
+Deliberate failure is admission control at the gateway. Past the ceiling, new requests are rejected quickly with a clear error, or held in a bounded queue and rejected once it is full. Rate limits per user stop one heavy client consuming a shared fleet. Where the product has priority tiers, low priority traffic is shed first, so the ceiling is felt by the traffic that matters least.
+
+A fast, honest rejection is also far better for the caller than a request that hangs for ninety seconds and then fails, because a client can retry a rejection somewhere else, or back off, and it cannot do anything useful with a hang.
+
+## Multi-region
+
+Regions are mainly about two things that are not capacity. Latency, because network round trips to another continent are noticeable before the model has generated anything. Resilience, because one region having a bad day should not be the whole product having a bad day.
+
+Regions add capacity as a side effect, but choosing them for capacity alone is a mistake, since a fleet split across regions has to carry enough spare capacity in each one to absorb another region's traffic during a failover. Each extra region also duplicates the cache. A conversation routed to a different region starts cold, which is the same cache miss problem as before, one level up, and it is why user traffic is normally pinned to a home region rather than balanced freely across all of them.
 
 ## What the run showed
 
@@ -136,16 +220,20 @@ Memory was the ceiling, not compute, here too. The 214 GiB of KV cache per GPU r
 
 Workload shape decided the outcome more than the hardware did. The same server, same GPUs, same flags were tested against three different kinds of traffic. Synthetic sessions, each with a unique 10,000-token document that had to be computed from scratch every time, started struggling around 200 requests per minute. Replayed multi-turn conversations, where later messages in a thread share most of their tokens with earlier ones, took the identical hardware to nearly 10 million tokens per minute of offered load without aborting. Nothing about the GPUs changed between these two results, only how much of each request the KV cache had already seen.
 
-![Peak input tokens per minute for four different traffic shapes on identical hardware, from 1.88 million on synthetic documents to 9.89 million on replayed real conversations](images/06-workload-shape-changes-the-answer.png)
+![Peak input tokens per minute for four different traffic shapes on identical hardware, from 1.88 million on synthetic documents to 9.89 million on replayed real conversations](images/11-workload-shape-changes-the-answer.png)
 
 That also means the headline number needs a second look before it is trusted. At peak, the system was offered about 10.2 million tokens per minute, but 97% of that was input, and 96.7% of the input was a cache hit rather than newly computed. The actual compute, real prefill plus real decode, was closer to 10,700 tokens per second. Both numbers are genuine, but they answer different questions: the first is how much traffic this exact workload shape can absorb, the second is how much work the GPUs are doing, and only the second one transfers to a workload with a different amount of shared prefix.
 
-![The 10.2 million tokens per minute headline decomposed, showing that almost all of it was cache hits and only about 10,700 tokens per second was real computation](images/07-traffic-absorbed-vs-real-compute.png)
+![The 10.2 million tokens per minute headline decomposed, showing that almost all of it was cache hits and only about 10,700 tokens per second was real computation](images/12-traffic-absorbed-vs-real-compute.png)
 
 Every script and every raw result: [deepseek-v4-flash](https://github.com/abhijithneilabraham/deepseek-v4-flash).
 
 ## Putting the whole thing together
 
-The whole discipline comes down to a loop. Load test one instance to find where latency breaks down. Use Little's Law to turn that into a concurrency ceiling, checked against the KV cache math. Turn the real user base into a peak concurrency number, not a customer count. Divide to get a replica count, with headroom. Put those replicas behind a router and an autoscaler that react to queue depth, with continuous batching and prefix caching to make each replica cheap, and backpressure so the system degrades on purpose instead of by accident.
+The whole discipline comes down to one sequence.
 
-Nothing about serving millions of customers requires a fundamentally different design than serving forty. It requires doing the same arithmetic at a different scale, and building the automation, routing, autoscaling, batching, that makes running many replicas as easy as running one.
+Load test a single replica to find where latency breaks down. Use Little's Law to turn that into a concurrency ceiling, and check it against the KV cache arithmetic to know whether memory or compute is the real limit. Turn the user base into a peak concurrency number rather than a customer count. Divide, add headroom, and that is the replica count.
+
+Then build the layer in front of the replicas, which is where the remaining engineering lives. Route on queue depth and on which replica already holds the conversation's cache. Split prefill from decode once the two stop growing at the same rate. Tier the cache so it survives eviction from GPU memory. Group replicas into cells so failures and rollouts are contained. Keep enough headroom that autoscaling never has to be fast. Reject traffic deliberately at the gateway instead of letting queues do it accidentally.
+
+Nothing in that list makes the model bigger. Serving millions of customers uses the same replica that served the first hundred, measured honestly once, then repeated, with a front end careful enough that the copies behave like one system.

@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420" role="img" aria-label="Prefill is a short compute bound burst and decode is a long memory bandwidth bound stream, so sharing one GPU makes a large prefill stall everyone's decode, which disaggregation fixes by using separate pools">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .sh { font: 700 12.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .pre { fill: #f2a541; rx: 2; }
+    .dec { fill: #5cc48a; rx: 2; }
+    .stall { fill: #e5646c; opacity: .3; rx: 2; }
+    .lane { font: 600 10px ui-monospace, Menlo, monospace; fill: #8a97a6; }
+    .tag { font: 700 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .pool { stroke-width: 2; rx: 6; }
+    .pp { fill: #3a2c14; stroke: #f2a541; }
+    .dp { fill: #14301f; stroke: #5cc48a; }
+    .pl { font: 700 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .kvarrow { stroke: #5aa9e6; stroke-width: 2; fill: none; marker-end: url(#k); }
+    .kvl { font: 600 10px ui-monospace, Menlo, monospace; fill: #5aa9e6; text-anchor: middle; }
+  </style>
+  <defs><marker id="k" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker></defs>
+  <rect class="bg" width="800" height="420" rx="6"/>
+  <text class="h" x="24" y="34">Prefill and decode want opposite things</text>
+  <text class="t" x="776" y="34" text-anchor="end">ONE GPU vs TWO POOLS</text>
+
+  <!-- key -->
+  <g transform="translate(24,56)">
+    <rect class="pre" x="0" y="-9" width="12" height="11"/>
+    <text class="d" x="18" y="0" style="fill:#f2a541">prefill: reads the prompt, one heavy burst, compute bound</text>
+    <rect class="dec" x="420" y="-9" width="12" height="11"/>
+    <text class="d" x="438" y="0" style="fill:#5cc48a">decode: one token at a time, memory bandwidth bound</text>
+  </g>
+
+  <!-- shared GPU timeline -->
+  <text class="sh" x="24" y="92">Sharing one GPU</text>
+  <text class="d" x="150" y="92">a big prefill takes the GPU, and every stream already running stops</text>
+
+  <text class="lane" x="24" y="117">user A</text>
+  <rect class="dec" x="90" y="108" width="120" height="11"/>
+  <rect class="stall" x="212" y="108" width="96" height="11"/>
+  <rect class="dec" x="310" y="108" width="180" height="11"/>
+
+  <text class="lane" x="24" y="139">user B</text>
+  <rect class="dec" x="90" y="130" width="120" height="11"/>
+  <rect class="stall" x="212" y="130" width="96" height="11"/>
+  <rect class="dec" x="310" y="130" width="150" height="11"/>
+
+  <text class="lane" x="24" y="161">user C</text>
+  <rect class="pre" x="212" y="152" width="96" height="11"/>
+  <rect class="dec" x="310" y="152" width="200" height="11"/>
+
+  <text class="tag" x="260" y="180" style="fill:#e5646c;text-anchor:middle">stall</text>
+  <text class="d" x="330" y="180" style="fill:#e5646c">C's prompt is read here, so A and B stop receiving tokens</text>
+
+  <line class="rule" x1="24" y1="200" x2="776" y2="200"/>
+
+  <!-- disaggregated -->
+  <text class="sh" x="24" y="228">Two pools</text>
+  <text class="d" x="110" y="228">each pool does one job, and each is sized against its own number</text>
+
+  <rect class="pool pp" x="24" y="244" width="230" height="86"/>
+  <text class="pl" x="40" y="266" style="fill:#f2a541">prefill pool</text>
+  <text class="d" x="40" y="284">does nothing but read prompts</text>
+  <text class="d" x="40" y="301">sized by input tokens per second</text>
+  <text class="d" x="40" y="318" style="fill:#f2a541">scales with prompt length</text>
+
+  <path class="kvarrow" d="M 262 288 H 322"/>
+  <text class="kvl" x="292" y="278">KV cache</text>
+  <text class="kvl" x="292" y="308">handed over</text>
+
+  <rect class="pool dp" x="330" y="244" width="230" height="86"/>
+  <text class="pl" x="346" y="266" style="fill:#5cc48a">decode pool</text>
+  <text class="d" x="346" y="284">does nothing but generate</text>
+  <text class="d" x="346" y="301">sized by streams running at once</text>
+  <text class="d" x="346" y="318" style="fill:#5cc48a">scales with answer length</text>
+
+  <text class="d" x="580" y="266" style="fill:#dfe6ee;font-weight:600">what it buys</text>
+  <text class="d" x="580" y="284">no prefill stalls a stream</text>
+  <text class="d" x="580" y="301">each pool grows on its own</text>
+  <text class="d" x="580" y="318">batching tuned per job</text>
+
+  <text class="cap" x="24" y="358">The cost is that every request's KV cache now crosses a network link, so the link has to be fast and there</text>
+  <text class="cap" x="24" y="378">are more moving parts. For a small deployment that trade is not worth it.</text>
+  <text class="cap" x="24" y="404" style="fill:#f2a541">It pays off once prefill demand and decode demand stop growing in the same proportion.</text>
+</svg>

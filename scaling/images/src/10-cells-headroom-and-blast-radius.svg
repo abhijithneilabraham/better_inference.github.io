@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="Replicas grouped into independent cells so a failure or a rollout is contained, with headroom kept below the knee and spare capacity to absorb a lost cell">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .cell { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; rx: 5; }
+    .celld { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; rx: 5; }
+    .cellu { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; rx: 5; }
+    .cl { font: 700 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .rep { fill: #24303d; rx: 1.5; }
+    .repg { fill: #5cc48a; rx: 1.5; opacity:.8 }
+    .repd { fill: #e5646c; rx: 1.5; opacity:.55 }
+    .d { font: 400 10.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .gw { fill: #3a2c14; stroke: #f2a541; stroke-width: 2; rx: 5; }
+    .gwl { font: 700 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; text-anchor: middle; }
+    .wire { stroke: #3d4956; stroke-width: 1.2; fill: none; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .track { fill: #24303d; rx: 3; }
+    .used { fill: #5aa9e6; rx: 3; }
+    .knee { stroke: #e5646c; stroke-width: 1.5; stroke-dasharray: 4 3; }
+    .kl { font: 700 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #e5646c; }
+    .sl { font: 600 10.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+  </style>
+  <rect class="bg" width="800" height="400" rx="6"/>
+  <text class="h" x="24" y="34">Cells contain failure. Headroom absorbs spikes.</text>
+  <text class="t" x="776" y="34" text-anchor="end">FLEET LAYOUT</text>
+
+  <!-- gateway -->
+  <rect class="gw" x="330" y="56" width="140" height="30"/>
+  <text class="gwl" x="400" y="76">gateway splits traffic</text>
+  <path class="wire" d="M 400 88 V 100 H 104 V 112"/>
+  <path class="wire" d="M 400 88 V 100 H 302 V 112"/>
+  <path class="wire" d="M 400 88 V 100 H 500 V 112"/>
+  <path class="wire" d="M 400 88 V 100 H 698 V 112"/>
+
+  <!-- cells -->
+  <g>
+    <rect class="cell" x="24" y="112" width="160" height="74"/>
+    <text class="cl" x="36" y="132">cell 1</text><text class="d" x="90" y="132">own router</text>
+    <g transform="translate(36,142)">
+      <rect class="rep" x="0"  y="0" width="16" height="10"/><rect class="rep" x="20" y="0" width="16" height="10"/><rect class="rep" x="40" y="0" width="16" height="10"/><rect class="rep" x="60" y="0" width="16" height="10"/><rect class="rep" x="80" y="0" width="16" height="10"/><rect class="rep" x="100" y="0" width="16" height="10"/>
+      <rect class="rep" x="0"  y="14" width="16" height="10"/><rect class="rep" x="20" y="14" width="16" height="10"/><rect class="rep" x="40" y="14" width="16" height="10"/><rect class="rep" x="60" y="14" width="16" height="10"/><rect class="rep" x="80" y="14" width="16" height="10"/><rect class="rep" x="100" y="14" width="16" height="10"/>
+    </g>
+    <text class="d" x="36" y="180">healthy</text>
+  </g>
+
+  <g>
+    <rect class="celld" x="222" y="112" width="160" height="74"/>
+    <text class="cl" x="234" y="132" style="fill:#e5646c">cell 2</text><text class="d" x="288" y="132" style="fill:#e5646c">bad rollout</text>
+    <g transform="translate(234,142)">
+      <rect class="repd" x="0"  y="0" width="16" height="10"/><rect class="repd" x="20" y="0" width="16" height="10"/><rect class="repd" x="40" y="0" width="16" height="10"/><rect class="repd" x="60" y="0" width="16" height="10"/><rect class="repd" x="80" y="0" width="16" height="10"/><rect class="repd" x="100" y="0" width="16" height="10"/>
+      <rect class="repd" x="0"  y="14" width="16" height="10"/><rect class="repd" x="20" y="14" width="16" height="10"/><rect class="repd" x="40" y="14" width="16" height="10"/><rect class="repd" x="60" y="14" width="16" height="10"/><rect class="repd" x="80" y="14" width="16" height="10"/><rect class="repd" x="100" y="14" width="16" height="10"/>
+    </g>
+    <text class="d" x="234" y="180" style="fill:#e5646c">its share of traffic only</text>
+  </g>
+
+  <g>
+    <rect class="cell" x="420" y="112" width="160" height="74"/>
+    <text class="cl" x="432" y="132">cell 3</text>
+    <g transform="translate(432,142)">
+      <rect class="rep" x="0"  y="0" width="16" height="10"/><rect class="rep" x="20" y="0" width="16" height="10"/><rect class="rep" x="40" y="0" width="16" height="10"/><rect class="rep" x="60" y="0" width="16" height="10"/><rect class="rep" x="80" y="0" width="16" height="10"/><rect class="rep" x="100" y="0" width="16" height="10"/>
+      <rect class="rep" x="0"  y="14" width="16" height="10"/><rect class="rep" x="20" y="14" width="16" height="10"/><rect class="rep" x="40" y="14" width="16" height="10"/><rect class="rep" x="60" y="14" width="16" height="10"/><rect class="rep" x="80" y="14" width="16" height="10"/><rect class="rep" x="100" y="14" width="16" height="10"/>
+    </g>
+    <text class="d" x="432" y="180">healthy</text>
+  </g>
+
+  <g>
+    <rect class="cellu" x="618" y="112" width="160" height="74"/>
+    <text class="cl" x="630" y="132" style="fill:#5cc48a">cell 4</text><text class="d" x="684" y="132" style="fill:#5cc48a">takes the slack</text>
+    <g transform="translate(630,142)">
+      <rect class="repg" x="0"  y="0" width="16" height="10"/><rect class="repg" x="20" y="0" width="16" height="10"/><rect class="repg" x="40" y="0" width="16" height="10"/><rect class="repg" x="60" y="0" width="16" height="10"/><rect class="repg" x="80" y="0" width="16" height="10"/><rect class="repg" x="100" y="0" width="16" height="10"/>
+      <rect class="repg" x="0"  y="14" width="16" height="10"/><rect class="repg" x="20" y="14" width="16" height="10"/><rect class="repg" x="40" y="14" width="16" height="10"/><rect class="repg" x="60" y="14" width="16" height="10"/><rect class="repg" x="80" y="14" width="16" height="10"/><rect class="repg" x="100" y="14" width="16" height="10"/>
+    </g>
+    <text class="d" x="630" y="180" style="fill:#5cc48a">only because it had room</text>
+  </g>
+
+  <line class="rule" x1="24" y1="208" x2="776" y2="208"/>
+
+  <!-- headroom bar -->
+  <text class="sl" x="24" y="240">Where to run each replica</text>
+  <rect class="track" x="24" y="252" width="620" height="22"/>
+  <rect class="used" x="24" y="252" width="434" height="22"/>
+  <line class="knee" x1="644" y1="244" x2="644" y2="282"/>
+  <text class="kl" x="644" y="296" text-anchor="middle">the knee, 100%</text>
+  <text class="d" x="200" y="267" style="fill:#0f1720;font-weight:700">run here, about 70% of measured capacity</text>
+  <text class="d" x="500" y="267" style="fill:#b7c2cd">headroom</text>
+
+  <text class="cap" x="24" y="326">Adding GPU capacity is slow. A new replica has to be provisioned, load the weights, and become ready, which</text>
+  <text class="cap" x="24" y="346">is minutes, not seconds. Autoscaling handles the slow, predictable shape of the day.</text>
+  <text class="cap" x="24" y="366" style="fill:#f2a541">Headroom handles everything faster than that, which is why it is not waste.</text>
+  <text class="cap" x="24" y="392" style="fill:#8a97a6">Scale on queue depth or time to first token. A saturated inference GPU can still show low CPU.</text>
+</svg>

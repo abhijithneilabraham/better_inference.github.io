@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="Tensor parallelism splits one model across the GPUs inside a node over NVLink, while capacity is added by repeating whole nodes over ordinary networking">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .node { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; rx: 6; }
+    .nodeh { fill: #16314a; stroke: #5aa9e6; stroke-width: 2; rx: 6; }
+    .gpu { fill: #24303d; stroke: #4a5866; stroke-width: 1; rx: 3; }
+    .gpuh { fill: #1d3a55; stroke: #5aa9e6; stroke-width: 1; rx: 3; }
+    .gl { font: 600 9px ui-monospace, Menlo, monospace; fill: #8a97a6; text-anchor: middle; }
+    .glh { font: 600 9px ui-monospace, Menlo, monospace; fill: #9fd0f5; text-anchor: middle; }
+    .nl { font: 700 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .lbl { font: 600 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; }
+    .sub { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .fast { stroke: #5cc48a; stroke-width: 2.5; fill: none; }
+    .slow { stroke: #6b7787; stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+    .fastl { font: 700 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #5cc48a; }
+    .slowl { font: 700 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+  </style>
+  <rect class="bg" width="800" height="400" rx="6"/>
+  <text class="h" x="24" y="34">Two different reasons to add GPUs</text>
+  <text class="t" x="776" y="34" text-anchor="end">FIT AND SPEED vs CAPACITY</text>
+
+  <!-- left: inside one replica -->
+  <text class="lbl" x="24" y="66">INSIDE one replica</text>
+  <text class="sub" x="24" y="83">tensor parallel, to fit the model and cut latency</text>
+
+  <rect class="nodeh" x="24" y="94" width="330" height="104"/>
+  <text class="nl" x="38" y="116">replica 1 (one node)</text>
+  <g>
+    <rect class="gpuh" x="38"  y="128" width="70" height="30"/><text class="glh" x="73"  y="147">GPU 0</text>
+    <rect class="gpuh" x="114" y="128" width="70" height="30"/><text class="glh" x="149" y="147">GPU 1</text>
+    <rect class="gpuh" x="190" y="128" width="70" height="30"/><text class="glh" x="225" y="147">GPU 2</text>
+    <rect class="gpuh" x="266" y="128" width="70" height="30"/><text class="glh" x="301" y="147">GPU 3</text>
+  </g>
+  <path class="fast" d="M 73 166 H 301"/>
+  <text class="fastl" x="38" y="188">NVLink, nearly free</text>
+  <text class="sub" x="196" y="188">every layer exchanges twice</text>
+
+  <!-- right: across replicas -->
+  <text class="lbl" x="400" y="66">ACROSS replicas</text>
+  <text class="sub" x="400" y="83">repeat the whole node, to add capacity</text>
+
+  <rect class="node" x="400" y="94" width="110" height="46"/>
+  <text class="nl" x="412" y="122" style="font-size:11px">replica 1</text>
+  <rect class="node" x="522" y="94" width="110" height="46"/>
+  <text class="nl" x="534" y="122" style="font-size:11px">replica 2</text>
+  <rect class="node" x="644" y="94" width="110" height="46"/>
+  <text class="nl" x="656" y="122" style="font-size:11px">replica 63</text>
+  <text class="sub" x="577" y="156" style="text-anchor:middle">each one a full copy, answers alone</text>
+  <path class="slow" d="M 455 164 V 182 H 699 V 164"/>
+  <path class="slow" d="M 577 164 V 182"/>
+  <text class="slowl" x="400" y="198">ordinary networking is fine here</text>
+
+  <line class="rule" x1="24" y1="222" x2="776" y2="222"/>
+
+  <text class="cap" x="24" y="250">Splitting one model across GPUs means the GPUs must combine partial results twice per layer, more than</text>
+  <text class="cap" x="24" y="270">a hundred times for a single token. That only stays cheap over NVLink, which is why tensor parallelism</text>
+  <text class="cap" x="24" y="290">normally stops at the edge of one node.</text>
+  <text class="cap" x="24" y="320">Replicas share nothing while answering, so they scale out over normal networking without that penalty.</text>
+  <text class="cap" x="24" y="340" style="fill:#f2a541;font-weight:600">Go as wide as the fast link inside a node, then stop, then repeat the node.</text>
+  <text class="cap" x="24" y="376" style="fill:#8a97a6">The model never gets bigger to serve more users.</text>
+</svg>

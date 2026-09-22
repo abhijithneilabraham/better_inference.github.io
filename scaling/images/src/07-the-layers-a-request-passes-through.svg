@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 430" width="800" height="430" role="img" aria-label="The layers a request passes through at fleet scale, from global entry through gateway and router to a replica, with the control plane sitting beside the request path">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; rx: 5; }
+    .gate { fill: #3a2c14; stroke: #f2a541; stroke-width: 2; rx: 5; }
+    .rout { fill: #16314a; stroke: #5aa9e6; stroke-width: 2; rx: 5; }
+    .rep { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.2; rx: 3; }
+    .ctl { fill: #1b2531; stroke: #4a5866; stroke-width: 1.2; stroke-dasharray: 4 3; rx: 5; }
+    .n { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .job { font: 600 10.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; }
+    .arrow { stroke: #5aa9e6; stroke-width: 2; fill: none; marker-end: url(#b); }
+    .thin { stroke: #4a5866; stroke-width: 1.2; fill: none; stroke-dasharray: 4 3; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rl { font: 600 9px ui-monospace, Menlo, monospace; fill: #5aa9e6; text-anchor: middle; }
+  </style>
+  <defs><marker id="b" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker></defs>
+  <rect class="bg" width="800" height="430" rx="6"/>
+  <text class="h" x="24" y="34">What a request passes through</text>
+  <text class="t" x="776" y="34" text-anchor="end">FLEET SCALE REQUEST PATH</text>
+
+  <!-- 1 global entry -->
+  <rect class="box" x="24" y="58" width="470" height="48"/>
+  <text class="n" x="40" y="80">global entry</text>
+  <text class="d" x="40" y="96">DNS or anycast picks the nearest healthy region</text>
+  <text class="job" x="510" y="88">latency and availability</text>
+  <path class="arrow" d="M 100 108 v 16"/>
+
+  <!-- 2 gateway -->
+  <rect class="gate" x="24" y="126" width="470" height="60"/>
+  <text class="n" x="40" y="148">gateway</text>
+  <text class="d" x="40" y="164">auth, per-user rate limits, quota, priority tier</text>
+  <text class="d" x="40" y="179">admission control: rejects here, fast and cheap</text>
+  <text class="job" x="510" y="156">the only place that says no</text>
+  <path class="arrow" d="M 100 188 v 16"/>
+
+  <!-- 3 router -->
+  <rect class="rout" x="24" y="206" width="470" height="60"/>
+  <text class="n" x="40" y="228">router</text>
+  <text class="d" x="40" y="244">picks a replica by queue depth and by who holds</text>
+  <text class="d" x="40" y="259">this conversation's cache</text>
+  <text class="job" x="510" y="236">most of the performance</text>
+  <path class="arrow" d="M 100 268 v 16"/>
+
+  <!-- 4 replicas -->
+  <rect class="box" x="24" y="286" width="470" height="62"/>
+  <text class="n" x="40" y="308">replicas</text>
+  <text class="d" x="40" y="324">continuous batching merges requests into shared GPU work</text>
+  <g>
+    <rect class="rep" x="40"  y="330" width="66" height="13"/><text class="rl" x="73"  y="340">replica</text>
+    <rect class="rep" x="112" y="330" width="66" height="13"/><text class="rl" x="145" y="340">replica</text>
+    <rect class="rep" x="184" y="330" width="66" height="13"/><text class="rl" x="217" y="340">replica</text>
+    <rect class="rep" x="256" y="330" width="66" height="13"/><text class="rl" x="289" y="340">replica</text>
+    <rect class="rep" x="328" y="330" width="66" height="13"/><text class="rl" x="361" y="340">replica</text>
+    <text class="d" x="404" y="341">…</text>
+  </g>
+  <text class="job" x="510" y="316">where the work happens</text>
+
+  <!-- control plane beside -->
+  <rect class="ctl" x="640" y="206" width="136" height="142"/>
+  <text class="n" x="654" y="228" style="font-size:11.5px">control plane</text>
+  <text class="d" x="654" y="248">health checks</text>
+  <text class="d" x="654" y="265">autoscaling</text>
+  <text class="d" x="654" y="282">weight distribution</text>
+  <text class="d" x="654" y="299">rollouts</text>
+  <text class="d" x="654" y="326" style="fill:#5cc48a">beside the path,</text>
+  <text class="d" x="654" y="340" style="fill:#5cc48a">never inside it</text>
+  <path class="thin" d="M 636 276 H 500"/>
+
+  <text class="cap" x="24" y="380">Each layer exists to solve one problem, and nothing else. Keeping the control plane out of the request</text>
+  <text class="cap" x="24" y="400">path means a slow autoscaler or a stuck rollout can never slow down a user's request.</text>
+  <text class="cap" x="24" y="420" style="fill:#8a97a6">Reject early, route well, batch hard.</text>
+</svg>

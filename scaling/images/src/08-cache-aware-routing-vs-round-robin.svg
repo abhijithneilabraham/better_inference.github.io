@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420" role="img" aria-label="Round robin routing sends each turn of a conversation to a different replica and recomputes the whole prompt, while cache aware routing sends it back to the replica already holding the conversation">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .sh { font: 700 12.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .bad { fill: #e5646c; }
+    .good { fill: #5cc48a; }
+    .rep { fill: #1b2531; stroke: #3d4956; stroke-width: 1.2; rx: 4; }
+    .repw { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; rx: 4; }
+    .rl { font: 600 10px ui-monospace, Menlo, monospace; fill: #8a97a6; text-anchor: middle; }
+    .rlw { font: 600 10px ui-monospace, Menlo, monospace; fill: #9fd0f5; text-anchor: middle; }
+    .turn { font: 600 10.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .aw { stroke: #e5646c; stroke-width: 1.6; fill: none; marker-end: url(#r); }
+    .ag { stroke: #5cc48a; stroke-width: 1.6; fill: none; marker-end: url(#g); }
+    .kv { font: 600 9.5px ui-monospace, Menlo, monospace; text-anchor: middle; }
+    .d { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .bar { rx: 2; }
+  </style>
+  <defs>
+    <marker id="r" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#e5646c"/></marker>
+    <marker id="g" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#5cc48a"/></marker>
+  </defs>
+  <rect class="bg" width="800" height="420" rx="6"/>
+  <text class="h" x="24" y="34">One conversation, three turns, two routing rules</text>
+  <text class="t" x="776" y="34" text-anchor="end">WHY ROUND ROBIN IS EXPENSIVE</text>
+
+  <!-- LEFT: round robin -->
+  <text class="sh bad" x="24" y="66">round robin</text>
+  <text class="d" x="24" y="83">next replica in turn, ignores history</text>
+
+  <text class="turn" x="24" y="112">turn 1</text>
+  <text class="turn" x="24" y="152">turn 2</text>
+  <text class="turn" x="24" y="192">turn 3</text>
+
+  <rect class="rep" x="150" y="98"  width="96" height="22"/><text class="rl" x="198" y="113">replica A</text>
+  <rect class="rep" x="150" y="138" width="96" height="22"/><text class="rl" x="198" y="153">replica B</text>
+  <rect class="rep" x="150" y="178" width="96" height="22"/><text class="rl" x="198" y="193">replica C</text>
+
+  <path class="aw" d="M 76 107 H 144"/>
+  <path class="aw" d="M 76 147 H 144"/>
+  <path class="aw" d="M 76 187 H 144"/>
+
+  <text class="kv" x="300" y="113" style="fill:#e5646c">cold, recompute all</text>
+  <text class="kv" x="300" y="153" style="fill:#e5646c">cold, recompute all</text>
+  <text class="kv" x="300" y="193" style="fill:#e5646c">cold, recompute all</text>
+
+  <!-- work bars left -->
+  <text class="d" x="24" y="226">prompt tokens computed</text>
+  <rect class="bar bad" x="150" y="234" width="80"  height="12"/>
+  <rect class="bar bad" x="150" y="250" width="160" height="12"/>
+  <rect class="bar bad" x="150" y="266" width="240" height="12"/>
+  <text class="kv" x="150" y="296" style="fill:#e5646c;text-anchor:start;font-size:10.5px">pays for the whole conversation, every turn</text>
+
+  <line class="rule" x1="24" y1="316" x2="776" y2="316"/>
+
+  <!-- RIGHT column header placed under, second block -->
+  <text class="sh good" x="430" y="66">cache aware</text>
+  <text class="d" x="430" y="83">hash the conversation, go back to its owner</text>
+
+  <rect class="repw" x="556" y="98" width="96" height="22"/><text class="rlw" x="604" y="113">replica A</text>
+  <rect class="rep"  x="556" y="138" width="96" height="22"/><text class="rl"  x="604" y="153">replica B</text>
+  <rect class="rep"  x="556" y="178" width="96" height="22"/><text class="rl"  x="604" y="193">replica C</text>
+
+  <text class="turn" x="430" y="112">turn 1</text>
+  <text class="turn" x="430" y="152">turn 2</text>
+  <text class="turn" x="430" y="192">turn 3</text>
+
+  <path class="ag" d="M 482 107 H 550"/>
+  <path class="ag" d="M 482 147 H 520 V 110 H 550"/>
+  <path class="ag" d="M 482 187 H 505 V 112 H 550"/>
+
+  <text class="kv" x="700" y="113" style="fill:#5cc48a">cache stays warm</text>
+  <text class="kv" x="700" y="153" style="fill:#5cc48a">hit, read it back</text>
+  <text class="kv" x="700" y="193" style="fill:#5cc48a">hit, read it back</text>
+
+  <text class="d" x="430" y="226">prompt tokens computed</text>
+  <rect class="bar good" x="556" y="234" width="80" height="12"/>
+  <rect class="bar good" x="556" y="250" width="26" height="12"/>
+  <rect class="bar good" x="556" y="266" width="26" height="12"/>
+  <text class="kv" x="556" y="296" style="fill:#5cc48a;text-anchor:start;font-size:11px">only the new message is new work</text>
+
+  <text class="cap" x="24" y="344">This choice changes how much work the whole fleet has to do, by a large multiple, without changing</text>
+  <text class="cap" x="24" y="364">a single thing about the hardware or the model.</text>
+  <text class="cap" x="24" y="392" style="fill:#f2a541">It is invisible in a single node benchmark, because with one replica every request is always in the right place.</text>
+  <text class="cap" x="24" y="412" style="fill:#8a97a6">Real routers treat cache ownership as a strong preference, and take the miss when that replica's queue is too deep.</text>
+</svg>
