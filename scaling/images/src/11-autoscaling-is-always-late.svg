@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420" role="img" aria-label="Demand rising faster than replicas can be added, with the gap covered by headroom in the first seconds, reactive scaling over minutes and scheduled scaling across the day">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .ax { stroke: #2e3a47; stroke-width: 1; }
+    .axl { font: 500 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .grid { stroke: #222c37; stroke-width: 1; }
+    .dem { fill: none; stroke: #e5646c; stroke-width: 2.5; stroke-linejoin: round; }
+    .cap2 { fill: none; stroke: #5aa9e6; stroke-width: 2.5; stroke-linejoin: round; }
+    .gap { fill: #f2a541; opacity: .16; }
+    .lg { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .note { font: 500 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; }
+    .band { rx: 4; }
+    .b1 { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.5; }
+    .b2 { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.5; }
+    .b3 { fill: #1b2531; stroke: #4a5866; stroke-width: 1.5; }
+    .bl { font: 700 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .bs { font: 400 10.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .sig { font: 600 11px ui-monospace, Menlo, monospace; }
+  </style>
+  <rect class="bg" width="800" height="420" rx="6"/>
+  <text class="h" x="24" y="34">Capacity arrives after the spike does</text>
+  <text class="t" x="776" y="34" text-anchor="end">AUTOSCALING LAG</text>
+
+  <!-- legend -->
+  <g transform="translate(24,56)">
+    <rect x="0" y="0" width="14" height="3" rx="1.5" fill="#e5646c"/>
+    <text class="lg" x="20" y="6" style="fill:#e5646c">demand</text>
+    <rect x="110" y="0" width="14" height="3" rx="1.5" fill="#5aa9e6"/>
+    <text class="lg" x="130" y="6" style="fill:#5aa9e6">replicas actually ready</text>
+    <rect x="320" y="-4" width="14" height="11" fill="#f2a541" opacity=".25"/>
+    <text class="lg" x="340" y="6" style="fill:#f2a541">the gap, covered by headroom</text>
+  </g>
+
+  <!-- grid -->
+  <line class="grid" x1="80" y1="90"  x2="600" y2="90"/>
+  <line class="grid" x1="80" y1="130" x2="600" y2="130"/>
+  <line class="grid" x1="80" y1="170" x2="600" y2="170"/>
+
+  <!-- axes -->
+  <line class="ax" x1="80" y1="212" x2="600" y2="212"/>
+  <line class="ax" x1="80" y1="78"  x2="80"  y2="212"/>
+
+  <!-- gap shading between demand and capacity -->
+  <path class="gap" d="M 210 196 L 250 104 L 330 92 L 430 88 L 430 100 L 330 128 L 250 172 L 210 196 Z"/>
+
+  <!-- demand curve: flat, sharp spike, plateau -->
+  <polyline class="dem" points="80,198 150,196 210,196 250,104 330,92 430,88 520,94 600,96"/>
+  <!-- capacity: flat, then delayed steps -->
+  <polyline class="cap2" points="80,200 210,200 250,200 275,200 275,172 330,172 330,128 390,128 390,100 600,100"/>
+
+  <text class="axl" x="215" y="230">spike</text>
+  <text class="axl" x="272" y="230">+1</text>
+  <text class="axl" x="327" y="230">+2</text>
+  <text class="axl" x="387" y="230">+3 replicas ready</text>
+  <text class="note" x="215" y="248">minutes pass here</text>
+
+  <!-- signals box -->
+  <rect class="band b3" x="620" y="86" width="156" height="126"/>
+  <text class="bl" x="634" y="108" style="fill:#dfe6ee">scale on</text>
+  <text class="sig" x="634" y="130" style="fill:#5cc48a">queue depth</text>
+  <text class="sig" x="634" y="148" style="fill:#5cc48a">waiting time</text>
+  <text class="sig" x="634" y="166" style="fill:#5cc48a">time to first token</text>
+  <text class="bl" x="634" y="192" style="fill:#e5646c">not CPU</text>
+  <text class="bs" x="634" y="206">a busy GPU looks idle</text>
+
+  <line class="rule" x1="24" y1="266" x2="776" y2="266"/>
+
+  <!-- three layers -->
+  <rect class="band b1" x="24" y="284" width="240" height="66"/>
+  <text class="bl" x="38" y="306" style="fill:#f2a541">headroom</text>
+  <text class="bs" x="38" y="324">covers the first seconds</text>
+  <text class="bs" x="38" y="340">already running when it hits</text>
+
+  <rect class="band b2" x="280" y="284" width="240" height="66"/>
+  <text class="bl" x="294" y="306" style="fill:#5aa9e6">reactive scaling</text>
+  <text class="bs" x="294" y="324">covers the next few minutes</text>
+  <text class="bs" x="294" y="340">driven by the queue signals</text>
+
+  <rect class="band b3" x="536" y="284" width="240" height="66"/>
+  <text class="bl" x="550" y="306" style="fill:#b7c2cd">scheduled scaling</text>
+  <text class="bs" x="550" y="324">covers the shape of the day</text>
+  <text class="bs" x="550" y="340">already known from history</text>
+
+  <text class="cap" x="24" y="378">A new replica must be scheduled, pull the weights, load them and warm up before it takes traffic.</text>
+  <text class="cap" x="24" y="398" style="fill:#f2a541">Add quickly on a modest signal. Remove slowly, and drain before shutting down.</text>
+</svg>

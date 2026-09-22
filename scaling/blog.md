@@ -188,11 +188,25 @@ Two more numbers matter at this level.
 
 **Failure capacity.** If losing a cell is survivable, the fleet needs enough spare capacity to absorb that cell's traffic. Sizing for exactly peak demand means the first failure becomes an outage, because the remaining cells were already full.
 
-Headroom matters more than it does for a stateless web service, because adding GPU capacity is slow. A new replica has to be provisioned, then load the model's weights, then be ready before it takes traffic, and that is minutes, not seconds. Autoscaling handles the slow, predictable shape of the day. Headroom handles everything faster than that.
-
-For the same reason, autoscaling has to watch the right signal. A GPU running flat out on inference can show low CPU usage, so a scaling rule written around CPU will not react at all. Queue depth, time to first token, or the number of requests waiting are the signals that actually move when the system is in trouble.
-
 ![Replicas grouped into independent cells so a failure or a rollout is contained, with each replica run below the knee and spare capacity kept to absorb a lost cell](images/10-cells-headroom-and-blast-radius.png)
+
+## Autoscaling, and why it is always late
+
+Autoscaling means adding replicas as demand rises and removing them as it falls. For a stateless web service that is close to instant. For inference it is not, and that one difference drives the whole design.
+
+**Scale on the right signal.** A GPU running inference at full stretch can still report low CPU usage, so a rule built on CPU will sit still through an overload. Raw GPU utilisation is not much better, because a GPU decoding one token at a time looks busy while still having room for more streams. The signals that track real load come from the engine itself: how many requests are waiting, how long they have waited, and time to first token. Queue depth is the most useful, because it moves before latency does.
+
+**Accept that it is late.** A new replica has to be scheduled onto a node, pull a very large model, load the weights into GPU memory and warm up before it can take traffic. That is minutes. Demand can double in seconds. An autoscaler is always reacting to something that started before it noticed.
+
+That gap is why capacity comes in three layers rather than one. Headroom covers the first seconds, because it is the only capacity already running when a spike lands. Reactive scaling covers the next several minutes, driven by the queue signals above. Scheduled scaling covers the shape of the day, which is usually already known from history, since traffic that climbs every weekday morning should not be rediscovered every weekday morning.
+
+**Scale up fast, scale down slowly.** Being one replica short means dropped or slow traffic. Being one replica over means a few minutes of an idle machine. Those costs are nowhere near equal, so the thresholds should not be equal either. Add quickly on a modest signal, remove only after demand has stayed low for a while. Otherwise the fleet flaps, and every replica removed has to be paid for again in load time a few minutes later.
+
+**Removing a replica is a drain, not a kill.** A replica being scaled down is still streaming answers. It has to stop accepting new work, finish what it is holding, and only then shut down, which takes as long as its longest running generation. A scale-down that skips the drain shows up to users as broken connections.
+
+**Underneath, this is two autoscalers.** One adjusts the number of model replicas against the engine's metrics, which normally needs a custom metrics adapter rather than the built-in CPU rules. The other adds and removes GPU nodes from the cluster, which is the slow part and the expensive part. Keeping a small pool of nodes already provisioned, with the weights already loaded, converts the slow path into the fast one, and the price of that is paying for hardware that is sitting idle.
+
+![Demand rising faster than replicas can be added, with the gap covered by headroom in the first seconds, reactive scaling over minutes and scheduled scaling across the day](images/11-autoscaling-is-always-late.png)
 
 ## Saying no on purpose
 
@@ -220,11 +234,11 @@ Memory was the ceiling, not compute, here too. The KV cache alone reserved more 
 
 Workload shape decided the outcome more than the hardware did. The same server, same GPUs, same flags were tested against three different kinds of traffic. Synthetic sessions, each with a unique 10,000-token document that had to be computed from scratch every time, started struggling around 200 requests per minute. Replayed multi-turn conversations, where later messages in a thread share most of their tokens with earlier ones, took the identical hardware to nearly 10 million tokens per minute of offered load without aborting. Nothing about the GPUs changed between these two results, only how much of each request the KV cache had already seen.
 
-![Peak input tokens per minute for four different traffic shapes on identical hardware, from roughly 2 million on synthetic documents to nearly 10 million on replayed conversations](images/11-workload-shape-changes-the-answer.png)
+![Peak input tokens per minute for four different traffic shapes on identical hardware, from roughly 2 million on synthetic documents to nearly 10 million on replayed conversations](images/12-workload-shape-changes-the-answer.png)
 
 That also means the headline number needs a second look before it is trusted. At peak, the system was offered around 10 million tokens per minute, but almost all of that was input, and roughly 97% of the input was a cache hit rather than newly computed. The actual compute, real prefill plus real decode, was closer to 11,000 tokens per second. Both numbers are genuine, but they answer different questions: the first is how much traffic this exact workload shape can absorb, the second is how much work the GPUs are doing, and only the second one transfers to a workload with a different amount of shared prefix.
 
-![The ten million tokens per minute headline decomposed, showing that almost all of it was cache hits and only around eleven thousand tokens per second was real computation](images/12-traffic-absorbed-vs-real-compute.png)
+![The ten million tokens per minute headline decomposed, showing that almost all of it was cache hits and only around eleven thousand tokens per second was real computation](images/13-traffic-absorbed-vs-real-compute.png)
 
 Every script and every raw result: [deepseek-v4-flash](https://github.com/abhijithneilabraham/deepseek-v4-flash).
 
