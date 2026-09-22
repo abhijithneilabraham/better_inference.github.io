@@ -186,7 +186,9 @@ Two more numbers matter at this level.
 
 **Headroom.** Replicas should not be sized to sit exactly at the knee, because the knee is where things stop degrading gracefully. Running at around 70% of measured capacity leaves room to absorb a spike without latency moving. That spare capacity is not waste, it is the thing that makes the system feel stable.
 
-**Failure capacity.** If losing a cell is survivable, the fleet needs enough spare capacity to absorb that cell's traffic. Sizing for exactly peak demand means the first failure becomes an outage, because the remaining cells were already full.
+**Failure capacity.** When a cell fails, its traffic does not disappear. It lands on the cells that are still running. If those were already at their limit, the failure spreads into them as well, which defeats the point of having cells at all.
+
+So the fleet needs one spare cell's worth of capacity above peak demand. With ten cells sharing the traffic, losing one pushes about 11% more onto each of the nine that remain, and each of them has to have that much room already sitting there. A fleet built to cover exactly peak demand has no such room, so the first failure becomes an outage.
 
 ![Replicas grouped into independent cells so a failure or a rollout is contained, with each replica run below the knee and spare capacity kept to absorb a lost cell](images/10-cells-headroom-and-blast-radius.png)
 
