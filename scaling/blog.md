@@ -28,6 +28,24 @@ The knee, not the crash point, is the number that matters. A system pushed past 
 
 ![Latency and throughput plotted against concurrency, with the knee marked where latency starts climbing and throughput stops improving](images/latency-vs-concurrency-the-knee.png)
 
+## Experiment Setup
+
+Every measured number in this article comes from one load test, described here so the numbers can be read in context. Where the article works through arithmetic to explain an idea, that is labelled as an example rather than a measurement.
+
+**Hardware.** A single node with 8 NVIDIA B300 SXM6 GPUs, 275 GB of memory each, attached to a host with 256 CPU cores and 3 TB of RAM. One node, no cross-node networking involved.
+
+**Model and engine.** DeepSeek-V4-Flash-0731, a large mixture-of-experts model, 167 GB of weights, served with vLLM 0.25.0 across all 8 GPUs using tensor parallelism. The KV cache was set to fp8 with a block size of 256, expert parallelism enabled, and speculative decoding on. That configuration left about 214 GiB of KV cache per GPU rank.
+
+**The traffic corpus.** This is the part that decides the result, so it is worth stating carefully. Rather than generating synthetic prompts, real requests were pulled out of 307 GB of production request logs, grouped by session id, and replayed in their original order. That kept 400 sessions and 1,904 requests, with prompt lengths from 8,009 to 11,623 tokens and a median of 8,818. Replaying real sessions matters because the amount of text a later message shares with earlier ones in the same thread is what production actually did, not something constructed. For comparison, the same rig was also tested against fully synthetic unique documents and against an artificial shared-prefix corpus.
+
+**Pinned output length.** Every request was sent with the minimum and maximum output length both set to 300 tokens. Without pinning, some requests stop early and others run long, and the decode work per request stops being comparable across steps in the ramp.
+
+**The ramp.** Offered load climbed from 50 to 2,000 requests per minute over 10 minutes, then held at the top for 5 minutes. Each session issues about 10 requests per minute, so the session count tracks the target rate, from 5 sessions at the bottom to 200 at the top. Session start times were staggered so a ramp step does not fire a wave of cold prefills all at once, which would produce a latency spike that has nothing to do with capacity.
+
+**What was measured.** Input and output tokens per minute, achieved requests per minute, time to first token at p50 and p95, error rate, the number of requests running and waiting at each moment, and cache hit rate. The cache hit rate was read from the server's own metrics endpoint, as the change in cached prompt tokens divided by the change in total prompt tokens, because this build does not report cached tokens per request.
+
+**Abort conditions.** The run was set to stop itself if p95 time to first token went past 4 seconds or errors went past 10%, evaluated continuously on a rolling 45 second window. A load test without an abort rule does not produce a capacity number, it produces a slow motion outage. The abort threshold is the definition of what counts as still working.
+
 ## The rule that connects concurrency, throughput and latency
 
 There is a simple relationship, called Little's Law, that connects the three numbers a load test measures:
@@ -108,15 +126,13 @@ This is why large inference systems scale horizontally, many copies of the same 
 
 **Multi-region placement.** This is mainly about latency, serving users from a location close to them, and about resilience, surviving one region having a problem. Extra regions add capacity too, but that should not be the main reason for adding them.
 
-## A real example
+## What the run showed
 
-Everything above shows up in a real deployment: a public load test of DeepSeek-V4-Flash-0731, a large mixture-of-experts model, on one node of 8 NVIDIA B300 GPUs running vLLM.
-
-The test itself was exactly the shape described earlier: 10k-token inputs, ramped from 50 to 2,000 requests per minute over 10 minutes, held for 5 minutes, set to abort if p95 time-to-first-token passed 4 seconds or errors passed 10%. It completed the full ramp and hold without tripping either limit.
+The run described at the top completed the full ramp and the hold without tripping either abort condition, and everything above shows up in its numbers.
 
 Little's Law shows up directly in the raw numbers, not just as a teaching formula. Near the end of the run, about 1,119 requests per minute were completing, about 18.65 per second, each taking around 10 seconds end to end. 18.65 × 10 is about 186, and the harness was independently tracking around 190 to 196 requests actually running at once, the small gap being a handful of requests briefly queued rather than running.
 
-Memory was the ceiling, not compute, here too. Split across 8 GPUs, the model's KV cache alone reserved about 214 GiB per GPU rank, before counting the model's own weights.
+Memory was the ceiling, not compute, here too. The 214 GiB of KV cache per GPU rank listed in the setup is what decided how many of those requests could be in flight at once, before counting the model's own weights.
 
 Workload shape decided the outcome more than the hardware did. The same server, same GPUs, same flags were tested against three different kinds of traffic. Synthetic sessions, each with a unique 10,000-token document that had to be computed from scratch every time, started struggling around 200 requests per minute. Replayed real user conversations, where later messages in a thread share most of their tokens with earlier ones, took the identical hardware to nearly 10 million tokens per minute of offered load without aborting. Nothing about the GPUs changed between these two results, only how much of each request the KV cache had already seen.
 
