@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="The 10.2 million tokens per minute headline decomposed, showing that 96.7 percent was cache hits and only about 10,700 tokens per second was real computation">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .lab { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .sub { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .cached { fill: #3d4956; rx: 3; }
+    .prefill { fill: #f2a541; rx: 2; }
+    .decode { fill: #5cc48a; rx: 2; }
+    .v { font: 700 14px ui-monospace, Menlo, monospace; fill: #dfe6ee; text-anchor: end; }
+    .key { font: 500 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .num { font: 700 11.5px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .brace { stroke: #f2a541; stroke-width: 1.5; fill: none; }
+  </style>
+  <rect class="bg" width="800" height="320" rx="6"/>
+  <text class="h" x="24" y="34">What a big throughput number is actually made of</text>
+  <text class="t" x="776" y="34" text-anchor="end">AT PEAK, TOKENS / SEC</text>
+
+  <!-- full bar: 170,517 tok/s total across 700px -->
+  <text class="lab" x="24" y="74">offered traffic</text>
+  <text class="sub" x="24" y="90">10.2M tokens per minute</text>
+  <g transform="translate(24,100)">
+    <!-- cached: 159787/170517 = 93.7% of 728px = 682 -->
+    <rect class="cached" x="0" y="0" width="682" height="38"/>
+    <!-- prefill: 5129/170517 = 3.0% = 22px -->
+    <rect class="prefill" x="684" y="0" width="22" height="38"/>
+    <!-- decode: 5601/170517 = 3.3% = 24px -->
+    <rect class="decode" x="708" y="0" width="24" height="38"/>
+  </g>
+
+  <!-- brace over the real compute part -->
+  <path class="brace" d="M 708 146 v 8 h 48 v -8"/>
+  <text class="num" x="732" y="172" style="fill:#f2a541;text-anchor:middle">real work</text>
+
+  <line class="rule" x1="24" y1="192" x2="776" y2="192"/>
+
+  <!-- key -->
+  <g transform="translate(24,214)">
+    <rect x="0" y="-9" width="12" height="12" rx="2" fill="#3d4956"/>
+    <text class="key" x="20" y="1">KV cache hits, read back from memory</text>
+    <text class="num" x="420" y="1" style="fill:#8a97a6">159,787 tok/s</text>
+    <text class="key" x="560" y="1">96.7% of input</text>
+  </g>
+  <g transform="translate(24,238)">
+    <rect x="0" y="-9" width="12" height="12" rx="2" fill="#f2a541"/>
+    <text class="key" x="20" y="1">input actually prefilled</text>
+    <text class="num" x="420" y="1" style="fill:#f2a541">5,129 tok/s</text>
+  </g>
+  <g transform="translate(24,262)">
+    <rect x="0" y="-9" width="12" height="12" rx="2" fill="#5cc48a"/>
+    <text class="key" x="20" y="1">output actually decoded</text>
+    <text class="num" x="420" y="1" style="fill:#5cc48a">5,601 tok/s</text>
+  </g>
+
+  <text class="cap" x="24" y="298">Both numbers are real, but they answer different questions. Size a different workload with the small one.</text>
+</svg>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" width="800" height="340" role="img" aria-label="GPU memory split between model weights and KV cache, where the KV cache pool divided by the per-request slice sets the maximum concurrency">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .lab { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .sub { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .w { fill: #3d4956; }
+    .kv { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.5; }
+    .slot { fill: #5aa9e6; opacity: .75; }
+    .bl { font: 700 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; text-anchor: middle; }
+    .math { font: 600 13px ui-monospace, Menlo, monospace; fill: #b7c2cd; }
+    .mathv { fill: #f2a541; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+  </style>
+  <rect class="bg" width="800" height="340" rx="6"/>
+  <text class="h" x="24" y="34">What sets the ceiling: memory, not compute</text>
+  <text class="t" x="776" y="34" text-anchor="end">ONE 80 GB GPU</text>
+
+  <!-- memory bar -->
+  <text class="lab" x="24" y="68">GPU memory</text>
+  <g transform="translate(24,78)">
+    <rect class="w" x="0" y="0" width="140" height="46" rx="4"/>
+    <text class="bl" x="70" y="28">weights 15 GB</text>
+    <rect class="kv" x="146" y="0" width="606" height="46" rx="4"/>
+    <text class="bl" x="449" y="28" style="fill:#5aa9e6">KV cache pool, about 60 GB</text>
+  </g>
+
+  <!-- slots -->
+  <text class="sub" x="24" y="148">each in-flight request takes its own slice of that pool</text>
+  <g transform="translate(24,158)">
+    <rect class="slot" x="0"   y="0" width="12" height="26" rx="2"/><rect class="slot" x="15"  y="0" width="12" height="26" rx="2"/><rect class="slot" x="30"  y="0" width="12" height="26" rx="2"/><rect class="slot" x="45"  y="0" width="12" height="26" rx="2"/><rect class="slot" x="60"  y="0" width="12" height="26" rx="2"/><rect class="slot" x="75"  y="0" width="12" height="26" rx="2"/><rect class="slot" x="90"  y="0" width="12" height="26" rx="2"/><rect class="slot" x="105" y="0" width="12" height="26" rx="2"/>
+    <rect class="slot" x="120" y="0" width="12" height="26" rx="2"/><rect class="slot" x="135" y="0" width="12" height="26" rx="2"/><rect class="slot" x="150" y="0" width="12" height="26" rx="2"/><rect class="slot" x="165" y="0" width="12" height="26" rx="2"/><rect class="slot" x="180" y="0" width="12" height="26" rx="2"/><rect class="slot" x="195" y="0" width="12" height="26" rx="2"/><rect class="slot" x="210" y="0" width="12" height="26" rx="2"/><rect class="slot" x="225" y="0" width="12" height="26" rx="2"/>
+    <rect class="slot" x="240" y="0" width="12" height="26" rx="2"/><rect class="slot" x="255" y="0" width="12" height="26" rx="2"/><rect class="slot" x="270" y="0" width="12" height="26" rx="2"/><rect class="slot" x="285" y="0" width="12" height="26" rx="2"/><rect class="slot" x="300" y="0" width="12" height="26" rx="2"/><rect class="slot" x="315" y="0" width="12" height="26" rx="2"/><rect class="slot" x="330" y="0" width="12" height="26" rx="2"/><rect class="slot" x="345" y="0" width="12" height="26" rx="2"/>
+    <rect class="slot" x="360" y="0" width="12" height="26" rx="2"/><rect class="slot" x="375" y="0" width="12" height="26" rx="2"/><rect class="slot" x="390" y="0" width="12" height="26" rx="2"/><rect class="slot" x="405" y="0" width="12" height="26" rx="2"/><rect class="slot" x="420" y="0" width="12" height="26" rx="2"/><rect class="slot" x="435" y="0" width="12" height="26" rx="2"/><rect class="slot" x="450" y="0" width="12" height="26" rx="2"/><rect class="slot" x="465" y="0" width="12" height="26" rx="2"/>
+    <rect class="slot" x="480" y="0" width="12" height="26" rx="2"/><rect class="slot" x="495" y="0" width="12" height="26" rx="2"/><rect class="slot" x="510" y="0" width="12" height="26" rx="2"/><rect class="slot" x="525" y="0" width="12" height="26" rx="2"/>
+    <text class="sub" x="548" y="18">… about 200 slots at 300 MB each</text>
+  </g>
+
+  <line class="rule" x1="24" y1="212" x2="776" y2="212"/>
+
+  <text class="math" x="24" y="240">one request's KV cache = 2 × layers × kv_heads × head_dim × context_length × bytes</text>
+  <text class="math" x="24" y="266">60,000 MB ÷ 300 MB per request = <tspan class="mathv">about 200 concurrent requests</tspan></text>
+
+  <text class="cap" x="24" y="300">The GPU runs out of memory before it runs out of compute. Longer context or a bigger model</text>
+  <text class="cap" x="24" y="320">shrinks this number sharply, even though the hardware has not changed.</text>
+</svg>

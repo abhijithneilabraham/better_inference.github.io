@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" width="800" height="340" role="img" aria-label="Requests entering a queue-aware router which spreads them across many identical GPU replicas, with the replica count formula">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .req { fill: #5aa9e6; opacity: .8; rx: 2; }
+    .router { fill: #3a2c14; stroke: #f2a541; stroke-width: 2; rx: 6; }
+    .rl { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; text-anchor: middle; }
+    .rs { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
+    .rep { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.5; rx: 4; }
+    .repl { font: 700 10px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #5aa9e6; text-anchor: middle; }
+    .reps { font: 400 9px ui-monospace, Menlo, monospace; fill: #8a97a6; text-anchor: middle; }
+    .wire { stroke: #3d4956; stroke-width: 1.2; fill: none; }
+    .math { font: 600 13px ui-monospace, Menlo, monospace; fill: #b7c2cd; }
+    .mathv { fill: #f2a541; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .lab { font: 500 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+  </style>
+  <rect class="bg" width="800" height="340" rx="6"/>
+  <text class="h" x="24" y="34">Many copies of the same system, not one bigger one</text>
+  <text class="t" x="776" y="34" text-anchor="end">HORIZONTAL SCALING</text>
+
+  <!-- incoming requests -->
+  <text class="lab" x="24" y="66">incoming</text>
+  <g transform="translate(24,74)">
+    <rect class="req" x="0"  y="0"  width="26" height="9"/><rect class="req" x="30" y="0"  width="26" height="9"/><rect class="req" x="60" y="0" width="26" height="9"/>
+    <rect class="req" x="0"  y="13" width="26" height="9"/><rect class="req" x="30" y="13" width="26" height="9"/><rect class="req" x="60" y="13" width="26" height="9"/>
+    <rect class="req" x="0"  y="26" width="26" height="9"/><rect class="req" x="30" y="26" width="26" height="9"/><rect class="req" x="60" y="26" width="26" height="9"/>
+    <rect class="req" x="0"  y="39" width="26" height="9"/><rect class="req" x="30" y="39" width="26" height="9"/><rect class="req" x="60" y="39" width="26" height="9"/>
+  </g>
+
+  <path class="wire" d="M 116 96 H 156"/>
+
+  <!-- router -->
+  <rect class="router" x="160" y="66" width="150" height="62"/>
+  <text class="rl" x="235" y="90">router</text>
+  <text class="rs" x="235" y="108">sends work to whichever</text>
+  <text class="rs" x="235" y="121">replica has the shortest queue</text>
+
+  <!-- wires to replicas -->
+  <path class="wire" d="M 310 97 H 340 V 68 H 366"/>
+  <path class="wire" d="M 310 97 H 340 V 110 H 366"/>
+  <path class="wire" d="M 310 97 H 340 V 152 H 366"/>
+  <path class="wire" d="M 310 97 H 340 V 194 H 366"/>
+
+  <!-- replicas -->
+  <g>
+    <rect class="rep" x="370" y="54"  width="180" height="28"/><text class="repl" x="430" y="72">GPU replica 1</text><text class="reps" x="502" y="72">160 in flight</text>
+    <rect class="rep" x="370" y="96"  width="180" height="28"/><text class="repl" x="430" y="114">GPU replica 2</text><text class="reps" x="502" y="114">160 in flight</text>
+    <rect class="rep" x="370" y="138" width="180" height="28"/><text class="repl" x="430" y="156">GPU replica 3</text><text class="reps" x="502" y="156">160 in flight</text>
+    <rect class="rep" x="370" y="180" width="180" height="28"/><text class="repl" x="430" y="198">GPU replica 63</text><text class="reps" x="502" y="198">160 in flight</text>
+  </g>
+  <text class="rs" x="460" y="228" style="text-anchor:middle">every replica runs the identical model</text>
+
+  <!-- vertical dots -->
+  <text class="lab" x="356" y="176">⋮</text>
+
+  <line class="rule" x1="24" y1="248" x2="776" y2="248"/>
+
+  <text class="math" x="24" y="276">replicas = peak concurrency ÷ per-GPU concurrency</text>
+  <text class="math" x="24" y="300">10,000 ÷ 160 = <tspan class="mathv">63 replicas</tspan>, rounded up with headroom</text>
+
+  <text class="cap" x="24" y="328">The model does not get bigger to serve more users. The same small system gets repeated.</text>
+</svg>

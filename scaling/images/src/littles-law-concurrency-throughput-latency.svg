@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="Little's Law: concurrency equals throughput times latency, with a worked example and a real measured check">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .box { rx: 6; stroke-width: 2; }
+    .b1 { fill: #3a2c14; stroke: #f2a541; }
+    .b2 { fill: #16314a; stroke: #5aa9e6; }
+    .b3 { fill: #17311f; stroke: #5cc48a; }
+    .bl { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; text-anchor: middle; }
+    .bs { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
+    .op { font: 700 22px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
+    .ex { font: 600 13px ui-monospace, Menlo, monospace; fill: #b7c2cd; }
+    .exv { fill: #f2a541; }
+    .lab { font: 600 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .04em; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+  </style>
+  <rect class="bg" width="800" height="320" rx="6"/>
+  <text class="h" x="24" y="34">Little's Law</text>
+  <text class="t" x="776" y="34" text-anchor="end">THE ONE FORMULA</text>
+
+  <!-- three boxes -->
+  <rect class="box b1" x="40"  y="62" width="200" height="66"/>
+  <text class="bl" x="140" y="90" style="fill:#f2a541">concurrency</text>
+  <text class="bs" x="140" y="110">requests in flight right now</text>
+
+  <text class="op" x="272" y="103">=</text>
+
+  <rect class="box b2" x="304" y="62" width="200" height="66"/>
+  <text class="bl" x="404" y="90" style="fill:#5aa9e6">throughput</text>
+  <text class="bs" x="404" y="110">requests finished per second</text>
+
+  <text class="op" x="536" y="103">×</text>
+
+  <rect class="box b3" x="568" y="62" width="192" height="66"/>
+  <text class="bl" x="664" y="90" style="fill:#5cc48a">latency</text>
+  <text class="bs" x="664" y="110">seconds each one takes</text>
+
+  <line class="rule" x1="24" y1="162" x2="776" y2="162"/>
+
+  <!-- worked example -->
+  <text class="lab" x="24" y="188">WORKED EXAMPLE</text>
+  <text class="ex" x="24" y="212">20 requests/sec  ×  2 sec each  =  <tspan class="exv">40 requests in flight</tspan></text>
+
+  <line class="rule" x1="24" y1="234" x2="776" y2="234"/>
+
+  <!-- real check -->
+  <text class="lab" x="24" y="260">MEASURED ON A REAL 8-GPU DEPLOYMENT</text>
+  <text class="ex" x="24" y="284">18.65 requests/sec  ×  10 sec each  =  <tspan class="exv">186 predicted</tspan></text>
+  <text class="ex" x="24" y="306">the server was running <tspan class="exv">190 to 196</tspan> at once. The formula describes what really happens.</text>
+</svg>

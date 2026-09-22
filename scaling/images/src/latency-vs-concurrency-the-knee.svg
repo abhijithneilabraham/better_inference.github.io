@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="Latency and throughput plotted against concurrency, with the knee marked where latency starts climbing and throughput stops improving">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .ax { stroke: #2e3a47; stroke-width: 1; }
+    .axl { font: 500 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .grid { stroke: #222c37; stroke-width: 1; }
+    .thr { fill: none; stroke: #5aa9e6; stroke-width: 2.5; stroke-linejoin: round; }
+    .lat { fill: none; stroke: #f2a541; stroke-width: 2.5; stroke-linejoin: round; }
+    .dot { fill: #161d26; stroke-width: 2; }
+    .knee { stroke: #e5646c; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .kneel { font: 700 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #e5646c; text-anchor: middle; }
+    .lg { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .zone { font: 500 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; text-anchor: middle; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+  </style>
+  <rect class="bg" width="800" height="400" rx="6"/>
+  <text class="h" x="24" y="34">What a load test shows</text>
+  <text class="t" x="776" y="34" text-anchor="end">ONE GPU, RISING CONCURRENCY</text>
+
+  <!-- legend -->
+  <g transform="translate(24,54)">
+    <rect x="0" y="0" width="14" height="3" rx="1.5" fill="#5aa9e6"/>
+    <text class="lg" x="20" y="6" style="fill:#5aa9e6">throughput</text>
+    <rect x="120" y="0" width="14" height="3" rx="1.5" fill="#f2a541"/>
+    <text class="lg" x="140" y="6" style="fill:#f2a541">latency per user</text>
+  </g>
+
+  <!-- grid -->
+  <line class="grid" x1="80" y1="80"  x2="760" y2="80"/>
+  <line class="grid" x1="80" y1="135" x2="760" y2="135"/>
+  <line class="grid" x1="80" y1="190" x2="760" y2="190"/>
+  <line class="grid" x1="80" y1="245" x2="760" y2="245"/>
+
+  <!-- axes -->
+  <line class="ax" x1="80" y1="300" x2="760" y2="300"/>
+  <line class="ax" x1="80" y1="70"  x2="80"  y2="300"/>
+
+  <!-- knee marker -->
+  <line class="knee" x1="456" y1="70" x2="456" y2="300"/>
+  <text class="kneel" x="456" y="62">the knee</text>
+
+  <!-- throughput line -->
+  <polyline class="thr" points="80,273.6 174,249.4 268,207.6 362,150.4 456,102 550,86.6 644,82.2 738,80"/>
+  <!-- latency line -->
+  <polyline class="lat" points="80,282.4 174,280.2 268,275.8 362,267 456,247.2 550,201 644,141.6 738,80"/>
+
+  <!-- points -->
+  <circle class="dot" cx="456" cy="102" r="4" stroke="#5aa9e6"/>
+  <circle class="dot" cx="456" cy="247.2" r="4" stroke="#f2a541"/>
+
+  <!-- x labels -->
+  <text class="axl" x="80"  y="318" text-anchor="middle">1</text>
+  <text class="axl" x="174" y="318" text-anchor="middle">2</text>
+  <text class="axl" x="268" y="318" text-anchor="middle">4</text>
+  <text class="axl" x="362" y="318" text-anchor="middle">8</text>
+  <text class="axl" x="550" y="318" text-anchor="middle">32</text>
+  <text class="axl" x="644" y="318" text-anchor="middle">64</text>
+  <text class="axl" x="738" y="318" text-anchor="middle">128</text>
+  <text class="axl" x="420" y="345" text-anchor="middle">concurrent requests</text>
+
+  <text class="cap" x="24" y="372">Past the knee, every extra request makes all users wait longer while the system finishes no more work per second.</text>
+  <text class="cap" x="24" y="390">The knee is the capacity number. The crash point is not.</text>
+</svg>

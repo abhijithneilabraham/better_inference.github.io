@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" width="800" height="340" role="img" aria-label="A funnel converting millions of registered users down to the peak concurrency number a system is actually sized for">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .band { rx: 5; }
+    .b1 { fill: #232d39; stroke: #3d4956; stroke-width: 1.5; }
+    .b2 { fill: #232d39; stroke: #3d4956; stroke-width: 1.5; }
+    .b3 { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.5; }
+    .b4 { fill: #3a2c14; stroke: #f2a541; stroke-width: 2; }
+    .n { font: 800 19px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .n4 { fill: #f2a541; }
+    .d { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.5; fill: none; marker-end: url(#a); }
+    .step { font: 600 11px ui-monospace, Menlo, monospace; fill: #8a97a6; }
+    .tag { font: 700 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f2a541; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+  </style>
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker></defs>
+  <rect class="bg" width="800" height="340" rx="6"/>
+  <text class="h" x="24" y="34">The number you size for is not the number of customers</text>
+  <text class="t" x="776" y="34" text-anchor="end">WORKED EXAMPLE</text>
+
+  <!-- band 1 -->
+  <rect class="band b1" x="24" y="58" width="600" height="46"/>
+  <text class="n" x="44" y="88">millions of registered users</text>
+  <text class="d" x="640" y="88">the marketing number</text>
+  <path class="arrow" d="M 120 106 v 16"/>
+
+  <!-- band 2 -->
+  <rect class="band b2" x="24" y="124" width="440" height="46"/>
+  <text class="n" x="44" y="154">a small fraction active at once</text>
+  <text class="d" x="480" y="154">most users are idle right now</text>
+  <path class="arrow" d="M 120 172 v 16"/>
+
+  <!-- band 3 -->
+  <rect class="band b3" x="24" y="190" width="300" height="46"/>
+  <text class="n" x="44" y="220" style="fill:#5aa9e6">5,000 requests/sec</text>
+  <text class="d" x="340" y="220">measured at the busiest moment</text>
+  <path class="arrow" d="M 120 238 v 16"/>
+  <text class="step" x="140" y="252">× 2 sec each</text>
+
+  <!-- band 4 -->
+  <rect class="band b4" x="24" y="256" width="230" height="46"/>
+  <text class="n n4" x="44" y="286">10,000 in flight</text>
+  <text class="tag" x="270" y="281">this is what the system is built for</text>
+  <text class="d" x="270" y="297">everything else is a vanity number</text>
+
+  <text class="cap" x="24" y="328">Getting this one number right matters more than any other decision in the design.</text>
+</svg>
