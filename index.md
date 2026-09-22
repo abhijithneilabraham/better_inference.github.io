@@ -15,7 +15,7 @@ Using Gemma 4 with 31B parameters on a single NVIDIA B300 to go from 46.7 to 150
 
 Code, patches and Dockerfile: [benchmark_gemma](https://github.com/abhijithneilabraham/benchmark_gemma). Benchmark dataset: [longctx30 on Hugging Face](https://huggingface.co/datasets/abhijithneilabraham/longctx30).
 
-### [Learning inference: How to reduce the cold start time of an LLM server](cold-start/)
+### [Reducing the cold start time of an LLM server](cold-start/)
 
 Using vLLM serving a 14B model on a single H100 to go from a 159.6 second cold start down to 18.2 seconds, and then to 0.55 seconds by not restarting at all. The article breaks down where the time actually goes, disk reads and compilation, shows the exact commands for each fix, explains which settings force a full recompile and which are free, and covers two changes that looked like wins and measured out to nothing.
 
