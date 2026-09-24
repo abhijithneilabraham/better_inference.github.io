@@ -18,15 +18,19 @@ In this setup, an unmodified server took 160 seconds to go from a cold process t
 
 ## Experiment Setup
 
-**Hardware.** One NVIDIA H100 80GB. Everything here is a single GPU, so there is no distributed startup cost or NCCL handshake between nodes. A multi GPU setup would add its own phase on top of everything measured here.
+**Hardware.** One NVIDIA H100 80GB HBM3 on a Nebius instance, with CUDA 12.8 and PyTorch 2.8.0. Everything here is a single GPU, so there is no distributed startup cost or NCCL handshake between nodes. A multi GPU setup would add its own phase on top of everything measured here.
+
+**Storage.** The disk is the single most important part of this setup, because it sets the baseline. Measured off a dropped page cache it reads at 432 MB/s in a single stream, and two parallel readers together manage 395 MB/s, so reading in parallel is slightly worse than reading once. At 432 MB/s the 29.55 GB checkpoint cannot be read in less than 68.4 seconds no matter what the loader does, and the measured 78.6 seconds is within 11% of that floor. Anyone reproducing this on local NVMe should expect a much smaller disk cost and therefore a much smaller total.
 
 **Model.** `Qwen/Qwen3-14B` in bf16, about 27.5 GiB of weights.
 
-**Engine.** vLLM 0.11.0 with transformers 4.56.2, using vLLM's own Python interface directly rather than the OpenAI compatible server, so the numbers are the engine's cost and not the API server's cost on top of it. The same experiments were also run against vLLM 0.28.0 later, and the differences are noted where they matter.
+**Engine.** vLLM 0.11.0 with transformers 4.56.2, using vLLM's own Python interface directly rather than the OpenAI compatible server, so the numbers are the engine's cost and not the API server's cost on top of it.
 
 **What counts as cold start here.** Wall clock time was measured from the moment the process starts importing Python packages to the moment a single test generation returns. That last part matters. It is easy to time "the server says it is ready" and miss that a server can report ready and still fail, or still be significantly slower, on the first real request. Every run included one generation, and its time was counted in the total.
 
 **The benchmark harness.** Each measurement is a fresh Python process, not a warm loop, so that every run has a genuinely new CUDA context, matching what a real restart looks like. Between runs, the harness waits for the GPU's memory to fully clear, and if a run leaves an orphaned process holding memory, it is killed before the next one starts. Most configurations were run three or five times, and results are reported as the mean with the standard deviation, the same way a p50 would be reported with its spread. The page cache, explained below, was only dropped for the two experiments that specifically measure disk behaviour. Dropping it everywhere would add about 75 seconds of constant disk noise on top of whatever else was being measured, and would make it impossible to see small effects.
+
+**Where the code and results are.** The measurement harness is [`harness/run_once.py`](https://github.com/abhijithneilabraham/inference_research/blob/main/harness/run_once.py) for a single measured start and [`harness/driver.py`](https://github.com/abhijithneilabraham/inference_research/blob/main/harness/driver.py) for the suites, and every raw run, including the per phase timings quoted below, is in [`results/`](https://github.com/abhijithneilabraham/inference_research/tree/main/results) in the [inference_research](https://github.com/abhijithneilabraham/inference_research) repository. Every command in this article can be run directly against that harness.
 
 ## Where do the 160 seconds go
 
@@ -83,6 +87,19 @@ python3 harness/run_once.py \
 ```
 
 That gave 72.63 seconds. The `--clean-compile-cache` flag is still there in both commands, on purpose, to isolate the disk cost alone. The compiler cost is still fully paid in both of these runs. That is the next thing to fix.
+
+There is a detail in those two numbers worth pulling out, because it does not add up at first glance. The weight file alone went from 78.6 seconds to 4.6 seconds, which is a saving of 74 seconds. But the total fell by about 87 seconds, from 159.6 to 72.6. Something else saved the other 13 seconds. The harness records each phase separately, so it is possible to see exactly what:
+
+| phase | cold disk | warm disk | saved |
+|---|---|---|---|
+| importing torch | 3.85s | 1.02s | 2.8s |
+| importing vLLM | 7.56s | 3.39s | 4.2s |
+| engine init, which contains the weight load | 144.88s | 66.64s | 78.2s |
+| total inside the process | 156.55s | 71.28s | 85.3s |
+
+The answer is that the weight file is the largest thing read off disk during startup, but it is not the only thing. Importing torch and vLLM means reading thousands of Python files and several hundred megabytes of shared libraries, and on a cold disk that costs about 7 seconds more than on a warm one. The remaining few seconds are other files read during engine init, such as the tokenizer and the config. A cold page cache makes every one of those reads slow, not just the big one.
+
+That distinction matters for the advice, not just the arithmetic. The 87 second gap is a completely cold machine compared to a completely warm one. The `cat` command above only pre reads the weight file, so on a genuinely cold machine it recovers about 74 of those 87 seconds. Getting the rest means the Python packages and libraries also have to be in page cache, which happens naturally on the second start and can be forced on the first one by reading those files too.
 
 ## The second big cost: compiling the model
 
