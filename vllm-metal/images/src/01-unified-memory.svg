@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="A normal PC has separate CPU memory and GPU memory joined by a slow cable, so data must be copied. An Apple Silicon Mac has one shared pool of memory that both the CPU and GPU read directly">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="400" rx="6"/>
+  <text class="h" x="24" y="34">Why a Mac is different: one shared memory</text>
+  <text class="t" x="776" y="34" text-anchor="end">UNIFIED MEMORY</text>
+
+  <text class="n" x="24" y="70">A normal PC with an NVIDIA card</text>
+  <rect class="box" x="24" y="84" width="170" height="70" rx="6"/><text class="n" x="109" y="114" text-anchor="middle">CPU</text><text class="d" x="109" y="134" text-anchor="middle">runs Python, the server</text>
+  <rect class="box" x="24" y="166" width="170" height="54" rx="6"/><text class="n" x="109" y="190" text-anchor="middle">CPU memory (RAM)</text><text class="d" x="109" y="208" text-anchor="middle">e.g. 64 GB</text>
+  <rect class="blue" x="226" y="84" width="150" height="70" rx="6"/><text class="n b" x="301" y="114" text-anchor="middle">GPU</text><text class="d" x="301" y="134" text-anchor="middle">does the model math</text>
+  <rect class="blue" x="226" y="166" width="150" height="54" rx="6"/><text class="n b" x="301" y="190" text-anchor="middle">GPU memory</text><text class="d" x="301" y="208" text-anchor="middle">e.g. 24 GB, separate</text>
+  <path class="arrowr" d="M 196 193 H 222"/><path class="arrowr" d="M 224 200 H 198" />
+  <text class="m r" x="24" y="246">data is COPIED across a cable (PCIe)</text>
+  <text class="d" x="24" y="264">the model must fit in the small GPU memory</text>
+
+  <line x1="400" y1="60" x2="400" y2="300" stroke="#2e3a47"/>
+
+  <text class="n" x="424" y="70">An Apple Silicon Mac (M1 to M5)</text>
+  <rect class="box" x="424" y="84" width="160" height="70" rx="6"/><text class="n" x="504" y="114" text-anchor="middle">CPU cores</text><text class="d" x="504" y="134" text-anchor="middle">runs Python, the server</text>
+  <rect class="blue" x="600" y="84" width="176" height="70" rx="6"/><text class="n b" x="688" y="114" text-anchor="middle">GPU cores</text><text class="d" x="688" y="134" text-anchor="middle">does the model math</text>
+  <rect class="good" x="424" y="176" width="352" height="54" rx="6"/><text class="n g" x="600" y="200" text-anchor="middle">one shared memory pool</text><text class="d" x="600" y="218" text-anchor="middle">e.g. 8 GB to 512 GB, both sides read it directly</text>
+  <path class="arrowg" d="M 504 156 V 172"/><path class="arrowg" d="M 688 156 V 172"/>
+  <text class="m g" x="424" y="256">no copy needed between CPU and GPU</text>
+  <text class="d" x="424" y="274">a model can use most of the Mac's memory</text>
+
+  <line class="rule" x1="24" y1="310" x2="776" y2="310"/>
+  <text class="cap" x="24" y="336">This is why a Mac with a lot of memory can run models that would need an expensive GPU on a PC.</text>
+  <text class="cap" x="24" y="356">The catch: the same memory also has to hold macOS and your other apps.</text>
+  <text class="cap" x="24" y="376">And Apple GPUs do not speak CUDA, which is what most AI software, including vLLM, is written for.</text>
+
+</svg>

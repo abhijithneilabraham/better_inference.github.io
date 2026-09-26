@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-label="The life of one request, in eight hops, from the HTTP call through the vLLM scheduler, the Metal worker and model runner, the mlx_lm model with wrapped attention, the Metal kernels, sampling, and back">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="520" rx="6"/>
+  <text class="h" x="24" y="34">The life of one request</text>
+  <text class="t" x="776" y="34" text-anchor="end">8 HOPS, EVERY STEP</text>
+
+<rect class="box" x="24" y="56" width="560" height="42" rx="5"/>
+  <text class="m s" x="40" y="82">1</text>
+  <text class="n" x="64" y="75" style="font-size:12px">Your app sends POST /v1/chat/completions</text>
+  <text class="d" x="64" y="91">vLLM's OpenAI server turns the text into token ids</text><rect class="blue" x="24" y="106" width="560" height="42" rx="5"/>
+  <text class="m b" x="40" y="132">2</text>
+  <text class="n" x="64" y="125" style="font-size:12px">vLLM scheduler plans the step</text>
+  <text class="d" x="64" y="141">picks which requests run, how many tokens each, and their KV block ids</text><rect class="amber" x="24" y="156" width="560" height="42" rx="5"/>
+  <text class="m a" x="40" y="182">3</text>
+  <text class="n" x="64" y="175" style="font-size:12px">MetalWorker hands the plan to MetalModelRunner</text>
+  <text class="d" x="64" y="191">the plugin's worker, set in place of the CUDA worker</text><rect class="amber" x="24" y="206" width="560" height="42" rx="5"/>
+  <text class="m a" x="40" y="232">4</text>
+  <text class="n" x="64" y="225" style="font-size:12px">the runner packs every token into one row</text>
+  <text class="d" x="64" y="241">decode tokens first, then prefill chunks, plus where each request starts</text><rect class="amber" x="24" y="256" width="560" height="42" rx="5"/>
+  <text class="m a" x="40" y="282">5</text>
+  <text class="n" x="64" y="275" style="font-size:12px">it writes a per-step 'context' and calls the mlx_lm model</text>
+  <text class="d" x="64" y="291">slot mapping, block tables, positions, kept where the wrapped layers can read them</text><rect class="purple" x="24" y="306" width="560" height="42" rx="5"/>
+  <text class="m p" x="40" y="332">6</text>
+  <text class="n" x="64" y="325" style="font-size:12px">the mlx_lm model runs layer by layer</text>
+  <text class="d" x="64" y="341">embeddings, norms, MLP come from mlx_lm; attention is the plugin's wrapper</text><rect class="good" x="24" y="356" width="560" height="42" rx="5"/>
+  <text class="m g" x="40" y="382">7</text>
+  <text class="n" x="64" y="375" style="font-size:12px">each attention layer calls two Metal kernels</text>
+  <text class="d" x="64" y="391">reshape_and_cache writes new K and V into pages; paged_attention reads them</text><rect class="blue" x="24" y="406" width="560" height="42" rx="5"/>
+  <text class="m b" x="40" y="432">8</text>
+  <text class="n" x="64" y="425" style="font-size:12px">sample the next token, send it back</text>
+  <text class="d" x="64" y="441">greedy in MLX, others through vLLM's sampler; the token streams to your app</text>
+  <rect class="box" x="604" y="56" width="172" height="392" rx="6"/>
+  <text class="n" x="618" y="80" style="font-size:12px">who owns each hop</text>
+  <text class="m b" x="618" y="108">vLLM</text><text class="d" x="618" y="124">1, 2, and part of 8</text>
+  <text class="m a" x="618" y="156">vllm-metal</text><text class="d" x="618" y="172">3, 4, 5, 7, and 8</text>
+  <text class="m p" x="618" y="204">mlx_lm</text><text class="d" x="618" y="220">6, the model itself</text>
+  <line class="rule" x1="618" y1="240" x2="762" y2="240"/>
+  <text class="d" x="618" y="262">nothing is computed until</text>
+  <text class="d" x="618" y="278">the end of hop 7. MLX builds</text>
+  <text class="d" x="618" y="294">the whole step as a lazy</text>
+  <text class="d" x="618" y="310">graph, then sends it to the</text>
+  <text class="d" x="618" y="326">GPU in one go.</text>
+  <line class="rule" x1="618" y1="346" x2="762" y2="346"/>
+  <text class="d" x="618" y="368">then the loop repeats for</text>
+  <text class="d" x="618" y="384">the next token, until the</text>
+  <text class="d" x="618" y="400">answer is done.</text>
+
+  <text class="cap" x="24" y="486">One "step" moves every running request forward at the same time. That is how one Mac serves</text>
+  <text class="cap" x="24" y="506">many users at once, a trick called continuous batching.</text>
+
+</svg>

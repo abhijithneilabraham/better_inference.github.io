@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 330" width="800" height="330" role="img" aria-label="TurboQuant shrinks the KV cache. Keys keep 8 bits and values drop to 3 bits by default, about 2.5 times smaller, so the same memory holds about 2.5 times more context">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="330" rx="6"/>
+  <text class="h" x="24" y="34">TurboQuant: squeeze the KV cache</text>
+  <text class="t" x="776" y="34" text-anchor="end">KV COMPRESSION</text>
+
+  <text class="n" x="24" y="72">normal KV cache (16 bits)</text>
+  <rect class="blue" x="220" y="56" width="512" height="26" rx="4"/><text class="m b" x="476" y="74" text-anchor="middle">keys 16 bit  |  values 16 bit</text>
+
+  <text class="n" x="24" y="120">TurboQuant default</text>
+  <rect class="good" x="220" y="104" width="200" height="26" rx="4"/><text class="m g" x="320" y="122" text-anchor="middle">~2.56x smaller</text>
+  <text class="d" x="432" y="122">keys 8 bit (q8_0), values 3 bit (q3_0)</text>
+
+  <text class="d" x="24" y="160">how: spin the numbers with a Walsh-Hadamard rotation so no single value is huge, then store each small block with fewer bits.</text>
+
+  <rect class="amber" x="24" y="178" width="752" height="62" rx="5"/>
+  <text class="n a" x="40" y="200" style="font-size:12px">why keys need more bits than values</text>
+  <text class="d" x="40" y="220">keys go into the attention score, which is exponentiated, so small key errors blow up.</text>
+  <text class="d" x="40" y="234">value errors just get averaged over the context, so values can be squeezed much harder.</text>
+
+  <line class="rule" x1="24" y1="258" x2="776" y2="258"/>
+  <text class="cap" x="24" y="284">Same memory, about 2.5x more context. Very low settings (2 bit keys) badly hurt the output, so test before using them.</text>
+  <text class="cap" x="24" y="304">Turned on with --additional-config '{"turboquant": true}'. Not supported on MLA models.</text>
+
+</svg>

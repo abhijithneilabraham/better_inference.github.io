@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" width="800" height="380" role="img" aria-label="Speculative decoding. A cheap drafter guesses several tokens, the big model checks all of them in one pass, and keeps the ones that match">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="380" rx="6"/>
+  <text class="h" x="24" y="34">Speculative decoding: guess, then check</text>
+  <text class="t" x="776" y="34" text-anchor="end">SPEC DECODE</text>
+
+  <text class="n" x="24" y="70">Without it: the big model makes 1 token per pass</text>
+  <g>
+    <rect class="box" x="24" y="82" width="90" height="28" rx="4"/><text class="m s" x="69" y="101" text-anchor="middle">pass 1: the</text>
+    <rect class="box" x="120" y="82" width="90" height="28" rx="4"/><text class="m s" x="165" y="101" text-anchor="middle">pass 2: cat</text>
+    <rect class="box" x="216" y="82" width="90" height="28" rx="4"/><text class="m s" x="261" y="101" text-anchor="middle">pass 3: sat</text>
+    <rect class="box" x="312" y="82" width="90" height="28" rx="4"/><text class="m s" x="357" y="101" text-anchor="middle">pass 4: on</text>
+  </g>
+  <text class="d" x="420" y="100">4 slow passes for 4 tokens</text>
+
+  <line class="rule" x1="24" y1="130" x2="776" y2="130"/>
+  <text class="n" x="24" y="160">With it: a cheap drafter guesses, the big model checks</text>
+
+  <rect class="purple" x="24" y="176" width="220" height="60" rx="5"/>
+  <text class="n p" x="40" y="198">step 1, the drafter guesses 3</text>
+  <text class="m p" x="40" y="222">"cat" "sat" "in"</text>
+
+  <path class="arrow" d="M 248 206 H 280"/>
+
+  <rect class="blue" x="286" y="176" width="232" height="60" rx="5"/>
+  <text class="n b" x="302" y="198">step 2, big model checks all 3</text>
+  <text class="d" x="302" y="222">in ONE pass, like a small prefill</text>
+
+  <path class="arrow" d="M 522 206 H 554"/>
+
+  <rect class="good" x="560" y="176" width="216" height="60" rx="5"/>
+  <text class="n g" x="576" y="198">step 3, keep what matches</text>
+  <text class="m g" x="576" y="222">cat ✓ sat ✓ in ✗ → on</text>
+
+  <text class="d" x="24" y="266">result: 3 tokens (cat, sat, and the corrected "on") from 1 big pass. the output is exactly what the big model alone would write.</text>
+
+  <rect class="box" x="24" y="286" width="752" height="66" rx="5"/>
+  <text class="n" x="40" y="308" style="font-size:12px">Three kinds of drafter in vllm-metal</text>
+  <text class="d" x="40" y="328">MTP: a small "assistant" head made for Gemma 4  ·  Draft model: a separate small model, e.g. Qwen3-0.6B for Qwen3-8B</text>
+  <text class="d" x="40" y="344">N-gram: no model at all, it copies patterns that already appeared in the prompt  ·  greedy requests only on Metal</text>
+
+</svg>

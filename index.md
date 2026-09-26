@@ -24,3 +24,7 @@ Code and every measured result: [inference_research](https://github.com/abhijith
 ### [From one GPU to millions of users](scaling/)
 
 How to size an inference system, starting from a load test instead of a guess. Covers what a load test measures, Little's Law as the one formula connecting concurrency, throughput and latency, the KV cache memory math that usually caps concurrency before compute does, and how to turn a customer count into the peak concurrency number a system actually has to be built for. Ends with the pieces that make many GPU replicas behave like one system: routing, autoscaling, continuous batching, prefix caching, and backpressure.
+
+### [vLLM on a Mac: vllm-metal explained from zero](vllm-metal/)
+
+A beginner's guide to vllm-metal, the plugin that runs vLLM on Apple Silicon using MLX. Starts from what unified memory is and why vLLM does not simply run on a Mac, then follows one request through the vLLM scheduler, the Metal worker, the mlx_lm model and the paged attention kernels. Covers the paged KV cache with a worked example, how the plugin swaps attention layers without editing the model, the single kernel that handles a whole batch, how the KV cache memory budget is set, and features like prefix caching, speculative decoding, TurboQuant and running across two Macs. Twelve figures, with pointers into the source code.

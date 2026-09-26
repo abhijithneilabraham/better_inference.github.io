@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420" role="img" aria-label="Every step packs all requests into one row, decode tokens first and then prefill chunks, marked by cumulative lengths. One paged attention kernel per layer handles the whole row and picks the NAX, tiled or per-token path">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="420" rx="6"/>
+  <text class="h" x="24" y="34">One row, one kernel, every request</text>
+  <text class="t" x="776" y="34" text-anchor="end">UNIFIED PAGED VARLEN</text>
+
+  <text class="n" x="24" y="68">this step's work, packed into one row of tokens</text>
+<rect class="good" x="24" y="80" width="56" height="34" rx="3"/><text class="m g" x="52.0" y="102" text-anchor="middle">A</text><rect class="good" x="84" y="80" width="56" height="34" rx="3"/><text class="m g" x="112.0" y="102" text-anchor="middle">B</text><rect class="good" x="144" y="80" width="56" height="34" rx="3"/><text class="m g" x="172.0" y="102" text-anchor="middle">C</text><rect class="amber" x="204" y="80" width="300" height="34" rx="3"/><text class="m a" x="354.0" y="102" text-anchor="middle">D: prompt chunk, 5 tokens</text><rect class="amber" x="508" y="80" width="268" height="34" rx="3"/><text class="m a" x="642.0" y="102" text-anchor="middle">E: prompt, 4 tokens</text>
+  <text class="d" x="24" y="134">green = decode, 1 new token each (A, B, C are mid-answer).  amber = prefill (D, E are reading prompts).</text>
+  <text class="m w" x="24" y="160">cu_seqlens = [0, 1, 2, 3, 8, 12]</text>
+  <text class="d" x="260" y="160">where each request's piece starts and ends in the row</text>
+
+  <rect class="box" x="24" y="178" width="752" height="58" rx="6"/>
+  <text class="n" x="40" y="200" style="font-size:12px">"varlen" = variable length</text>
+  <text class="d" x="40" y="220">each GPU thread looks up which request its token belongs to (a quick search in cu_seqlens), then reads only that request's pages</text>
+
+  <text class="n" x="24" y="266">which kernel runs, inside that one call</text>
+  <rect class="good" x="24" y="278" width="240" height="64" rx="5"/><text class="n g" x="40" y="300" style="font-size:12px">NAX prefill</text><text class="d" x="40" y="318">M5 chips only: uses the new</text><text class="d" x="40" y="333">tensor units for prompt reading</text>
+  <rect class="blue" x="280" y="278" width="240" height="64" rx="5"/><text class="n b" x="296" y="300" style="font-size:12px">tiled prefill</text><text class="d" x="296" y="318">any batch with a prompt in it,</text><text class="d" x="296" y="333">Flash-Attention style tiles</text>
+  <rect class="purple" x="536" y="278" width="240" height="64" rx="5"/><text class="n p" x="552" y="300" style="font-size:12px">per-token decode</text><text class="d" x="552" y="318">pure decode steps; splits long</text><text class="d" x="552" y="333">contexts into 512-token parts</text>
+
+  <line class="rule" x1="24" y1="360" x2="776" y2="360"/>
+  <text class="cap" x="24" y="384">One launch per layer for the whole batch, whatever mix of reading and writing it holds. The v0.2.0</text>
+  <text class="cap" x="24" y="404">release that made it the default reported 83x faster first tokens and 3.6x throughput over v0.1.0.</text>
+
+</svg>

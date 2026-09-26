@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="How vllm-metal plugs into an mlx_lm model without editing it. It walks the layers and replaces each attention module with a wrapper that reads the per-step context and calls the paged Metal kernels">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="400" rx="6"/>
+  <text class="h" x="24" y="34">Swapping the attention, without editing the model</text>
+  <text class="t" x="776" y="34" text-anchor="end">WALK AND WRAP</text>
+
+  <rect class="purple" x="24" y="60" width="300" height="236" rx="6"/>
+  <text class="n p" x="40" y="82">an mlx_lm model, as downloaded</text>
+<rect class="box" x="40" y="96" width="268" height="40" rx="4"/>
+  <text class="m s" x="52" y="114">layer 0</text>
+  <text class="m r" x="120" y="114">self_attn</text><text class="m s" x="210" y="114">+ mlp</text>
+  <text class="d" x="52" y="129">expects a simple, unpaged cache</text><rect class="box" x="40" y="144" width="268" height="40" rx="4"/>
+  <text class="m s" x="52" y="162">layer 1</text>
+  <text class="m r" x="120" y="162">self_attn</text><text class="m s" x="210" y="162">+ mlp</text>
+  <text class="d" x="52" y="177">expects a simple, unpaged cache</text><rect class="box" x="40" y="192" width="268" height="40" rx="4"/>
+  <text class="m s" x="52" y="210">layer 2</text>
+  <text class="m r" x="120" y="210">self_attn</text><text class="m s" x="210" y="210">+ mlp</text>
+  <text class="d" x="52" y="225">expects a simple, unpaged cache</text><rect class="box" x="40" y="240" width="268" height="40" rx="4"/>
+  <text class="m s" x="52" y="258">layer 3</text>
+  <text class="m r" x="120" y="258">self_attn</text><text class="m s" x="210" y="258">+ mlp</text>
+  <text class="d" x="52" y="273">expects a simple, unpaged cache</text>
+  <path class="arrowa" d="M 330 178 H 400"/><text class="m a" x="365" y="168" text-anchor="middle">walk</text><text class="m a" x="365" y="198" text-anchor="middle">and wrap</text>
+
+  <rect class="amber" x="406" y="60" width="370" height="236" rx="6"/>
+  <text class="n a" x="422" y="82">the same model, after vllm-metal</text>
+<rect class="box" x="422" y="96" width="338" height="40" rx="4"/>
+  <text class="m s" x="434" y="114">layer 0</text>
+  <text class="m g" x="502" y="114">PagedWrapper</text><text class="m s" x="620" y="114">+ mlp (same)</text>
+  <text class="d" x="434" y="129">keeps the original inside, adds paging</text><rect class="box" x="422" y="144" width="338" height="40" rx="4"/>
+  <text class="m s" x="434" y="162">layer 1</text>
+  <text class="m g" x="502" y="162">PagedWrapper</text><text class="m s" x="620" y="162">+ mlp (same)</text>
+  <text class="d" x="434" y="177">keeps the original inside, adds paging</text><rect class="box" x="422" y="192" width="338" height="40" rx="4"/>
+  <text class="m s" x="434" y="210">layer 2</text>
+  <text class="m g" x="502" y="210">PagedWrapper</text><text class="m s" x="620" y="210">+ mlp (same)</text>
+  <text class="d" x="434" y="225">keeps the original inside, adds paging</text><rect class="box" x="422" y="240" width="338" height="40" rx="4"/>
+  <text class="m s" x="434" y="258">layer 3</text>
+  <text class="m g" x="502" y="258">PagedWrapper</text><text class="m s" x="620" y="258">+ mlp (same)</text>
+  <text class="d" x="434" y="273">keeps the original inside, adds paging</text>
+  <rect class="box" x="24" y="310" width="752" height="74" rx="6"/>
+  <text class="n" x="40" y="332" style="font-size:12px">what the wrapper does on every call</text>
+  <text class="d" x="40" y="352">1. use the model's own q, k, v projections, norms and RoPE  2. read the step's context (slot mapping, block tables)</text>
+  <text class="d" x="40" y="370">3. write new K and V into the pages  4. run paged attention  5. apply the output projection.  no context set? act like the original.</text>
+
+</svg>

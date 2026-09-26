@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" width="800" height="440" role="img" aria-label="The paged KV cache. Memory is cut into blocks of 16 token slots. Each request has a block table listing which blocks it owns, in order, and they do not need to be next to each other">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="440" rx="6"/>
+  <text class="h" x="24" y="34">The KV cache is kept in pages</text>
+  <text class="t" x="776" y="34" text-anchor="end">PAGED KV CACHE</text>
+
+  <text class="n" x="24" y="68">GPU memory, cut into blocks of 16 token slots each</text>
+<rect class="blue" x="24" y="80" width="56" height="40" rx="4"/><text class="m b" x="52" y="99" text-anchor="middle">block</text><text class="m b" x="52" y="113" text-anchor="middle">0</text><rect class="box" x="86" y="80" width="56" height="40" rx="4"/><text class="m s" x="114" y="99" text-anchor="middle">block</text><text class="m s" x="114" y="113" text-anchor="middle">1</text><rect class="amber" x="148" y="80" width="56" height="40" rx="4"/><text class="m a" x="176" y="99" text-anchor="middle">block</text><text class="m a" x="176" y="113" text-anchor="middle">2</text><rect class="blue" x="210" y="80" width="56" height="40" rx="4"/><text class="m b" x="238" y="99" text-anchor="middle">block</text><text class="m b" x="238" y="113" text-anchor="middle">3</text><rect class="amber" x="272" y="80" width="56" height="40" rx="4"/><text class="m a" x="300" y="99" text-anchor="middle">block</text><text class="m a" x="300" y="113" text-anchor="middle">4</text><rect class="box" x="334" y="80" width="56" height="40" rx="4"/><text class="m s" x="362" y="99" text-anchor="middle">block</text><text class="m s" x="362" y="113" text-anchor="middle">5</text><rect class="blue" x="396" y="80" width="56" height="40" rx="4"/><text class="m b" x="424" y="99" text-anchor="middle">block</text><text class="m b" x="424" y="113" text-anchor="middle">6</text><rect class="box" x="458" y="80" width="56" height="40" rx="4"/><text class="m s" x="486" y="99" text-anchor="middle">block</text><text class="m s" x="486" y="113" text-anchor="middle">7</text><rect class="amber" x="520" y="80" width="56" height="40" rx="4"/><text class="m a" x="548" y="99" text-anchor="middle">block</text><text class="m a" x="548" y="113" text-anchor="middle">8</text><rect class="box" x="582" y="80" width="56" height="40" rx="4"/><text class="m s" x="610" y="99" text-anchor="middle">block</text><text class="m s" x="610" y="113" text-anchor="middle">9</text><rect class="box" x="644" y="80" width="56" height="40" rx="4"/><text class="m s" x="672" y="99" text-anchor="middle">block</text><text class="m s" x="672" y="113" text-anchor="middle">10</text><rect class="box" x="706" y="80" width="56" height="40" rx="4"/><text class="m s" x="734" y="99" text-anchor="middle">block</text><text class="m s" x="734" y="113" text-anchor="middle">11</text>
+  <text class="d" x="24" y="140">blue = request A,  amber = request B,  grey = free. a request's pages can sit anywhere.</text>
+
+  <rect class="blue" x="24" y="156" width="360" height="92" rx="6"/>
+  <text class="n b" x="40" y="178">request A's block table</text>
+  <text class="m b" x="40" y="202">[ 0, 3, 6 ]</text>
+  <text class="d" x="40" y="224">tokens 0-15 in block 0, 16-31 in block 3,</text>
+  <text class="d" x="40" y="240">32-47 in block 6</text>
+  <rect class="amber" x="416" y="156" width="360" height="92" rx="6"/>
+  <text class="n a" x="432" y="178">request B's block table</text>
+  <text class="m a" x="432" y="202">[ 2, 4, 8 ]</text>
+  <text class="d" x="432" y="224">a new block is handed out only when the</text>
+  <text class="d" x="432" y="240">last one fills up, so almost nothing is wasted</text>
+
+  <rect class="box" x="24" y="264" width="752" height="84" rx="6"/>
+  <text class="n" x="40" y="286" style="font-size:12px">where does token 20 of request A go?</text>
+  <text class="m w" x="40" y="310">slot = block_table[20 // 16] * 16 + (20 % 16)  =  3 * 16 + 4  =  52</text>
+  <text class="d" x="40" y="332">vllm-metal computes this "slot mapping" for every token, then a Metal kernel writes the key and value there</text>
+
+  <line class="rule" x1="24" y1="366" x2="776" y2="366"/>
+  <text class="cap" x="24" y="390">vLLM's block manager decides who owns which block. vllm-metal only reads and writes the pages.</text>
+  <text class="cap" x="24" y="410">The same idea as pages in an operating system: no big empty reservation per request,</text>
+  <text class="cap" x="24" y="430">so many more requests fit in the same memory.</text>
+
+</svg>

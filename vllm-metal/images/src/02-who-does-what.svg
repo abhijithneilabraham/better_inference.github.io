@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 470" width="800" height="470" role="img" aria-label="Who does what. Upstream vLLM runs the API server, the scheduler and the block manager. vllm-metal replaces the worker, the model runner and the attention. mlx_lm provides the model layers. MLX and Metal run everything on the Apple GPU">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="470" rx="6"/>
+  <text class="h" x="24" y="34">Four layers, three teams</text>
+  <text class="t" x="776" y="34" text-anchor="end">WHO DOES WHAT</text>
+
+  <rect class="box" x="24" y="56" width="752" height="46" rx="6"/>
+  <text class="n" x="40" y="78">your app</text><text class="d" x="40" y="94">chat UI, coding agent, OpenAI SDK, curl</text>
+  <text class="m s" x="760" y="84" text-anchor="end">talks OpenAI-style HTTP</text>
+  <path class="arrow" d="M 120 104 V 116"/>
+
+  <rect class="blue" x="24" y="118" width="752" height="74" rx="6"/>
+  <text class="n b" x="40" y="140">vLLM, the manager (upstream, used as is)</text>
+  <text class="d" x="40" y="160">API server  ·  scheduler: who gets to run this step  ·  block manager: which memory pages each request owns</text>
+  <text class="d" x="40" y="178">prefix cache hashing  ·  tokenizer  ·  the sampler for non-greedy requests</text>
+  <path class="arrow" d="M 120 194 V 206"/><text class="m s" x="132" y="204">"run these tokens, using these memory pages"</text>
+
+  <rect class="amber" x="24" y="208" width="752" height="96" rx="6"/>
+  <text class="n a" x="40" y="230">vllm-metal, the plugin (this project)</text>
+  <text class="d" x="40" y="250">MetalPlatform: tells vLLM "you are on a Mac" and picks the Metal worker</text>
+  <text class="d" x="40" y="266">MetalWorker + MetalModelRunner: pack the tokens, run the model, sample the next token</text>
+  <text class="d" x="40" y="282">the attention path: paged attention Metal kernels, M5 NAX prefill, speculative decoding</text>
+  <text class="d" x="40" y="298">loads the model with mlx_lm, then swaps each attention layer for its own</text>
+
+  <rect class="purple" x="24" y="316" width="364" height="64" rx="6"/>
+  <text class="n p" x="40" y="338">mlx_lm, the model recipes</text>
+  <text class="d" x="40" y="356">Qwen, Llama, Gemma, ... layer code and weight loading</text>
+  <text class="d" x="40" y="372">knows nothing about requests or pages</text>
+  <rect class="good" x="412" y="316" width="364" height="64" rx="6"/>
+  <text class="n g" x="428" y="338">MLX + Metal, the engine room</text>
+  <text class="d" x="428" y="356">Apple's array library and GPU language</text>
+  <text class="d" x="428" y="372">runs every op on the Mac GPU, in unified memory</text>
+
+  <line class="rule" x1="24" y1="398" x2="776" y2="398"/>
+  <text class="cap" x="24" y="422">vLLM decides WHAT to run. mlx_lm defines the MODEL. vllm-metal makes the two meet on a Mac,</text>
+  <text class="cap" x="24" y="442">and owns the part that has to know about many requests at once: attention over paged memory.</text>
+  <text class="cap" x="24" y="462" style="fill:#8a97a6">PyTorch is only used at the edges, where vLLM expects it. The model math itself is all MLX.</text>
+
+</svg>

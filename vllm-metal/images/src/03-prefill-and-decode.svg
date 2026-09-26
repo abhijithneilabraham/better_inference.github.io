@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="800" height="360" role="img" aria-label="Prefill reads the whole prompt in one pass and produces the first token. Decode then produces one token per pass, reusing saved work from the KV cache">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="360" rx="6"/>
+  <text class="h" x="24" y="34">Two phases of every answer</text>
+  <text class="t" x="776" y="34" text-anchor="end">PREFILL AND DECODE</text>
+
+  <text class="n a" x="24" y="72">1. Prefill: read the whole prompt at once</text>
+  <g>
+    <rect class="amber" x="24" y="84" width="72" height="30" rx="4"/><text class="m a" x="60" y="104" text-anchor="middle">What</text>
+    <rect class="amber" x="100" y="84" width="72" height="30" rx="4"/><text class="m a" x="136" y="104" text-anchor="middle">is</text>
+    <rect class="amber" x="176" y="84" width="72" height="30" rx="4"/><text class="m a" x="212" y="104" text-anchor="middle">the</text>
+    <rect class="amber" x="252" y="84" width="72" height="30" rx="4"/><text class="m a" x="288" y="104" text-anchor="middle">capital</text>
+    <rect class="amber" x="328" y="84" width="72" height="30" rx="4"/><text class="m a" x="364" y="104" text-anchor="middle">of</text>
+    <rect class="amber" x="404" y="84" width="72" height="30" rx="4"/><text class="m a" x="440" y="104" text-anchor="middle">France</text>
+  </g>
+  <path class="arrowa" d="M 482 99 H 540"/>
+  <rect class="good" x="546" y="84" width="72" height="30" rx="4"/><text class="m g" x="582" y="104" text-anchor="middle">Paris</text>
+  <text class="d" x="24" y="136">all prompt tokens go through the model together. heavy math, one pass. its time is the "time to first token"</text>
+
+  <text class="n g" x="24" y="186">2. Decode: one new token per pass</text>
+  <g>
+    <rect class="box" x="24" y="198" width="120" height="30" rx="4"/><text class="m s" x="84" y="218" text-anchor="middle">saved prompt</text>
+    <rect class="good" x="150" y="198" width="60" height="30" rx="4"/><text class="m g" x="180" y="218" text-anchor="middle">Paris</text>
+    <path class="arrowg" d="M 214 213 H 244"/>
+    <rect class="good" x="250" y="198" width="60" height="30" rx="4"/><text class="m g" x="280" y="218" text-anchor="middle">is</text>
+    <path class="arrowg" d="M 314 213 H 344"/>
+    <rect class="good" x="350" y="198" width="60" height="30" rx="4"/><text class="m g" x="380" y="218" text-anchor="middle">a</text>
+    <path class="arrowg" d="M 414 213 H 444"/>
+    <rect class="good" x="450" y="198" width="80" height="30" rx="4"/><text class="m g" x="490" y="218" text-anchor="middle">city</text>
+    <text class="d" x="546" y="218">... until done</text>
+  </g>
+  <text class="d" x="24" y="250">each step reads the whole model from memory to make one token. its speed is "tokens per second"</text>
+
+  <rect class="blue" x="24" y="270" width="752" height="46" rx="5"/>
+  <text class="n b" x="40" y="291" style="font-size:12px">The KV cache is the saved work</text>
+  <text class="d" x="40" y="308">during prefill the model saves a small note (a key and a value) for every token, so decode never has to re-read the prompt</text>
+  <text class="cap" x="24" y="344">A server mixes both kinds of work from many users in every single step.</text>
+
+</svg>

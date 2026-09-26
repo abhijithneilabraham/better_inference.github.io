@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="How much memory the KV cache gets. macOS recommends a working set for the GPU. vllm-metal takes gpu-memory-utilization of that, subtracts the model weights and a measured overhead, and the rest becomes KV blocks">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="400" rx="6"/>
+  <text class="h" x="24" y="34">How much memory the KV cache gets</text>
+  <text class="t" x="776" y="34" text-anchor="end">MEMORY BUDGET</text>
+
+  <text class="n" x="24" y="68">a 16 GB Mac, as an example</text>
+  <rect class="box" x="24" y="80" width="752" height="30" rx="4"/><text class="m s" x="400" y="100" text-anchor="middle">all memory: 16 GB</text>
+  <rect class="blue" x="24" y="120" width="560" height="30" rx="4"/><text class="m b" x="304" y="140" text-anchor="middle">GPU "recommended working set", roughly 2/3 to 3/4 of it</text>
+  <text class="d" x="600" y="140">the rest is for macOS and apps</text>
+
+  <text class="d" x="24" y="176">times --gpu-memory-utilization (say 0.8) gives the plugin's share, then take away:</text>
+  <rect class="purple" x="24" y="188" width="230" height="36" rx="4"/><text class="m p" x="139" y="211" text-anchor="middle">model weights</text>
+  <rect class="amber" x="258" y="188" width="80" height="36" rx="4"/><text class="m a" x="298" y="211" text-anchor="middle">overhead</text>
+  <rect class="good" x="342" y="188" width="106" height="36" rx="4"/><text class="m g" x="395" y="211" text-anchor="middle">KV cache</text>
+  <text class="d" x="462" y="204">KV cache = what is left,</text><text class="d" x="462" y="220">cut into 16-token blocks</text>
+
+  <rect class="box" x="24" y="244" width="752" height="84" rx="6"/>
+  <text class="n" x="40" y="266" style="font-size:12px">how it measures "overhead"</text>
+  <text class="d" x="40" y="286">at startup it runs one dummy step at the biggest batch size (profile_run) and measures how much scratch memory MLX needed.</text>
+  <text class="d" x="40" y="302">MLX's buffer cache is then capped at exactly that, so it cannot quietly grow and eat into the KV cache later.</text>
+  <text class="m w" x="40" y="320">kv = working_set x gpu_memory_utilization - weights - overhead</text>
+
+  <line class="rule" x1="24" y1="344" x2="776" y2="344"/>
+  <text class="cap" x="24" y="368">More KV blocks means more users at once and longer conversations. If a model barely fits,</text>
+  <text class="cap" x="24" y="388">lower --max-model-len or --max-num-seqs, pick a smaller quantized model, or turn on TurboQuant.</text>
+
+</svg>
