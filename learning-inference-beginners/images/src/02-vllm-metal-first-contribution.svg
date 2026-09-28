@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" width="800" height="380" role="img" aria-label="The first contribution loop for vllm-metal. Fork and install, run a tiny model, pick something small, prove it with tests and the parity tool, then open a signed off PR">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="380" rx="6"/>
+  <text class="h" x="24" y="34">Your first vllm-metal PR</text>
+  <text class="t" x="776" y="34" text-anchor="end">APPLE SILICON</text>
+<rect class="box" x="24" y="58" width="470" height="48" rx="5"/>
+  <text class="n s" x="40" y="79" style="font-size:12.5px">1  fork and install</text><text class="m s" x="40" y="96">./install.sh, full Xcode needed (about 10 GB)</text>
+  <path class="arrow" d="M 110 107 V 115"/><rect class="blue" x="24" y="116" width="470" height="48" rx="5"/>
+  <text class="n b" x="40" y="137" style="font-size:12.5px">2  run a tiny model</text><text class="m s" x="40" y="154">vllm serve Qwen/Qwen3-0.6B on your own Mac</text>
+  <path class="arrow" d="M 110 165 V 173"/><rect class="purple" x="24" y="174" width="470" height="48" rx="5"/>
+  <text class="n p" x="40" y="195" style="font-size:12.5px">3  pick something small</text><text class="m s" x="40" y="212">an experimental model, a doc gap, a failing edge case</text>
+  <path class="arrow" d="M 110 223 V 231"/><rect class="amber" x="24" y="232" width="470" height="48" rx="5"/>
+  <text class="n a" x="40" y="253" style="font-size:12.5px">4  prove it</text><text class="m s" x="40" y="270">pytest -m "not slow" tests/, the greedy parity tool</text>
+  <path class="arrow" d="M 110 281 V 289"/><rect class="good" x="24" y="290" width="470" height="48" rx="5"/>
+  <text class="n g" x="40" y="311" style="font-size:12.5px">5  open the PR</text><text class="m s" x="40" y="328">git commit -s, numbers for any speed claim</text>
+  
+  <rect class="box" x="516" y="58" width="260" height="280" rx="6"/>
+  <text class="n" x="532" y="82" style="font-size:12.5px">good first targets</text>
+  <text class="d" x="532" y="106">models marked experimental in</text><text class="d" x="532" y="122">docs/supported_models.md: run</text><text class="d" x="532" y="138">them, report what breaks</text>
+  <text class="d" x="532" y="166">the parity tool: does the server</text><text class="d" x="532" y="182">match plain mlx-lm token by token?</text>
+  <text class="d" x="532" y="210">docs that confused you. you are</text><text class="d" x="532" y="226">the best tester of beginner docs</text>
+  <text class="d" x="532" y="254">tests for an edge case you hit</text>
+  <text class="d" x="532" y="282">a model family missing from</text><text class="d" x="532" y="298">the list that mlx-lm already has</text>
+  <text class="cap" x="24" y="366">The whole VLLM stack, scheduler and all, running on the laptop you already own.</text>
+</svg>

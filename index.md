@@ -28,3 +28,7 @@ How to size an inference system, starting from a load test instead of a guess. C
 ### [vLLM on a Mac: vllm-metal explained from zero](vllm-metal/)
 
 A beginner's guide to vllm-metal, the plugin that runs vLLM on Apple Silicon using MLX. Starts from what unified memory is and why vLLM does not simply run on a Mac, then follows one request through the vLLM scheduler, the Metal worker, the mlx_lm model and the paged attention kernels. Covers the paged KV cache with a worked example, how the plugin swaps attention layers without editing the model, the single kernel that handles a whole batch, how the KV cache memory budget is set, and features like prefix caching, speculative decoding, TurboQuant and running across two Macs. Twelve figures, with pointers into the source code.
+
+### [Learning Inference: A case study for beginners](learning-inference-beginners/)
+
+How to start contributing to real inference projects without a GPU. Covers vllm-metal, mlx-lm and mlx for Mac users, and VLLM's CPU backend and parsers, Sglang's router, llama.cpp, transformers, guidellm and llm-compressor for everyone else, with how to pick a first issue. Ends with how much of inference work is getting automated, and why knowing the architecture and the theory is what lets you pilot the agents instead of being replaced by them.

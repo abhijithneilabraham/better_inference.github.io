@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" width="800" height="440" role="img" aria-label="The layers of an inference system and whether each needs a GPU to work on. The platform, the server and the model can be worked on with a laptop and a tiny model. Only real hardware numbers need a GPU">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="440" rx="6"/>
+  <text class="h" x="24" y="34">Where the work actually is</text>
+  <text class="t" x="776" y="34" text-anchor="end">YOU DON'T NEED A GPU TO START</text>
+  <text class="n" x="24" y="70">what you end up touching</text><text class="n" x="560" y="70">do you need a GPU?</text>
+<rect class="amber" x="24" y="84" width="520" height="46" rx="5"/>
+  <text class="n a" x="40" y="104" style="font-size:12.5px">the platform around it</text><text class="d" x="40" y="121">routing, autoscaling, queues, many users at once</text>
+  <text class="m g" x="560" y="112">no</text><rect class="blue" x="24" y="140" width="520" height="46" rx="5"/>
+  <text class="n b" x="40" y="160" style="font-size:12.5px">the inference server</text><text class="d" x="40" y="177">API, scheduler, tool call and reasoning parsers</text>
+  <text class="m g" x="560" y="168">no</text><rect class="purple" x="24" y="196" width="520" height="46" rx="5"/>
+  <text class="n p" x="40" y="216" style="font-size:12.5px">the model</text><text class="d" x="40" y="233">layers, heads, KV cache size, quantisation, MoE</text>
+  <text class="m g" x="560" y="224">tiny model on a CPU</text><rect class="box" x="24" y="252" width="520" height="46" rx="5"/>
+  <text class="n s" x="40" y="272" style="font-size:12.5px">the kernels</text><text class="d" x="40" y="289">attention, matmul, the code that runs on the chip</text>
+  <text class="m a" x="560" y="280">Mac, CPU, or a GPU</text><rect class="bad" x="24" y="308" width="520" height="46" rx="5"/>
+  <text class="n r" x="40" y="328" style="font-size:12.5px">the hardware</text><text class="d" x="40" y="345">bandwidth, memory, interconnect</text>
+  <text class="m r" x="560" y="336">yes, for real numbers</text>
+  <line class="rule" x1="24" y1="378" x2="776" y2="378"/>
+  <text class="cap" x="24" y="402">Most of the stack runs fine on a laptop with a tiny model. Only the bottom layer really needs</text>
+  <text class="cap" x="24" y="422">big hardware, and that is where most beginners wrongly think they have to start.</text>
+</svg>

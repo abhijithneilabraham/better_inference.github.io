@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 390" width="800" height="390" role="img" aria-label="Mecha piloting. The agent is the mecha, strong and fast but happy to trust a wrong number. You are the pilot, who knows the model, the chip and the maths, sets the goal and the expected number, and checks the results">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="390" rx="6"/>
+  <text class="h" x="24" y="34">Mecha piloting: the agent is the suit, you are the pilot</text>
+  <text class="t" x="776" y="34" text-anchor="end">AGENTS</text>
+  <rect class="blue" x="24" y="58" width="300" height="250" rx="8"/>
+  <text class="n b" x="40" y="82">the mecha: your agent</text>
+  <text class="d" x="40" y="106">runs 50 benchmarks while you sleep</text>
+  <text class="d" x="40" y="126">reads 10,000 lines of logs</text>
+  <text class="d" x="40" y="146">writes the patch, the test, the plot</text>
+  <text class="d" x="40" y="166">never gets tired</text>
+  <text class="m r" x="40" y="200">but will also happily:</text>
+  <text class="d" x="40" y="222">mix two runs and call it a baseline</text>
+  <text class="d" x="40" y="242">trust a number without checking the logs</text>
+  <text class="d" x="40" y="262">stop at "it works" when the</text>
+  <text class="d" x="40" y="280">theory says it could be 6x faster</text>
+
+  <rect class="amber" x="476" y="58" width="300" height="250" rx="8"/>
+  <text class="n a" x="492" y="82">the pilot: you</text>
+  <text class="d" x="492" y="106">know the model: layers, heads, KV size</text>
+  <text class="d" x="492" y="126">know the chip: bandwidth, memory</text>
+  <text class="d" x="492" y="146">know the maths: roofline, Little's law</text>
+  <text class="d" x="492" y="166">know what a clean measurement is</text>
+  <text class="m g" x="492" y="200">so you can:</text>
+  <text class="d" x="492" y="222">guess the answer before the run</text>
+  <text class="d" x="492" y="242">smell a wrong number</text>
+  <text class="d" x="492" y="262">take manual control when needed</text>
+  <text class="d" x="492" y="280">and point it somewhere better</text>
+
+  <path class="arrowa" d="M 470 130 H 330"/><text class="m a" x="400" y="120" text-anchor="middle">goal + expected</text><text class="m a" x="400" y="146" text-anchor="middle">number</text>
+  <path class="arrowb" d="M 330 236 H 470"/><text class="m b" x="400" y="226" text-anchor="middle">results</text><text class="m b" x="400" y="252" text-anchor="middle">to check</text>
+
+  <line class="rule" x1="24" y1="326" x2="776" y2="326"/>
+  <text class="cap" x="24" y="352">The agent gives you strength and speed. Where to walk, and when a step looks wrong, still comes</text>
+  <text class="cap" x="24" y="372">from the pilot. The more theory you know, the bigger the mecha you can safely pilot.</text>
+</svg>

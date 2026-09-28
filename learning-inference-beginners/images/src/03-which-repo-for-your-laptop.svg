@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="Which repo to contribute to, based on your laptop. With an Apple Silicon Mac, vllm-metal, mlx-lm, mlx and llama.cpp. On any laptop, vLLM's CPU backend and parsers, SGLang's router, llama.cpp, transformers, guidellm and llm-compressor">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="400" rx="6"/>
+  <text class="h" x="24" y="34">Repos you can contribute to without a GPU</text>
+  <text class="t" x="776" y="34" text-anchor="end">PICK BY YOUR DESK</text>
+  <rect class="good" x="24" y="56" width="364" height="300" rx="6"/>
+  <text class="n g" x="40" y="80">you have an Apple Silicon Mac</text>
+  <text class="m w" x="40" y="110">vllm-metal</text><text class="d" x="40" y="126">VLLM on MLX. scheduler, kernels, models</text>
+  <text class="m w" x="40" y="156">ml-explore/mlx-lm</text><text class="d" x="40" y="172">model definitions in plain Python</text>
+  <text class="m w" x="40" y="202">ml-explore/mlx</text><text class="d" x="40" y="218">the array library, C++ and Metal</text>
+  <text class="m w" x="40" y="248">ggml-org/llama.cpp</text><text class="d" x="40" y="264">also has a Metal backend</text>
+  <text class="d" x="40" y="300">plus everything on the right,</text><text class="d" x="40" y="316">a Mac runs those too</text>
+
+  <rect class="blue" x="412" y="56" width="364" height="300" rx="6"/>
+  <text class="n b" x="428" y="80">any laptop: Linux, or WSL on Windows</text>
+  <text class="m w" x="428" y="110">vllm-project/vllm</text><text class="d" x="428" y="126">CPU backend, tool and reasoning parsers</text>
+  <text class="m w" x="428" y="156">sgl-project/sglang</text><text class="d" x="428" y="172">sgl-model-gateway: a router in Rust</text>
+  <text class="m w" x="428" y="202">ggml-org/llama.cpp</text><text class="d" x="428" y="218">runs on any CPU, GGUF quantisation</text>
+  <text class="m w" x="428" y="248">huggingface/transformers</text><text class="d" x="428" y="264">the reference model code everyone checks</text>
+  <text class="m w" x="428" y="294">guidellm, llm-compressor</text><text class="d" x="428" y="310">benchmarking and quantisation tools</text>
+  <text class="cap" x="24" y="384">Pick by the hardware on your desk. Then pick by the part of the stack you want to learn.</text>
+</svg>

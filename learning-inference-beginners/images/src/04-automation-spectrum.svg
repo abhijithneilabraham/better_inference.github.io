@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 410" width="800" height="410" role="img" aria-label="The automation spectrum in inference work. Benchmark sweeps, CI, autoscaling and autotuning are automated. Agents help with patches, ports and experiments. Deciding what to measure, trusting results and system design are still you">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="410" rx="6"/>
+  <text class="h" x="24" y="34">What gets automated, and what does not (yet)</text>
+  <text class="t" x="776" y="34" text-anchor="end">AUTOMATION</text>
+  <defs><linearGradient id="sp" x1="0" x2="1"><stop offset="0" stop-color="#5cc48a"/><stop offset=".5" stop-color="#f2a541"/><stop offset="1" stop-color="#e5646c"/></linearGradient></defs>
+  <rect x="24" y="58" width="752" height="10" rx="5" fill="url(#sp)"/>
+  <text class="m g" x="24" y="88">pure execution</text><text class="m r" x="776" y="88" text-anchor="end">judgement</text>
+<rect class="good" x="24" y="102" width="752" height="36" rx="4"/>
+  <text class="m g" x="40" y="125">automated</text><text class="d" x="160" y="125">benchmark sweeps, CI parity runs, autoscaling, deployments</text><rect class="good" x="24" y="146" width="752" height="36" rx="4"/>
+  <text class="m g" x="40" y="169">automated</text><text class="d" x="160" y="169">kernel autotuning, config search, reading long logs</text><rect class="amber" x="24" y="190" width="752" height="36" rx="4"/>
+  <text class="m a" x="40" y="213">agent helps</text><text class="d" x="160" y="213">writing patches, porting a model, running an experiment overnight</text><rect class="amber" x="24" y="234" width="752" height="36" rx="4"/>
+  <text class="m a" x="40" y="257">agent helps</text><text class="d" x="160" y="257">first draft of a kernel, a test, a doc</text><rect class="bad" x="24" y="278" width="752" height="36" rx="4"/>
+  <text class="m r" x="40" y="301">still you</text><text class="d" x="160" y="301">which number to measure, and is the result even real?</text><rect class="bad" x="24" y="322" width="752" height="36" rx="4"/>
+  <text class="m r" x="40" y="345">still you</text><text class="d" x="160" y="345">reading the roofline, picking the system design, saying stop</text>
+  <text class="cap" x="24" y="390">The line keeps moving right every year. The right end is what knowing the theory buys you.</text>
+</svg>
