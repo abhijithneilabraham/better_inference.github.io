@@ -66,31 +66,76 @@ vllm-metal loads every model through [mlx-lm](https://github.com/ml-explore/mlx-
 
 ## Repos to contribute: if you don't have a Mac
 
-Most people I talk to are on Linux or Windows laptops, so here are the ones that work without a Mac and without a GPU.
+Most people I talk to are on Linux or Windows laptops, so this section is for you. I will be honest first. Every repo here was built to run on GPUs, and if you just clone one and run the full test suite, a lot of it will fail or skip. But each of them has big parts that never touch a GPU, and most of them even give you a way to test those parts with fake models, mock servers or the CPU. The trick is knowing which door to walk through, so for each repo I have written what needs a GPU, and how to work around it.
 
 ![Which repo to contribute to, based on your laptop. With an Apple Silicon Mac, vllm-metal, mlx-lm, mlx and llama.cpp. On any laptop, vLLM's CPU backend and parsers, SGLang's router, llama.cpp, transformers, guidellm and llm-compressor](images/03-which-repo-for-your-laptop.png)
 
 ### VLLM itself
 
-[VLLM](https://github.com/vllm-project/vllm) has a CPU backend that runs on Intel and AMD x86, ARM, Apple silicon and IBM Z. It has its own channel (`#sig-cpu` on the VLLM Slack), and issues about it get a `[CPU Backend]` tag in the title. On Windows, you will want WSL for this.
+**Needs a GPU:** the CUDA kernels, the attention backends, performance work, and a good chunk of the test suite.
 
-Apart from the CPU backend, there are big parts of VLLM that don't care about hardware at all. The tool call parsers (`vllm/tool_parsers`) and reasoning parsers (`vllm/reasoning`) for eg, turn a model's raw text into proper tool calls and thinking blocks, and almost every new model family needs one. When I checked, VLLM had 21 open issues labelled good first issue.
+**How to avoid it:** first, don't compile anything. If you are only changing Python code, VLLM's contributing guide says to install it like this, which pulls in the prebuilt parts so you skip the long CUDA build:
+
+```bash
+VLLM_USE_PRECOMPILED=1 uv pip install -e .
+```
+
+Then work on the parts that are just Python. The best example is the tool call parsers (`vllm/tool_parsers`) and reasoning parsers (`vllm/reasoning`). These turn a model's raw text into proper tool calls and thinking blocks, and almost every new model family needs one. Their tests (`tests/tool_parsers`) don't even load a model. They use a fake tokenizer built with `MagicMock`, so they run in seconds on any laptop. The OpenAI API layer and the docs are the same story.
+
+If you want to run a real model, VLLM also has a CPU backend for Intel and AMD x86, ARM, Apple silicon and IBM Z (use WSL on Windows). It's slow, but a 0.6B model works fine for checking that your change does what you think. Its home is the `#sig-cpu` channel on the VLLM Slack, and issues about it get a `[CPU Backend]` tag in the title.
+
+One more thing their guide says openly, not every unit test passes on CPU. If a test in your area needs a GPU, don't worry about it. Push your PR and let their CI run it on real GPUs for you. When I checked, VLLM had 21 open issues labelled good first issue.
 
 ### Sglang
 
-[Sglang](https://github.com/sgl-project/sglang) is the other big inference server. The part I would point beginners to is `sgl-model-gateway`, the router that sits in front of many Sglang workers and decides where each request goes. It's written in Rust, it's pure systems work (load balancing, retries, cache aware routing), and it needs no GPU at all. If you read my scaling blog, this is the router box from those diagrams, in real code. Sglang also had 49 open good first issues when I checked, the most of any repo in this list.
+**Needs a GPU:** the Python serving engine and its kernels, which is most of what people think of as Sglang.
+
+**How to avoid it:** go to `sgl-model-gateway`. It's the router that sits in front of many Sglang workers and decides where each request goes, written in Rust, pure systems work (load balancing, retries, cache aware routing). Its Rust tests don't need a single real model. They spin up fake workers (`tests/common/mock_worker.rs`) and fake OpenAI servers, and check the routing against those:
+
+```bash
+cd sgl-model-gateway
+cargo build
+cargo test
+```
+
+Stay away from its `e2e_test` folder on a laptop, that one starts real servers. If you read my scaling blog, this router is the router box from those diagrams, in real code. Sglang also had 49 open good first issues when I checked, the most of any repo in this list.
 
 ### llama.cpp
 
-[llama.cpp](https://github.com/ggml-org/llama.cpp) runs on basically any CPU, which is why so many people use it to run models locally. If you want to properly learn quantisation, the GGUF format, and how fast kernels are written for CPUs, this is a great place. It had 17 open good first issues at the time of writing. It also has a Metal backend, so Mac users can play here too.
+**Needs a GPU:** only the GPU backends, like CUDA, Vulkan or Metal, if you want to change those.
+
+**How to avoid it:** this is the easiest one, because llama.cpp treats the CPU as a first class citizen. The default build is a CPU build:
+
+```bash
+cmake -B build
+cmake --build build --config Release -j 8
+```
+
+Their contributing guide even says that when adding a new model or feature, the first PR should "focus on CPU support only", and GPU backends come in later PRs. So on this repo, the CPU is literally where new work starts. To check your change, they ask for `llama-perplexity` and `llama-bench` numbers, and both run on CPU. If you want to properly learn quantisation, the GGUF format, and how fast kernels are written for CPUs, this is a great place. It had 17 open good first issues at the time of writing.
 
 ### Hugging Face transformers
 
-Almost every inference engine checks its outputs against [transformers](https://github.com/huggingface/transformers), which makes it the reference for how a model is supposed to behave. Model code, tests and docs mostly run on CPU, and they label beginner friendly issues as `Good First Issue` and `Good First Documentation Issue`.
+**Needs a GPU:** the big model integration tests and anything marked for an accelerator.
 
-### guidellm and llm-compressor
+**How to avoid it:** you mostly don't have to do anything. Tests that need a GPU are marked with decorators like `@require_torch_gpu` or `@require_torch_accelerator`, and they skip themselves on a laptop. The heavy tests are marked `@slow` and are skipped unless you set `RUN_SLOW=1`. So a normal `pytest` on your laptop runs exactly the tests that are meant for it, which use tiny randomly initialised models, not the real multi GB weights. Almost every inference engine checks its outputs against transformers, which makes it the reference for how a model is supposed to behave. Beginner issues are labelled `Good First Issue` and `Good First Documentation Issue`.
 
-These two are tools from the VLLM project that sit around serving. [guidellm](https://github.com/vllm-project/guidellm) is for benchmarking a server, and [llm-compressor](https://github.com/vllm-project/llm-compressor) is for quantising models before you serve them. Benchmarking tools are especially good for beginners. To improve one, you have to understand what TTFT, throughput and latency actually mean, and once you understand those, you understand half of this job (my [scaling blog](../scaling/blog.md) goes deep into that).
+### guidellm
+
+**Needs a GPU:** only if you want to benchmark a real model on real hardware.
+
+**How to avoid it:** [guidellm](https://github.com/vllm-project/guidellm) is a benchmarking tool, and it ships with its own fake server, `guidellm mock-server`. It pretends to be an OpenAI style endpoint, so you can run full benchmarks against it on a laptop. Their end to end tests use this mock server by default, with a tiny tokenizer checked into the repo, so the whole suite runs with no GPU, no Docker and no downloads:
+
+```bash
+tox -e test-e2e
+```
+
+Benchmarking tools are especially good for beginners. To improve one, you have to understand what TTFT, throughput and latency actually mean, and once you understand those, you understand half of this job (my [scaling blog](../scaling/blog.md) goes deep into that).
+
+### llm-compressor
+
+**Needs a GPU:** quantising real models, and a lot of its tests. Their own guide warns that the full test suite "might require many GPUs".
+
+**How to avoid it:** this is the most GPU heavy one on the list, so pick your spot carefully. Stick to the unit tests (`tests/unit`), the docs, the examples and the recipes, and don't try running `make test` end to end on a laptop. They also ask you to talk to the maintainers before starting anything big, so for bigger ideas, open an issue first and let them tell you what can be tested without a GPU. [llm-compressor](https://github.com/vllm-project/llm-compressor) is still worth it, because this is where you learn what FP8, INT4 and NVFP4 actually do to a model's weights.
 
 ### How to pick your first issue
 
