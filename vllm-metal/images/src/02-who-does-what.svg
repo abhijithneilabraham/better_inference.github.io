@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 470" width="800" height="470" role="img" aria-label="Who does what. Upstream vLLM runs the API server, the scheduler and the block manager. vllm-metal replaces the worker, the model runner and the attention. mlx_lm provides the model layers. MLX and Metal run everything on the Apple GPU">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 490" width="800" height="490" role="img" aria-label="One question, four helpers. vLLM is the manager that takes the question and plans the step. vllm-metal is the head chef that runs the plan on a Mac. mlx_lm is the recipe book that knows how the model is built. MLX and Metal are the stove that does the maths on the GPU">
   <style>
     .bg { fill: #161d26; }
     .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
@@ -29,40 +29,27 @@
     <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
   </defs>
 
-  <rect class="bg" width="800" height="470" rx="6"/>
-  <text class="h" x="24" y="34">Four layers, three teams</text>
+  <rect class="bg" width="800" height="490" rx="6"/>
+  <text class="h" x="24" y="34">One question, four helpers</text>
   <text class="t" x="776" y="34" text-anchor="end">WHO DOES WHAT</text>
-
-  <rect class="box" x="24" y="56" width="752" height="46" rx="6"/>
-  <text class="n" x="40" y="78">your app</text><text class="d" x="40" y="94">chat UI, coding agent, OpenAI SDK, curl</text>
-  <text class="m s" x="760" y="84" text-anchor="end">talks OpenAI-style HTTP</text>
-  <path class="arrow" d="M 120 104 V 116"/>
-
-  <rect class="blue" x="24" y="118" width="752" height="74" rx="6"/>
-  <text class="n b" x="40" y="140">vLLM, the manager (upstream, used as is)</text>
-  <text class="d" x="40" y="160">API server  ·  scheduler: who gets to run this step  ·  block manager: which memory pages each request owns</text>
-  <text class="d" x="40" y="178">prefix cache hashing  ·  tokenizer  ·  the sampler for non-greedy requests</text>
-  <path class="arrow" d="M 120 194 V 206"/><text class="m s" x="132" y="204">"run these tokens, using these memory pages"</text>
-
-  <rect class="amber" x="24" y="208" width="752" height="96" rx="6"/>
-  <text class="n a" x="40" y="230">vllm-metal, the plugin (this project)</text>
-  <text class="d" x="40" y="250">MetalPlatform: tells vLLM "you are on a Mac" and picks the Metal worker</text>
-  <text class="d" x="40" y="266">MetalWorker + MetalModelRunner: pack the tokens, run the model, sample the next token</text>
-  <text class="d" x="40" y="282">the attention path: paged attention Metal kernels, M5 NAX prefill, speculative decoding</text>
-  <text class="d" x="40" y="298">loads the model with mlx_lm, then swaps each attention layer for its own</text>
-
-  <rect class="purple" x="24" y="316" width="364" height="64" rx="6"/>
-  <text class="n p" x="40" y="338">mlx_lm, the model recipes</text>
-  <text class="d" x="40" y="356">Qwen, Llama, Gemma, ... layer code and weight loading</text>
-  <text class="d" x="40" y="372">knows nothing about requests or pages</text>
-  <rect class="good" x="412" y="316" width="364" height="64" rx="6"/>
-  <text class="n g" x="428" y="338">MLX + Metal, the engine room</text>
-  <text class="d" x="428" y="356">Apple's array library and GPU language</text>
-  <text class="d" x="428" y="372">runs every op on the Mac GPU, in unified memory</text>
-
-  <line class="rule" x1="24" y1="398" x2="776" y2="398"/>
-  <text class="cap" x="24" y="422">vLLM decides WHAT to run. mlx_lm defines the MODEL. vllm-metal makes the two meet on a Mac,</text>
-  <text class="cap" x="24" y="442">and owns the part that has to know about many requests at once: attention over paged memory.</text>
-  <text class="cap" x="24" y="462" style="fill:#8a97a6">PyTorch is only used at the edges, where vLLM expects it. The model math itself is all MLX.</text>
-
+  <text class="m s" x="24" y="66">you send: "What is the capital of France?"</text>
+  <text class="n" x="300" y="92" style="font-size:12px">what it does for your question</text>
+  <text class="n" x="560" y="92" style="font-size:12px">take it away and ...</text>
+<rect class="blue" x="24" y="104" width="752" height="62" rx="6"/>
+  <text class="n b" x="40" y="130">vLLM</text><text class="d" x="40" y="148">the restaurant manager</text>
+  <text class="d w" x="300" y="130">takes your question, turns it into tokens,</text><text class="d w" x="300" y="148">says "you run now, your notes go in block 12"</text>
+  <text class="d r" x="560" y="130">mlx_lm alone can still answer you, but you</text><text class="d r" x="560" y="148">lose vLLM's scheduler for many users at once</text><rect class="amber" x="24" y="176" width="752" height="62" rx="6"/>
+  <text class="n a" x="40" y="202">vllm-metal</text><text class="d" x="40" y="220">the head chef for this kitchen</text>
+  <text class="d w" x="300" y="202">takes the manager's plan, packs your tokens</text><text class="d w" x="300" y="220">with other users' tokens, runs the model</text>
+  <text class="d r" x="560" y="202">vLLM cannot use the Mac GPU at all.</text><text class="d r" x="560" y="220">at best it runs slowly on the CPU</text><rect class="purple" x="24" y="248" width="752" height="62" rx="6"/>
+  <text class="n p" x="40" y="274">mlx_lm</text><text class="d" x="40" y="292">the recipe book</text>
+  <text class="d w" x="300" y="274">knows Qwen3-0.6B is 28 layers and how</text><text class="d w" x="300" y="292">each one works. runs them in order</text>
+  <text class="d r" x="560" y="274">nobody knows what Qwen or Llama</text><text class="d r" x="560" y="292">looks like inside</text><rect class="good" x="24" y="320" width="752" height="62" rx="6"/>
+  <text class="n g" x="40" y="346">MLX + Metal</text><text class="d" x="40" y="364">the stove and oven</text>
+  <text class="d w" x="300" y="346">does every multiplication on the Mac GPU,</text><text class="d w" x="300" y="364">in the Mac's shared memory</text>
+  <text class="d r" x="560" y="346">nothing actually runs on the GPU</text><text class="d r" x="560" y="364"></text>
+  <text class="m g" x="24" y="412">out comes "Paris", and vLLM sends it back to you</text>
+  <line class="rule" x1="24" y1="428" x2="776" y2="428"/>
+  <text class="cap" x="24" y="452">vLLM knows users but not the Mac GPU. mlx_lm knows models but not users.</text>
+  <text class="cap" x="24" y="472">vllm-metal is the one piece that knows both, so it sits in the middle and connects them.</text>
 </svg>

@@ -65,21 +65,51 @@ vllm-metal solves this by keeping all the parts of vLLM that do not care about t
 
 ## The big picture: who does what
 
-It helps to think of the system as a small team where each member has one job.
+There are four pieces, and the names sound alike, which is why they are easy to mix up. The easiest way to keep them apart is to remember **what each one knows about, and what it has no idea about**.
 
-**vLLM is the manager.** It runs the web server that apps talk to, turns text into tokens, and decides every step which requests get to run and how many tokens each one gets. It also keeps track of which pieces of memory belong to which request. vllm-metal uses this part of vLLM as it is.
+| Piece | Think of it as | Knows about | Has no idea about |
+|---|---|---|---|
+| **vLLM** | the restaurant manager | users, requests, who goes next, which memory belongs to whom | how to use a Mac GPU |
+| **mlx_lm** | the recipe book | how each model is built, layer by layer, and how to load its weights | users, requests, sharing memory between them |
+| **vllm-metal** | the head chef who connects the two | vLLM's plan, mlx_lm's models, and the Mac GPU | deciding who goes next (it asks vLLM) |
+| **MLX + Metal** | the stove and oven | doing maths fast on the Mac GPU | what a model or a user even is |
 
-**vllm-metal is the plugin, and this project.** It tells vLLM "you are on a Mac", provides the worker that actually runs the model each step, and owns the most delicate part: attention over memory that is shared by many requests. It brings its own GPU kernels, written in Metal, for that.
+### The restaurant version
 
-**mlx_lm is the recipe book.** It knows how each model family is put together, and how to load its weights. It has no idea about servers, requests or shared memory. It just runs a model.
+Picture a busy restaurant.
 
-**MLX and Metal are the engine room.** Every bit of math finally runs on the Mac GPU through MLX, in unified memory.
+- **The manager (vLLM)** takes orders from many tables, decides which dishes get cooked next, and keeps track of which plate belongs to which table. The manager never cooks.
+- **The recipe book (mlx_lm)** says exactly how to make each dish. But it was written for cooking one dish at home, for one person.
+- **The stove and oven (MLX and Metal)** just apply heat to whatever you put on them. They don't know what a dish is.
+- **The head chef (vllm-metal)** reads the manager's tickets, follows the recipes, and works out how to cook twenty orders at once on this particular stove, while sharing one fridge between all of them. That shared fridge is the KV cache, which comes up again below.
 
-![Who does what. Upstream vLLM runs the API server, the scheduler and the block manager. vllm-metal replaces the worker, the model runner and the attention. mlx_lm provides the model layers. MLX and Metal run everything on the Apple GPU](images/02-who-does-what.png)
+vLLM was built for restaurants with NVIDIA kitchens. vllm-metal is what lets the same manager run a restaurant with an Apple kitchen.
 
-The project's own summary of this is: *upstream vLLM schedules, mlx_lm defines the model, vllm-metal owns the attention path.*
+### One real question, step by step
 
-One detail surprises most people. vllm-metal tells PyTorch that the device is `"cpu"` (`vllm_metal/platform.py`, around line 98). That is on purpose. PyTorch is only used at the edges, where vLLM's code expects PyTorch objects, like the sampler. The actual model math never touches PyTorch. It is all MLX.
+Say you send `What is the capital of France?` to a Mac running Qwen3-0.6B.
+
+1. **vLLM** receives it, turns the words into token ids, and decides: "this request runs in the next step, and its notes go into memory block 12".
+2. **vllm-metal** gets that plan, packs your tokens together with the tokens of everyone else being served right now, and calls the model.
+3. **mlx_lm** runs Qwen3-0.6B's 28 layers in order. It knows exactly what each layer does, because that is all it knows.
+4. Inside each layer's attention step, **vllm-metal** steps in with its own code: it writes your notes into block 12, and reads them back when needed.
+5. **MLX and Metal** do every multiplication along the way on the Mac GPU.
+6. Out comes `Paris`. vLLM sends it back to you, and the loop repeats for the next word.
+
+![One question, four helpers. vLLM is the manager that takes the question and plans the step. vllm-metal is the head chef that runs the plan on a Mac. mlx_lm is the recipe book that knows how the model is built. MLX and Metal are the stove that does the maths on the GPU](images/02-who-does-what.png)
+
+### Take one away
+
+Another good way to see the difference is to ask what breaks if one piece is missing.
+
+- **No vLLM:** mlx_lm on its own can still answer you. But you lose vLLM's scheduler, the part that serves many users at once without wasting memory.
+- **No vllm-metal:** vLLM has no way to use the Mac GPU. At best it falls back to a slow CPU mode.
+- **No mlx_lm:** nobody knows what Qwen or Llama looks like inside, so there is no model to run.
+- **No MLX and Metal:** nothing actually runs on the GPU.
+
+So vLLM knows users but not the Mac GPU, and mlx_lm knows models but not users. vllm-metal is the one piece that knows both, so it sits in the middle and connects them. The project sums it up in one line: *upstream vLLM schedules, mlx_lm defines the model, vllm-metal owns the attention path.*
+
+One small detail, in case you read the code: vllm-metal tells PyTorch the device is `"cpu"` (`vllm_metal/platform.py`, around line 98). That is on purpose. vLLM expects PyTorch objects in a few places, like the sampler, so PyTorch is kept around for those. The model's actual maths never touches PyTorch. It is all MLX.
 
 ## Try it yourself
 
