@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 462" width="800" height="462" role="img" aria-label="What a block is. Each token's note in Qwen3-0.6B takes about 112 KB. A block is a fixed box of 16 slots, about 1.75 MB. A request gets blocks one at a time as it grows, listed in its block table, instead of reserving 4.4 GB up front">
+  <style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+
+  <rect class="bg" width="800" height="462" rx="6"/>
+  <text class="h" x="24" y="34">What is a block?</text>
+  <text class="t" x="776" y="34" text-anchor="end">KV CACHE BLOCKS</text>
+  <text class="n" x="24" y="68">1. one token's note (Qwen3-0.6B)</text>
+  <rect class="blue" x="24" y="80" width="22" height="26" rx="3"/>
+  <text class="d w" x="58" y="92">= a key and a value, for each of 28 layers x 8 heads x 128 numbers</text>
+  <text class="m b" x="58" y="108">= about 112 KB per token</text>
+
+  <text class="n" x="24" y="146">2. a block = a fixed box with 16 slots, one note per slot (about 1.75 MB)</text>
+<text class="m b" x="24" y="164">block 12: your question, 10 tokens, 6 slots still free</text><rect class="blue" x="24" y="172" width="18" height="22" rx="2"/><rect class="blue" x="45" y="172" width="18" height="22" rx="2"/><rect class="blue" x="66" y="172" width="18" height="22" rx="2"/><rect class="blue" x="87" y="172" width="18" height="22" rx="2"/><rect class="blue" x="108" y="172" width="18" height="22" rx="2"/><rect class="blue" x="129" y="172" width="18" height="22" rx="2"/><rect class="blue" x="150" y="172" width="18" height="22" rx="2"/><rect class="blue" x="171" y="172" width="18" height="22" rx="2"/><rect class="blue" x="192" y="172" width="18" height="22" rx="2"/><rect class="blue" x="213" y="172" width="18" height="22" rx="2"/><rect class="box" x="234" y="172" width="18" height="22" rx="2"/><rect class="box" x="255" y="172" width="18" height="22" rx="2"/><rect class="box" x="276" y="172" width="18" height="22" rx="2"/><rect class="box" x="297" y="172" width="18" height="22" rx="2"/><rect class="box" x="318" y="172" width="18" height="22" rx="2"/><rect class="box" x="339" y="172" width="18" height="22" rx="2"/>
+  <text class="n" x="24" y="232">3. the answer grows, and blocks are handed out one at a time</text>
+<text class="m b" x="24" y="250">block 12: full</text><rect class="blue" x="24" y="258" width="18" height="22" rx="2"/><rect class="blue" x="45" y="258" width="18" height="22" rx="2"/><rect class="blue" x="66" y="258" width="18" height="22" rx="2"/><rect class="blue" x="87" y="258" width="18" height="22" rx="2"/><rect class="blue" x="108" y="258" width="18" height="22" rx="2"/><rect class="blue" x="129" y="258" width="18" height="22" rx="2"/><rect class="blue" x="150" y="258" width="18" height="22" rx="2"/><rect class="blue" x="171" y="258" width="18" height="22" rx="2"/><rect class="blue" x="192" y="258" width="18" height="22" rx="2"/><rect class="blue" x="213" y="258" width="18" height="22" rx="2"/><rect class="blue" x="234" y="258" width="18" height="22" rx="2"/><rect class="blue" x="255" y="258" width="18" height="22" rx="2"/><rect class="blue" x="276" y="258" width="18" height="22" rx="2"/><rect class="blue" x="297" y="258" width="18" height="22" rx="2"/><rect class="blue" x="318" y="258" width="18" height="22" rx="2"/><rect class="blue" x="339" y="258" width="18" height="22" rx="2"/><text class="m a" x="390" y="250">token 17 lands in block 40</text><rect class="amber" x="390" y="258" width="18" height="22" rx="2"/><rect class="box" x="411" y="258" width="18" height="22" rx="2"/><rect class="box" x="432" y="258" width="18" height="22" rx="2"/><rect class="box" x="453" y="258" width="18" height="22" rx="2"/><rect class="box" x="474" y="258" width="18" height="22" rx="2"/><rect class="box" x="495" y="258" width="18" height="22" rx="2"/><rect class="box" x="516" y="258" width="18" height="22" rx="2"/><rect class="box" x="537" y="258" width="18" height="22" rx="2"/><rect class="box" x="558" y="258" width="18" height="22" rx="2"/><rect class="box" x="579" y="258" width="18" height="22" rx="2"/><rect class="box" x="600" y="258" width="18" height="22" rx="2"/><rect class="box" x="621" y="258" width="18" height="22" rx="2"/><rect class="box" x="642" y="258" width="18" height="22" rx="2"/><rect class="box" x="663" y="258" width="18" height="22" rx="2"/><rect class="box" x="684" y="258" width="18" height="22" rx="2"/><rect class="box" x="705" y="258" width="18" height="22" rx="2"/>
+  <text class="m w" x="24" y="306">your block table = [12, 40]</text>
+  <text class="d" x="230" y="306">a list of your boxes, in order. they don't need to be next to each other</text>
+  <text class="d" x="24" y="326">when you are done, blocks 12 and 40 go back on the free shelf for the next user</text>
+
+  <line class="rule" x1="24" y1="344" x2="776" y2="344"/>
+  <rect class="bad" x="24" y="356" width="370" height="84" rx="5"/>
+  <text class="n r" x="40" y="378" style="font-size:12px">without blocks</text>
+  <text class="d" x="40" y="398">reserve room for the longest possible chat</text>
+  <text class="d" x="40" y="414">(40,960 tokens) for every user, up front</text>
+  <text class="m r" x="40" y="428">about 4.4 GB each, mostly empty</text>
+  <rect class="good" x="406" y="356" width="370" height="84" rx="5"/>
+  <text class="n g" x="422" y="378" style="font-size:12px">with blocks</text>
+  <text class="d" x="422" y="398">a 30 token chat takes 2 blocks</text>
+  <text class="d" x="422" y="414">at most 15 empty slots wasted per user</text>
+  <text class="m g" x="422" y="428">about 3.5 MB</text>
+
+</svg>

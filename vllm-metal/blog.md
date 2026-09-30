@@ -89,7 +89,7 @@ vLLM was built for restaurants with NVIDIA kitchens. vllm-metal is what lets the
 
 Say you send `What is the capital of France?` to a Mac running Qwen3-0.6B.
 
-1. **vLLM** receives it, turns the words into token ids, and decides: "this request runs in the next step, and its notes go into memory block 12".
+1. **vLLM** receives it, turns the words into token ids, and decides: "this request runs in the next step, and its notes go into memory block 12". A block is a small, fixed-size box of memory, explained properly [below](#what-is-a-block).
 2. **vllm-metal** gets that plan, packs your tokens together with the tokens of everyone else being served right now, and calls the model.
 3. **mlx_lm** runs Qwen3-0.6B's 28 layers in order. It knows exactly what each layer does, because that is all it knows.
 4. Inside each layer's attention step, **vllm-metal** steps in with its own code: it writes your notes into block 12, and reads them back when needed.
@@ -165,27 +165,52 @@ During prefill the model saves a small note for every token it reads: a **key** 
 
 ## The KV cache, kept in pages
 
-The KV cache is the biggest thing in memory after the model itself, and how it is stored decides how many users fit at once.
+The KV cache is the biggest thing in memory after the model itself, and how it is stored decides how many users fit at once. To understand how vLLM stores it, you need one word: **block**.
 
-The simple way would be to reserve one big chunk of memory per request, big enough for the longest possible answer. That wastes most of it, because most answers are short. vLLM's famous idea, called **PagedAttention**, works like pages in an operating system. Memory is cut into small **blocks**, and in vllm-metal each block holds 16 tokens. A request gets a new block only when its last one fills up. Its blocks do not have to sit next to each other. A small list called the **block table** records which blocks a request owns, in order.
+### What is a block?
 
-![The paged KV cache. Memory is cut into blocks of 16 token slots. Each request has a block table listing which blocks it owns, in order, and they do not need to be next to each other](images/04-paged-kv-cache.png)
+Start with what is being stored. Every time the model reads a token, it writes down a small note about it, a key and a value, so it never has to read that token again. For Qwen3-0.6B, one token's note is about **112 KB**. That comes from a key and a value for each of its 28 layers, 8 KV heads and 128 numbers per head, at 2 bytes per number.
 
-To find where a token's key and value go, vllm-metal computes a **slot** for it:
+Now, where do those notes go? Think of the KV cache as a big shelf of identical boxes.
+
+- Each box has **16 slots**, and each slot holds one token's note. That box is a **block**. For Qwen3-0.6B, a full block is about 1.75 MB.
+- Every box has a number: block 0, block 1, block 2, and so on, up to however many fit in memory.
+- A conversation does not get the whole shelf. It gets **one box at a time**, only when it needs one.
+- It keeps a short list of which boxes are its own, in order. That list is its **block table**.
+
+Here is the example from earlier. You ask `What is the capital of France?`, and say it becomes 10 tokens. vLLM hands you one free box, block 12. Your 10 notes go into its first 10 slots, and 6 slots are still empty. Your block table is `[12]`.
+
+The model starts answering. Every new word adds one note, into the next empty slot of block 12. After 16 tokens, block 12 is full. For token 17, vLLM takes any free box off the shelf, say block 40, and your block table becomes `[12, 40]`. Block 40 does not have to sit next to block 12. It can be anywhere. When your conversation is finished, blocks 12 and 40 go back on the shelf for the next person.
+
+![What a block is. Each token's note in Qwen3-0.6B takes about 112 KB. A block is a fixed box of 16 slots, about 1.75 MB. A request gets blocks one at a time as it grows, listed in its block table, instead of reserving 4.4 GB up front](images/04-what-is-a-block.png)
+
+**Why bother with boxes?** Because the other way is terrible. Without blocks, the server has to reserve room for the longest conversation a user might ever have, for every user, up front. Qwen3-0.6B can handle 40,960 tokens, so that is about **4.4 GB per user**, almost all of it empty. On an 8 GB Mac, that is one user. With blocks, a 30 token chat takes 2 boxes, about **3.5 MB**, and the most any conversation ever wastes is the empty slots in its last box, never more than 15.
+
+**Why 16 slots?** It is a trade-off. Smaller boxes waste less space at the end, but the GPU reads memory fastest in decent sized chunks. 16 is the size vllm-metal uses by default.
+
+This whole idea is vLLM's most famous one. It is called **PagedAttention**, because it works like the pages an operating system uses for normal memory, where "block" and "page" mean the same thing.
+
+### Where exactly does a token go?
+
+Two conversations share the same shelf, each with their own block table:
+
+![The paged KV cache. Memory is cut into blocks of 16 token slots. Each request has a block table listing which blocks it owns, in order, and they do not need to be next to each other](images/05-paged-kv-cache.png)
+
+To find the exact slot for a token, vllm-metal looks up which box it falls in, then which slot inside that box:
 
 ```
 slot = block_table[position // 16] * 16 + (position % 16)
 ```
 
-This is exactly the formula in `vllm_metal/attention/context.py` (around line 238), as `block_idx * block_size + (pos % block_size)`.
+For token 20 of a conversation with block table `[0, 3, 6]`: 20 // 16 = 1, so it is in the second box on the list, block 3. And 20 % 16 = 4, so it is slot 4 inside that box. Counting every slot on the shelf from the start, that is 3 * 16 + 4 = slot 52. This is exactly the formula in `vllm_metal/attention/context.py` (around line 238), as `block_idx * block_size + (pos % block_size)`.
 
-The split of work matters here. vLLM's **block manager** decides who owns which block. vllm-metal never decides that. It only reads and writes the pages it is told to use.
+The split of work matters here. vLLM's **block manager** decides which boxes belong to which conversation. vllm-metal never decides that. It only writes notes into the boxes it is told to use, and reads them back.
 
 ## The life of one request
 
 Now we can follow a request all the way through. This loop runs once per **step**, and every step moves every running request forward by some tokens.
 
-![The life of one request, in eight hops, from the HTTP call through the vLLM scheduler, the Metal worker and model runner, the mlx_lm model with wrapped attention, the Metal kernels, sampling, and back](images/05-life-of-a-request.png)
+![The life of one request, in eight hops, from the HTTP call through the vLLM scheduler, the Metal worker and model runner, the mlx_lm model with wrapped attention, the Metal kernels, sampling, and back](images/06-life-of-a-request.png)
 
 1. **Your app sends a request.** vLLM's OpenAI server turns the text into token ids.
 2. **The vLLM scheduler plans the step.** It decides which requests run now, how many tokens each gets, and which KV blocks they use. It hands this plan, called a `SchedulerOutput`, to the worker.
@@ -208,7 +233,7 @@ It swaps out the attention part of each layer after loading.
 
 When the KV cache is set up, vllm-metal walks through the model's layers, finds each attention module (named things like `self_attn` or `linear_attn`), and replaces it with its own wrapper. This happens in `walk_and_wrap` in `vllm_metal/attention/patching.py`. The wrapper keeps the original module inside it, so it can still use the model's own weights for turning tokens into queries, keys and values. Only the part that stores and reads the cache is new.
 
-![How vllm-metal plugs into an mlx_lm model without editing it. It walks the layers and replaces each attention module with a wrapper that reads the per-step context and calls the paged Metal kernels](images/06-swapping-the-attention-layer.png)
+![How vllm-metal plugs into an mlx_lm model without editing it. It walks the layers and replaces each attention module with a wrapper that reads the per-step context and calls the paged Metal kernels](images/07-swapping-the-attention-layer.png)
 
 But how does the wrapper get the block tables and slot mapping, when mlx_lm calls it with its normal arguments? This is the clever bit. The runner puts that step's context in a **thread-local** variable, a kind of shared note that anything running on the same thread can read (`vllm_metal/attention/context.py`). The wrapper reads the note. mlx_lm is also handed a fake, empty cache object called `OffsetCache`, which stores nothing and only exists so mlx_lm's own position code keeps working.
 
@@ -218,7 +243,7 @@ If no context is set, the wrapper simply behaves like the original. That keeps t
 
 In one step, some requests are writing (one new token each) and some are reading prompts (many tokens each). The obvious way would be to run them separately. vllm-metal does not. It packs everything into one row and runs **one attention kernel per layer for the whole batch**.
 
-![Every step packs all requests into one row, decode tokens first and then prefill chunks, marked by cumulative lengths. One paged attention kernel per layer handles the whole row and picks the NAX, tiled or per-token path](images/07-one-packed-batch.png)
+![Every step packs all requests into one row, decode tokens first and then prefill chunks, marked by cumulative lengths. One paged attention kernel per layer handles the whole row and picks the NAX, tiled or per-token path](images/08-one-packed-batch.png)
 
 To keep the requests apart inside that one row, the runner builds a list called `cu_seqlens` ("cumulative sequence lengths") that says where each request's piece starts and ends. Every GPU thread takes a token, does a quick search in that list to find which request it belongs to (the `find_seq_idx` function in `pagedattention.metal`), and then reads only that request's pages. Because each request can have a different number of tokens, this is called **varlen**, short for variable length. The same trick is used by FlashAttention and by vLLM's Triton kernels on NVIDIA.
 
@@ -243,7 +268,7 @@ macOS tells each program how much memory the GPU should comfortably use, called 
 
 What is left becomes the KV cache, cut into 16-token blocks.
 
-![How much memory the KV cache gets. macOS recommends a working set for the GPU. vllm-metal takes gpu-memory-utilization of that, subtracts the model weights and a measured overhead, and the rest becomes KV blocks](images/08-memory-budget.png)
+![How much memory the KV cache gets. macOS recommends a working set for the GPU. vllm-metal takes gpu-memory-utilization of that, subtracts the model weights and a measured overhead, and the rest becomes KV blocks](images/09-memory-budget.png)
 
 The overhead is measured, not guessed. At startup, vllm-metal runs one dummy step at the largest batch size it may see (`profile_run` in `model_runner.py`) and checks how much extra memory MLX needed. It then caps MLX's internal buffer cache at exactly that amount, so the cache cannot quietly grow later and eat into the KV cache. The budget calculation is in `vllm_metal/v1/cache_policy.py`.
 
@@ -271,7 +296,7 @@ The full list, with a working example checkpoint for each, is in the project's [
 
 Chat apps send the whole conversation again with every new message. So most of each new request is text the server has already read. **Prefix caching** notices this. vLLM gives each full block of tokens a fingerprint (a hash). When a new request starts with blocks it has seen before, it reuses them and only computes the new part.
 
-![Prefix caching. Two requests that start with the same system prompt share the same KV cache blocks, so the shared part is computed only once](images/09-prefix-caching.png)
+![Prefix caching. Two requests that start with the same system prompt share the same KV cache blocks, so the shared part is computed only once](images/10-prefix-caching.png)
 
 For standard models this is done almost entirely by vLLM. vllm-metal just starts reading the prompt from the first new token, and its kernel reads the reused blocks through the block table as normal. It is on by default for most models. It is currently off for Nemotron-H and Granite 4.0 hybrids.
 
@@ -279,7 +304,7 @@ For standard models this is done almost entirely by vLLM. vllm-metal just starts
 
 Decode is slow because the big model makes one token per pass. **Speculative decoding** uses a cheap helper, called a drafter, to guess the next few tokens. The big model then checks all the guesses in one pass, keeps the ones it agrees with, and fixes the first wrong one. The output is exactly what the big model would have written on its own, just faster.
 
-![Speculative decoding. A cheap drafter guesses several tokens, the big model checks all of them in one pass, and keeps the ones that match](images/10-speculative-decoding.png)
+![Speculative decoding. A cheap drafter guesses several tokens, the big model checks all of them in one pass, and keeps the ones that match](images/11-speculative-decoding.png)
 
 vllm-metal supports three kinds of drafter:
 
@@ -302,7 +327,7 @@ Between two decode steps, the CPU has to prepare the next step. Normally the GPU
 
 The KV cache is normally stored with 16 bits per number. **TurboQuant** shrinks it. It first "spins" the numbers with a Walsh-Hadamard rotation so that no single number is extreme, then stores small blocks of them with fewer bits. The default keeps keys at 8 bits and values at 3 bits, which makes the cache about 2.5 times smaller. The same memory then holds about 2.5 times more conversation.
 
-![TurboQuant shrinks the KV cache. Keys keep 8 bits and values drop to 3 bits by default, about 2.5 times smaller, so the same memory holds about 2.5 times more context](images/11-turboquant-kv-compression.png)
+![TurboQuant shrinks the KV cache. Keys keep 8 bits and values drop to 3 bits by default, about 2.5 times smaller, so the same memory holds about 2.5 times more context](images/12-turboquant-kv-compression.png)
 
 Keys need more bits than values because keys feed into the attention score, which goes through an exponent, so small errors in keys get blown up. Errors in values are just averaged. Very low settings, like 2 bit keys, clearly damage the output, so test before using them.
 
@@ -334,7 +359,7 @@ vllm-metal can do more than chat models, though most of these are marked experim
 
 For normal use, one Mac is all you need. But if you have two or more, there are two ways to use them together. Both use a tool called Ray to start one worker on each Mac.
 
-![Two ways to use two Macs. Data parallel puts a full copy of the model on each Mac to serve more users. Pipeline parallel splits the layers across Macs to fit a bigger model](images/12-two-macs-data-vs-pipeline.png)
+![Two ways to use two Macs. Data parallel puts a full copy of the model on each Mac to serve more users. Pipeline parallel splits the layers across Macs to fit a bigger model](images/13-two-macs-data-vs-pipeline.png)
 
 **Data parallel** puts a full copy of the model on each Mac, and spreads requests between them. You serve about twice as many users, but the biggest model you can run does not change, because each Mac still has to hold all of it.
 
