@@ -32,3 +32,7 @@ A beginner's guide to vllm-metal, the plugin that runs vLLM on Apple Silicon usi
 ### [Learning Inference: A case study for beginners](learning-inference-beginners/)
 
 How to start contributing to real inference projects without a GPU. Covers vllm-metal, mlx-lm and mlx for Mac users, and VLLM's CPU backend and parsers, Sglang's router, llama.cpp, transformers, guidellm and llm-compressor for everyone else, with how to pick a first issue. Ends with how much of inference work is getting automated, and why knowing the architecture and the theory is what lets you pilot the agents instead of being replaced by them.
+
+### [Benchmark coding agents, increase TPS, and get on the leaderboards](agent-benchmarks/)
+
+How to measure a coding agent for quality and for speed, how to increase tokens per second from the memory bandwidth ceiling up, and how to get onto the main leaderboards: Artificial Analysis, SWE-bench, Terminal-Bench, Aider Polyglot, LiveCodeBench, LMArena WebDev and OpenRouter. Includes the server settings that break agent scores, a local speed harness that copies the leaderboard method, and a checklist before you submit. Written in Simplified Technical English.
