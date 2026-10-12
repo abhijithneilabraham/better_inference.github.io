@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 372" width="800" height="372" role="img" aria-label="Two separate topics: coding agent quality and LLM inference speed, with the question, unit, tools and leaderboards of each">
+<style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style><defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+<rect class="bg" width="800" height="372" rx="6"/>
+<text class="h" x="24" y="34">Two topics in one article</text>
+<text class="t" x="776" y="34" text-anchor="end">OVERVIEW</text>
+<rect class="amber" x="24" y="56" width="360" height="250" rx="6"/><text class="n" x="40" y="84">Part A: how good is the coding agent?</text><text class="d" x="40" y="116">the question</text><text class="n" x="40" y="133" style="font-size:12px">Does it fix the bug? Does it finish the task?</text><text class="d" x="40" y="154">what changes the answer</text><text class="n" x="40" y="171" style="font-size:12px">the model, the harness, the server settings</text><text class="d" x="40" y="192">unit</text><text class="n" x="40" y="209" style="font-size:12px">pass@1: percent of tasks solved</text><text class="d" x="40" y="230">tools</text><text class="n" x="40" y="247" style="font-size:12px">SWE-bench, Terminal-Bench, Aider, LiveCodeBench</text><text class="d" x="40" y="268">leaderboards</text><text class="n" x="40" y="285" style="font-size:12px">SWE-bench, Terminal-Bench, Aider, LMArena</text><rect class="blue" x="416" y="56" width="360" height="250" rx="6"/><text class="n" x="432" y="84">Part B: how fast does the server make tokens?</text><text class="d" x="432" y="116">the question</text><text class="n" x="432" y="133" style="font-size:12px">How many tokens per second, for each user and in total?</text><text class="d" x="432" y="154">what changes the answer</text><text class="n" x="432" y="171" style="font-size:12px">the GPU, the engine (vLLM, SGLang), its settings</text><text class="d" x="432" y="192">unit</text><text class="n" x="432" y="209" style="font-size:12px">TPS, TTFT, total throughput</text><text class="d" x="432" y="230">tools</text><text class="n" x="432" y="247" style="font-size:12px">vllm bench serve, sglang.bench_serving</text><text class="d" x="432" y="268">leaderboards</text><text class="n" x="432" y="285" style="font-size:12px">Artificial Analysis, OpenRouter, MLPerf</text><text class="cap" x="24" y="336">Two separate measurements. A model can be clever and slow, or fast and weak. TPS is the same idea for chat,</text><text class="cap" x="24" y="356">agents, RAG or batch jobs. Part C shows the one place where the two meet: agent task time.</text>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 362" width="800" height="362" role="img" aria-label="Per-user TPS falls and total server throughput rises as more users share one GPU, with example numbers">
+<style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style><defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+<rect class="bg" width="800" height="362" rx="6"/>
+<text class="h" x="24" y="34">Two kinds of TPS</text>
+<text class="t" x="776" y="34" text-anchor="end">THROUGHPUT</text>
+<text class="m s" x="24" y="66">one GPU, one model, more users at the same time (example numbers; the shape is typical)</text><text class="n" x="24" y="96" style="font-size:12px">users</text><text class="n" x="110" y="96" style="font-size:12px">speed for each user (tok/s)</text><text class="n" x="440" y="96" style="font-size:12px">total for the server (tok/s)</text><text class="n" x="24" y="132">1</text><rect class="amber" x="110" y="110" width="264" height="30" rx="3"/><text class="m w" x="382" y="130">120</text><rect class="blue" x="440" y="110" width="10" height="30" rx="3"/><text class="m w" x="458" y="130">120</text><text class="n" x="24" y="178">8</text><rect class="amber" x="110" y="156" width="209" height="30" rx="3"/><text class="m w" x="327" y="176">95</text><rect class="blue" x="440" y="156" width="65" height="30" rx="3"/><text class="m w" x="513" y="176">760</text><text class="n" x="24" y="224">32</text><rect class="amber" x="110" y="202" width="132" height="30" rx="3"/><text class="m w" x="250" y="222">60</text><rect class="blue" x="440" y="202" width="163" height="30" rx="3"/><text class="m w" x="611" y="222">1920</text><text class="n" x="24" y="270">128</text><rect class="amber" x="110" y="248" width="55" height="30" rx="3"/><text class="m w" x="173" y="268">25</text><rect class="blue" x="440" y="248" width="272" height="30" rx="3"/><text class="m w" x="720" y="268">3200</text><line class="rule" x1="24" y1="300" x2="776" y2="300"/><text class="cap" x="24" y="326">More users: each user gets slower, but the server makes many more tokens in total. A speed board shows the left</text><text class="cap" x="24" y="346">column. Your GPU bill depends on the right column. Always say which TPS you mean, and at how many users.</text>
+</svg>
