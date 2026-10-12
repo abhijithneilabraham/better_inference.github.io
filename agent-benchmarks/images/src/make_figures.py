@@ -88,26 +88,32 @@ body = (f'<text class="m s" x="24" y="66">one agent task: 30 turns, 400 output t
         f'<text class="cap" x="24" y="354">inside a benchmark time limit, and how long a developer waits.</text>')
 svg("05-where-agent-time-goes", 800, 370, "Where the time of one agent task goes: TTFT, decode and tool work for each turn, before and after optimisation, with example numbers", "Where the time of one agent task goes", "AGENT TIME", body)
 
-# 05 the leaderboards
-items = [("SWE-bench", "real GitHub issues fixed", "you run it, then submit logs", "amber"),
-         ("Terminal-Bench", "tasks in a real terminal", "you run it, then submit", "amber"),
-         ("Aider Polyglot", "225 exercises, 6 languages, cost", "you run it, then open a PR", "amber"),
-         ("LiveCodeBench", "new contest problems, by date", "maintainers or you run it", "purple"),
-         ("LMArena WebDev", "human votes between two answers", "users vote; the team adds models", "good"),
-         ("Artificial Analysis", "TPS, TTFT, price (also quality indexes)", "the leaderboard team measures you", "blue"),
-         ("OpenRouter", "live provider speed and latency", "measured from real traffic", "blue"),
-         ("MLPerf Inference", "throughput of hardware + software", "you run it; MLCommons reviews", "blue")]
-body = ('<text class="n" x="24" y="66" style="font-size:12px">leaderboard</text>'
-        '<text class="n" x="200" y="66" style="font-size:12px">what it ranks</text>'
-        '<text class="n" x="510" y="66" style="font-size:12px">who runs the test</text>'
-        '<text class="t" x="776" y="66" text-anchor="end">A: AGENT QUALITY</text>')
-for i, (a, b, c, k) in enumerate(items):
-    y = 78 + i * 40 + (18 if i >= 5 else 0)
-    if i == 5:
-        body += f'<text class="t" x="776" y="{y-6}" text-anchor="end">B: INFERENCE SPEED</text>'
-    body += (f'<rect class="{k}" x="24" y="{y}" width="752" height="32" rx="4"/>'
-             f'<text class="n" x="38" y="{y+21}" style="font-size:12.5px">{a}</text>'
-             f'<text class="d" x="200" y="{y+21}" style="fill:#dfe6ee">{b}</text><text class="d" x="510" y="{y+21}">{c}</text>')
-body += '<text class="cap" x="24" y="438">amber: you measure, they check. green: users vote. purple: mixed. blue: speed boards.</text>'
-svg("01-the-leaderboards", 800, 454, "Eight leaderboards: five for coding agent quality and three for inference speed, what each ranks and who runs the test", "Eight leaderboards and who runs the test", "LEADERBOARDS", body)
+# 01a / 01b the leaderboards
+def boards(name, title, tag, label, items, legend):
+    body = ('<text class="n" x="24" y="66" style="font-size:12px">leaderboard</text>'
+            '<text class="n" x="200" y="66" style="font-size:12px">what it ranks</text>'
+            '<text class="n" x="510" y="66" style="font-size:12px">who runs the test</text>')
+    for i, (a, b, c, k) in enumerate(items):
+        y = 78 + i * 40
+        body += (f'<rect class="{k}" x="24" y="{y}" width="752" height="32" rx="4"/>'
+                 f'<text class="n" x="38" y="{y+21}" style="font-size:12.5px">{a}</text>'
+                 f'<text class="d" x="200" y="{y+21}" style="fill:#dfe6ee">{b}</text><text class="d" x="510" y="{y+21}">{c}</text>')
+    h = 78 + len(items) * 40 + 30
+    body += f'<text class="cap" x="24" y="{h}">{legend}</text>'
+    svg(name, 800, h + 16, label, title, tag, body)
+
+boards("01a-coding-agent-leaderboards", "Coding agent leaderboards", "AGENT QUALITY",
+       "Five coding agent leaderboards, what each ranks and who runs the test",
+       [("SWE-bench", "real GitHub issues fixed", "you run it, then submit logs", "amber"),
+        ("Terminal-Bench", "tasks in a real terminal", "you run it, then submit", "amber"),
+        ("Aider Polyglot", "225 exercises, 6 languages, cost", "you run it, then open a PR", "amber"),
+        ("LiveCodeBench", "new contest problems, by date", "maintainers or you run it", "purple"),
+        ("LMArena WebDev", "human votes between two answers", "users vote; the team adds models", "good")],
+       "amber: you measure, they check. purple: mixed. green: users vote.")
+boards("01b-inference-engine-leaderboards", "Inference engine leaderboards", "INFERENCE SPEED",
+       "Three inference engine leaderboards, what each ranks and who runs the test",
+       [("Artificial Analysis", "speed for one user, TTFT, price", "the leaderboard team measures you", "blue"),
+        ("OpenRouter", "live provider speed and latency", "measured from real traffic", "good"),
+        ("MLPerf Inference", "total throughput of hardware + software", "you run it; MLCommons reviews", "amber")],
+       "blue: they measure you. green: real traffic decides. amber: you measure, they check.")
 print("done")

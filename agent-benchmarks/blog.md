@@ -13,7 +13,7 @@ This article joins two topics that people often mix up.
 - **How good is a coding agent?** This is a question about quality. You answer it with agent benchmarks such as SWE-bench and Terminal-Bench. The answer depends on the model, the agent program around it, and a few server settings.
 - **How fast does an LLM server make tokens?** This is a question about speed, measured in **TPS** (tokens per second). The answer depends on the GPU, the serving engine (for example vLLM or SGLang) and its settings. It has nothing special to do with agents. The same TPS matters for a chat app, a document summary job or a coding agent.
 
-Each topic has its own leaderboards. So the article starts with the leaderboards: what each one ranks, and how you get on it. Then **Part A** teaches how to benchmark a coding agent, and **Part B** teaches how to measure and increase inference TPS. **Part C** shows the one place where the two topics meet.
+Each topic has its own leaderboards. So the article starts with them: first the coding agent leaderboards, then the inference engine leaderboards, with how to get on each one. Then **Part A** teaches how to benchmark a coding agent, and **Part B** teaches how to measure and increase inference TPS. **Part C** shows the one place where the two topics meet.
 
 ![Two separate topics: coding agent quality and LLM inference speed, with the question, unit, tools and leaderboards of each](images/02-two-topics.png)
 
@@ -33,26 +33,13 @@ The rules of each leaderboard change often. This article describes them as they 
 
 ---
 
-# The leaderboards, and how to get on each one
+# Coding agent leaderboards
 
-![Eight leaderboards: five for coding agent quality and three for inference speed, what each ranks and who runs the test](images/01-the-leaderboards.png)
+![Five coding agent leaderboards, what each ranks and who runs the test](images/01a-coding-agent-leaderboards.png)
 
-#### Two families of leaderboard
+These leaderboards ask one question: **how many tasks does this agent solve?** They measure quality. The speed of your server does not appear on them, although it can change your score on long tasks (Part C).
 
-- **Agent quality boards** ask: "how many tasks does this agent solve?" SWE-bench, Terminal-Bench, Aider Polyglot, LiveCodeBench and LMArena WebDev are in this family. To do well, read Part A.
-- **Inference speed boards** ask: "how fast does this server answer?" Artificial Analysis, OpenRouter and MLPerf Inference are in this family. To do well, read Part B.
-
-#### Three ways a leaderboard gets its numbers
-
-This matters more than anything else, because it tells you what you must do.
-
-- **They measure you.** The leaderboard team sends requests to your public endpoint and measures it themselves. You cannot send your own numbers. Example: Artificial Analysis.
-- **You measure, they check.** You run the benchmark yourself, then you send the results with all the logs. The team checks them. Examples: SWE-bench, Terminal-Bench, Aider, MLPerf.
-- **Users decide.** The score comes from people's votes or from real use. Examples: LMArena, OpenRouter.
-
-Think of a running race. In the first kind, the race officials time you with their own stopwatch. In the second, you time yourself and send the video. In the third, the crowd votes for the best runner.
-
-## Agent quality boards
+On most of them, you run the benchmark yourself and send the results with all the logs. The leaderboard team checks the logs before your score appears. Think of a race where you time yourself, and then send the video so that the officials can check it. LMArena is different: there, real users vote. To prepare for any of these boards, read Part A.
 
 ### SWE-bench
 
@@ -88,7 +75,31 @@ Think of a running race. In the first kind, the race officials time you with the
 
 **Who runs it.** Real users vote. The LMArena team decides which models to add.
 
-## Inference speed boards
+### Summary
+
+| Leaderboard | Ranks | Who runs it | How to get on |
+|---|---|---|---|
+| SWE-bench | GitHub issues fixed | you | PR with logs and trajectories |
+| Terminal-Bench | terminal tasks solved | you | run the official harness, submit |
+| Aider Polyglot | exercises solved, cost | you | PR with the result file |
+| LiveCodeBench | new contest problems | maintainers or you | through the project GitHub |
+| LMArena WebDev | human votes | users | the team adds models |
+
+---
+
+# Inference engine leaderboards
+
+![Three inference engine leaderboards, what each ranks and who runs the test](images/01b-inference-engine-leaderboards.png)
+
+These leaderboards ask a different question: **how fast does this server answer?** They measure the inference engine (for example vLLM or SGLang), the GPUs and the settings, for any kind of request. They do not ask whether the answers are good at coding.
+
+Each one gets its numbers in its own way:
+
+- **Artificial Analysis measures you.** Their team sends requests to your public endpoint and times the answers with their own stopwatch. You cannot send your own numbers.
+- **OpenRouter uses real traffic.** The speed comes from the requests of real users, all day.
+- **MLPerf Inference checks your run.** You run the official test yourself, and the results are reviewed before they are published.
+
+To prepare for any of these boards, read Part B.
 
 ### Artificial Analysis
 
@@ -122,18 +133,13 @@ Think of a running race. In the first kind, the race officials time you with the
 
 **Note.** MLPerf is mostly for hardware and system companies. It is the board where total throughput (B.1) matters most.
 
-## Summary of the boards
+### Summary
 
-| Leaderboard | Family | Ranks | Who runs it | How to get on |
-|---|---|---|---|---|
-| SWE-bench | agent quality | GitHub issues fixed | you | PR with logs and trajectories |
-| Terminal-Bench | agent quality | terminal tasks solved | you | run the official harness, submit |
-| Aider Polyglot | agent quality | exercises solved, cost | you | PR with the result file |
-| LiveCodeBench | agent quality | new contest problems | maintainers or you | through the project GitHub |
-| LMArena WebDev | agent quality | human votes | users | the team adds models |
-| Artificial Analysis | inference speed | TPS, TTFT, price | the AA team | public endpoint, then contact them |
-| OpenRouter | inference speed | live speed and latency | real traffic | become a provider |
-| MLPerf Inference | inference speed | system throughput | you, then review | submit in a round |
+| Leaderboard | Ranks | Who runs it | How to get on |
+|---|---|---|---|
+| Artificial Analysis | speed for one user, TTFT, price | the AA team | public endpoint, then contact them |
+| OpenRouter | live speed and latency | real traffic | become a provider |
+| MLPerf Inference | total throughput | you, then review | submit in a round |
 
 ---
 
@@ -376,13 +382,13 @@ Two speed changes from Part B help agents the most:
 - **Prefix caching.** Each turn sends the whole conversation again, and most of it is the same as last turn. With prefix caching, the server reuses the notes of the earlier turns. In one of my load tests, 96.7% of the input tokens came from the cache. So TTFT stays low even when the conversation gets long.
 - **Speculative decoding.** Agents write code, and code is easy to guess (B.6).
 
-But keep the two reports separate. A speed board does not tell you if the agent is good. An agent board does not tell you if the server is fast. Publish both, and say which is which.
+But keep the two reports separate. An inference engine leaderboard does not tell you if the agent is good. A coding agent leaderboard does not tell you if the server is fast. Publish both, and say which is which.
 
 ---
 
 # Checklist before you submit
 
-**For an agent quality board:**
+**For a coding agent leaderboard:**
 
 1. Write down the model version, the harness version and the benchmark version.
 2. Check the tool-call parser, the reasoning parser, the context length and the output limit.
@@ -391,7 +397,7 @@ But keep the two reports separate. A speed board does not tell you if the agent 
 5. Keep all logs and trajectories.
 6. Read the current submission rules.
 
-**For an inference speed board:**
+**For an inference engine leaderboard:**
 
 1. Calculate the ceiling for one user (B.3).
 2. Measure with fixed prompts, fixed output lengths and streaming. Report the median and p99.
@@ -399,8 +405,8 @@ But keep the two reports separate. A speed board does not tell you if the agent 
 4. Count tokens from the stream, and read every reasoning field.
 5. Make sure no number is above the ceiling.
 6. Run the correctness gate after every speed change.
-7. For a "they measure you" board, keep spare capacity and do not change settings without a test.
+7. For Artificial Analysis, which measures you itself, keep spare capacity and do not change settings without a test.
 
 # Summary
 
-Start from the leaderboard you want, because it tells you what to measure and who measures it. For agent quality boards, keep the harness the same, set up the parsers and the context length correctly, and run each benchmark more than once. For inference speed boards, know the two kinds of TPS, calculate the ceiling, measure the way the board does, and check quality after every speed change. The two topics meet in agent task time: a faster server finishes more agent tasks inside the time limit.
+Start from the leaderboard you want, because it tells you what to measure and who measures it. For coding agent leaderboards, keep the harness the same, set up the parsers and the context length correctly, and run each benchmark more than once. For inference engine leaderboards, know the two kinds of TPS, calculate the ceiling, measure the way the board does, and check quality after every speed change. The two topics meet in agent task time: a faster server finishes more agent tasks inside the time limit.
