@@ -35,9 +35,71 @@ The rules of each leaderboard change often. This article describes them as they 
 
 # Coding agent leaderboards
 
+## What does a task look like?
+
+Each benchmark is a list of **tasks**. A task gives the agent a job and a place to work. When the agent says "done", an automatic check decides if the job is really done. The agent never sees this check.
+
+Here is one short example in the style of each benchmark. They are simplified, so you can read them quickly.
+
+**SWE-bench: fix a bug in a real project.**
+
+```
+The agent gets:  a copy of a Python project, and this bug report:
+                 "slugify('Hello  World') returns 'hello--world'.
+                  It should return 'hello-world'."
+The agent does:  finds slugify() in utils/text.py, and changes it
+                 so that two spaces become one dash.
+The check:       the tests from the real fix must pass, and all the
+                 old tests of the project must still pass.
+```
+
+**Terminal-Bench: do a job in a terminal.**
+
+```
+The agent gets:  a terminal inside a container, and this instruction:
+                 "The web server in /app does not start.
+                  Make it answer on port 8080."
+The agent does:  reads the error log, installs a missing package,
+                 changes the port in the config file, starts the server.
+The check:       a script asks localhost:8080 for a page and expects an answer.
+```
+
+**Aider Polyglot: finish an exercise in one of six languages.**
+
+```
+The agent gets:  a Rust file with an empty function, and this instruction:
+                 "is_leap_year(year): a year is a leap year if it divides by 4,
+                  except when it divides by 100, unless it also divides by 400."
+The agent does:  writes the function.
+The check:       the exercise's tests. If they fail, the model sees the
+                 errors and gets one more try.
+```
+
+**LiveCodeBench: solve a new contest problem.**
+
+```
+The agent gets:  "Read a list of numbers. Print the length of the longest
+                  run of equal numbers next to each other.
+                  Example: 1 1 2 2 2 3  ->  3"
+The agent does:  writes a program.
+The check:       hidden inputs, each with a known answer and a time limit.
+```
+
+**LMArena WebDev: build something a person likes more.**
+
+```
+A user asks:     "Make a to-do list web page with a dark mode button."
+Two hidden models each build a page. The user tries both pages.
+The check:       the user votes for the better page.
+```
+
+#### How the score is counted
+
+A task counts as **solved** only when its check passes completely. Half a fix scores 0. For example, if the agent solves 320 of the 500 SWE-bench Verified tasks on its first try, its score is 320 / 500 = 64% (this is **pass@1**).
+
 ![Five coding agent leaderboards, what each ranks and who runs the test](images/01a-coding-agent-leaderboards.png)
 
-These leaderboards ask one question: **how many tasks does this agent solve?** They measure quality. The speed of your server does not appear on them, although it can change your score on long tasks (Part C).
+So these leaderboards ask one question: **how many tasks does this agent solve?** They measure quality. The speed of your server does not appear on them, although it can change your score on long tasks (Part C).
 
 On most of them, you run the benchmark yourself and send the results with all the logs. The leaderboard team checks the logs before your score appears. Think of a race where you time yourself, and then send the video so that the officials can check it. LMArena is different: there, real users vote. To prepare for any of these boards, read Part A.
 
