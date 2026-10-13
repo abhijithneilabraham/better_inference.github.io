@@ -117,6 +117,8 @@ On most of them, you run the benchmark yourself and send the results with all th
 
 **Who runs it.** You run it with the official harness, then you submit.
 
+**How to get on.** Do a full run with the official harness, then open a pull request that adds your run logs to the Terminal-Bench logs repository on Hugging Face (see A.9).
+
 **Note.** Terminal-Bench tasks are long, and each one has a time limit. A slow server fails tasks that it could solve. So speed (Part B) has a big effect on this score. Part C explains why.
 
 ### Aider Polyglot
@@ -127,7 +129,7 @@ On most of them, you run the benchmark yourself and send the results with all th
 
 ### LiveCodeBench
 
-**What it ranks.** [LiveCodeBench](https://livecodebench.github.io) uses new contest problems from LeetCode, AtCoder and Codeforces. You can choose only problems that were published after the model was trained. So the model cannot have seen the answers (see "contamination" in A.2).
+**What it ranks.** [LiveCodeBench](https://livecodebench.github.io) uses new contest problems from LeetCode, AtCoder and Codeforces. You can choose only problems that were published after the model was trained. So the model cannot have seen the answers during its training. (When a model has seen benchmark answers during training, its score is too high. This is called **contamination**.)
 
 **Who runs it.** The maintainers evaluate models. You can also run the open code and send results through the project's GitHub.
 
@@ -207,84 +209,160 @@ To prepare for any of these boards, read Part B.
 
 # Part A: Benchmark a coding agent
 
-## A.1 What a coding agent does
+Everything in this part comes from my own work on **Terminal-Bench 2.0 and 2.1**. Each version has 89 tasks. Each task runs in its own container, and a hidden test suite grades it. I built several agent designs, ran them on the full set, read why each task failed, and changed one thing at a time. The advice below is in the order you will meet the problems.
 
-A **coding agent** is a model that works on code in many small steps. For example, you tell it: "the login test fails, fix it". The agent then:
+## A.1 Know that there are two graders
 
-1. reads the test file,
-2. runs the test and reads the error,
-3. opens the login code,
-4. changes one line,
-5. runs the test again,
-6. sees that it passes, and stops.
+The most important idea first. When your agent works on a task, two different things judge it:
 
-Each of these steps is one **turn**: one request to the model and one answer. A real task can take 20 to 100 turns.
-
-The model alone cannot run tests or open files. The **harness** does that. It shows the model a list of tools, runs the tool that the model asks for, and gives the result back to the model. SWE-agent, mini-SWE-agent, OpenHands and Terminus (the reference agent of Terminal-Bench) are examples of harnesses.
-
-## A.2 Choose the right benchmarks
-
-Each benchmark tests a different skill, so use more than one.
-
-| Benchmark | What it tests | Size |
+| | Your agent's own checks | The benchmark's hidden tests |
 |---|---|---|
-| **SWE-bench Verified** | Fixing real bugs in real Python projects. | 500 tasks, checked by people |
-| **Terminal-Bench** | Doing jobs in a terminal: build, configure, repair. | 89 tasks in version 2.0 |
-| **Aider Polyglot** | Editing code in six languages to solve exercises. | 225 exercises |
-| **LiveCodeBench** | Solving new contest problems. | grows over time |
+| When | during the task | after your agent stops |
+| Job | decide "am I done, or do I try again?" | decide "is the task solved?" |
+| Sees the answer key? | no | yes, it is the task author's test suite |
+| Counts for your score? | no | **yes, this is the score** |
 
-#### Contamination: when the model has seen the answers
+For example: the agent sets up a web server, opens the page, sees text, and says "done". The hidden test asks for the page and expects exactly `hello world`. The page says `hello world updated`. Score: 0.
 
-A model learns from a huge amount of internet text. If the answers to a benchmark were on the internet, the model may have learned them by heart. This is **contamination**.
+So the whole game is this: **make your agent's own checks predict the hidden tests.** Most of the designs in A.5 exist to do that better.
 
-For example: before, a model scores 70% on an old public benchmark. After you give it new problems of the same kind that it never saw, it scores 45%. The 70% was partly memory.
+## A.2 Run it the way the leaderboard will
 
-LiveCodeBench avoids this with dates: it uses only problems from after the model's training. Fixed sets such as SWE-bench Verified cannot fully avoid it. So also test with a few private tasks of your own.
+Use the official harness from the start. Terminal-Bench runs agents through its own harness (`tb run`, built on Harbor). The harness builds a fresh container for each task, types the task into a terminal, waits for your agent to finish, runs the hidden tests, and deletes the container. Your agent plugs in through a small **adapter** (a Python class), the same way the built-in agents such as Claude Code, Codex and OpenCode plug in.
 
-## A.3 Keep the harness the same
+Start small. A smoke test runs one task once and lets you watch it:
 
-The same model can get very different scores in two different harnesses. One harness may show the model better error messages, or give it more turns, or handle a failed tool call better.
+```bash
+tb run --dataset <dataset name>==<version> \
+  --agent-import-path my_adapter:MyAgent \
+  --task-id hello-world --n-attempts 1 --livestream
+```
 
-So when you compare **models**, use one harness for all of them, and do not change it. Then any difference in the score comes from the model. When you compare **harnesses**, do the opposite: keep the model the same.
+Then run all the tasks. Two rules keep your number honest:
 
-## A.4 Set up the server for agents
+- **One graded answer for each task.** Your agent can try many models inside one attempt. But the hidden tests run once, on whatever is on disk when it stops. That is a true **pass@1**.
+- **A rerun of only the failed tasks is a diagnostic, never a score.** For example, the first run fails 14 tasks and a rerun of those 14 passes 5 of them. If you add those 5 to the first run, you are reporting "best of two tries" (pass@2), and calling it pass@1.
 
-Many low agent scores come from server settings, not from the model. Check these before you run anything. Each item shows what goes wrong and what it looks like when it is right.
+## A.3 Expect noise, and compare like with like
 
-**Tool-call parser.** The model writes its tool requests as text, for example "call `run_tests` with `path=tests/`". The server must turn that text into a structured **tool call** that the harness can read. A **parser** is the part of the server that does this, and each model family needs its own one.
+**The same agent gives different scores on different days.** In my runs, two identical full runs differed by 3 to 4 tasks. So a one-run comparison of two designs is mostly noise. If design A scores 69 and design B scores 68, you have learned nothing. Run each design several times and compare the averages.
 
-- Before (no parser): the harness asks for tools with `tool_choice=auto`, and the server answers with an error (HTTP 400). Every task fails at turn one.
-- After: in vLLM, start the server with `--enable-auto-tool-choice --tool-call-parser <name for your model>`. The harness gets clean tool calls.
+**Know which tasks the leaderboard counts.** Artificial Analysis grades 84 of the 89 Terminal-Bench 2.0 tasks. It leaves out 5 that do not run well in its environment (`write-compressor`, `feal-linear-cryptanalysis`, `gpt2-codegolf`, `filter-js-from-html`, `make-doom-for-mips`). To compare with that board, report "passed out of 84" as well as "out of 89". A task that timed out still counts as a fail.
 
-**Reasoning parser.** A "thinking" model first writes its private reasoning, then its answer. The server must put the reasoning in a field called `reasoning_content` and the answer in `content`.
+**Do not compare 2.0 scores with 2.1 scores.** Version 2.1 repaired 28 tasks, and "repaired" mostly means stricter. For example: one answer for `kv-store-grpc` passed the 2.0 tests and failed the 2.1 tests. Same answer, stricter test. A lower 2.1 score is expected, and it does not mean your agent got worse.
 
-- Before (no reasoning parser): the long reasoning text goes into the answer, and the harness cannot find the tool call inside it.
-- Also wrong (a reasoning parser on a model that does not think): the server may put the whole answer in `reasoning_content`, and `content` stays empty. The harness sees an empty answer.
-- After: use the reasoning parser only for models that think, and send one test request to check both fields.
+## A.4 Read why each task failed
 
-**Context length.** An agent sends the whole conversation in every turn, so the requests become very long. `--max-model-len` is the longest request the server accepts.
+After every run, open each failed task's grader output (in Harbor, `verifier/test-stdout.txt`). It tells you exactly what the hidden test wanted. Many "impossible" tasks turned out to be very close misses:
 
-- Before: in one of my runs, a limit copied from a vendor's documentation was too short, and the server refused 72% of the requests. In another run, a limit of half the model's maximum refused 2%.
-- After: use the full context length that the model supports.
+| Task | What the grader said |
+|---|---|
+| `configure-git-webserver` | the page said `hello world updated`; the test wanted exactly `hello world` |
+| `gcode-to-text` | the answer had `gcOd3` (capital letter O); the test wanted `gc0d3` (zero) |
+| `sam-cell-seg` | overlap score 0.484; the test needed 0.5 |
+| `sanitize-git-repo` | one fake secret was still in the repo; `grep -ri` would have found it |
+| `make-doom-for-mips` | the output image was never written: the agent ran out of time |
 
-**Output limit.** A thinking model can spend all of `max_tokens` (the most tokens it may write) on reasoning.
+Then sort every failure into one bucket. Each bucket has a different fix:
 
-- Before: the limit runs out during the reasoning. The answer is empty, but you still pay for all the tokens, and the task fails.
-- After: give thinking models a large output limit, and count how many answers come back empty.
+| Bucket | What happened | The fix |
+|---|---|---|
+| **False accept** | the agent's check said "done", the hidden test said no | a stricter, independent checker (A.5) |
+| **Near miss** | almost right: one character, a number just under a limit | a short refinement pass (A.5) |
+| **Timeout** | the agent was still working when the clock ran out | a time guard (A.5) |
+| **Solve wall** | no model could solve it in any run | nothing in the harness helps; a better model, or more time |
+| **Flaky environment** | the task itself fails at random, for example a download that sometimes breaks | nothing; it is a coin flip for every agent |
 
-**Time limits.** Set the harness timeout longer than your longest answer. A timeout counts as a failed task.
+In my first full run, 9 of the 14 failures were false accepts. That told me where to work.
 
-## A.5 The procedure
+## A.5 The designs that raised the score
 
-1. Choose the benchmarks and write down the version of each.
-2. Choose the harness and keep it the same.
-3. Set up the server (A.4). Send one test task and read the full output yourself.
-4. Run each benchmark at least three times. Agents give different results from run to run.
-5. Record pass@1 for each run, the average and the range.
-6. Record the cost and the total time.
-7. Keep all logs and trajectories. Most leaderboards ask for them.
+Each step below fixed a failure that I measured. Think of them as layers that you add one at a time.
 
-**Report the range, not only your best run.** For example, three runs give 61%, 64% and 66%. Report "64% (61 to 66, 3 runs)". If another model got 65%, you cannot say it is better: the gap is smaller than the normal change between runs.
+#### 1. Check the work by running it, with a model from a different company
+
+**Before:** the agent checks its own work, or a second copy of the same model checks it. It says "PASS" to almost everything. A model shares the blind spots of its own family: it tests what it already thought of, and misses what it did not. I watched a same-family check pass a broken build that the hidden tests failed.
+
+**After:** a separate **critic** (a checker model) gets a shell and a strict prompt: "the agent is probably overconfident; run the deliverable yourself and hunt for proof that it is wrong". It comes from a different model family than the solver. Its rules:
+
+- **"It runs" is not "it matches".** If the task names an exact output (a file, a string, a number to beat), the critic must produce the agent's output and compare it.
+- **Not checked means not passed.** If it could not verify a requirement, it answers FAIL with low confidence, and the agent tries again.
+- **At least 3 real commands before any PASS.**
+
+#### 2. When an attempt fails, start the next one from a clean copy
+
+**Before:** the second model starts in the folder that the first model left: half-built files, a wrong approach, broken settings. It copies the wrong approach.
+
+**After:** take a snapshot of the task folder before anything runs. Before each new attempt (each **arm**), restore the clean snapshot. Tell the new model only that "an earlier attempt failed verification", and do not show it the failed work. Then try a different model family. Models fail in different places, so a second family often solves what the first could not. In my first full run, the second and third arms, plus salvage (next step), added 16 passes.
+
+#### 3. If nothing passes, ship the best attempt (salvage)
+
+**Before:** a strict critic sometimes rejects a correct answer, because it cannot prove it is correct. Then the agent escalates, the later attempts are worse, and a correct answer is lost.
+
+**After:** snapshot the folder after every arm, and keep each critic score. If no arm gets a PASS, restore the attempt with the best score. For example: on `overfull-hbox`, both checkers said FAIL because they could not verify the output. The first answer was right. Salvage put it back, and the task passed. Salvage is what makes a strict critic affordable: a wrong "no" now costs almost nothing, while a wrong "yes" still ends the task.
+
+#### 4. Decide on the verdict, not on a confidence number
+
+**Before:** "ship only if the critic is at least 90% confident". One correct answer got 88 and was sent to a worse model.
+
+**After:** decide on PASS or FAIL. A model's confidence number is not calibrated, and 88 against 90 is noise.
+
+#### 5. Give near misses one focused second look
+
+**Before:** after a near miss, a new model solves the whole task again from zero, and often makes the same small mistake.
+
+**After:** send the **same** arm back once with a short note: do not restart; look for the small difference, such as 0 against O, upper and lower case, spaces, a trailing newline, an off-by-one, or a score just under its limit.
+
+#### 6. Give the model the known trick for its kind of task (playbooks)
+
+Models often fail on the approach, not on skill. A cheap classifier (even simple keywords) tags the task type and adds a few lines of expert advice before the model starts. For example:
+
+- a file that must work in two languages: the known trick to hide one language's code from the other, and "test both after every edit";
+- an HTML filter against script attacks: the full list of attack patterns, not only `<script>`, and "use a real HTML parser";
+- training a model: "the test checks a quality threshold, so keep a validation split and use the whole time budget".
+
+#### 7. Protect the clock
+
+The harness stops a task at its time limit and grades whatever is on disk. It does not retry a timeout. The worst case: the clock runs out just after you restored a clean snapshot, so an empty folder gets graded. Two guards fix this:
+
+- **Between arms:** if too little time is left for a full new attempt, skip straight to salvage.
+- **Inside an arm:** cap each arm's time, and keep a reserve for checking and salvage.
+
+In a rerun of the 14 failed tasks, the strict critic and the time guard together turned 5 of them into passes, including one task that had timed out before.
+
+#### What did not help
+
+- **A planning step before solving.** Writing a plan first locked the model onto a worse approach. Removing it fixed a task that had regressed.
+- **Two checkers that must both agree, when one is weak.** The weak checker never caught a real error, and its rare "no" votes were wrong. They sent correct answers to worse models. A weak checker from another family is worse than none.
+- **A lenient checker on tasks it cannot run.** Checkers catch errors they can execute and test (compile it, run it, compare). They approve what they cannot test (a training accuracy, a video's content). There, they guess from how plausible the answer looks.
+
+## A.6 Harness settings that silently cost points
+
+These are small settings, but each one cost me tasks before I found it.
+
+- **Use the model's exact catalog name.** In the Codex CLI, a prefixed model name failed the lookup in its model list. Codex then used default context-window settings, and it compressed the conversation far too early. Long tasks quietly got worse. The bare name fixed it.
+- **Turn on thinking explicitly.** One model ran without extended thinking until its config said so. Without it, it lost most of its strength on hard tasks. That model's thinking mode also needed temperature 1: temperature 0 with thinking crashed the call.
+- **Check that the effort setting really works.** Through one router, a model ignored `reasoning.effort`: the "max" setting used fewer reasoning tokens than "low". Send the same prompt at two settings and compare the token counts.
+- **Refusals do not go away with a retry.** Some models refuse security tasks (for example, cracking a test password hash). A refusal comes back every time, so send those tasks to a different model.
+- **Single-line commands for the checker.** Multi-line shell input (heredocs, `<<EOF`) failed in the command path and quietly wasted the checker's turns.
+
+## A.7 Run it like an experiment
+
+- **Run a preflight before every full run:** check the keys and the account balance, make one real call to every model in the chain, and check that Docker runs. A full run of 89 tasks takes hours, and a bad key fails every task.
+- **Retry infrastructure errors, not answers.** Set the harness to retry connection errors and gateway errors with a back-off. Do not retry wrong answers.
+- **Run long jobs in `tmux`.** It keeps the run alive when your connection drops. Leave with `Ctrl-b d`. `Ctrl-C` stops the run.
+- **Keep every job folder.** Rename it, do not delete it. It holds each task's trajectory, the critic's transcript, which arm shipped, and the grader output. That is your evidence.
+- **Write an experiment log:** what changed, why, the config, the score, the failures by bucket, and what you learned. The next change comes from the failure buckets.
+
+## A.8 Know where the ceiling is
+
+After all the steps above, my checking was no longer the problem. In the last full runs, most of the remaining failures were tasks that no model in the chain could solve, and a perfect checker would only have moved them to another wrong answer. The next gains come from better solving: several full runs to beat the noise, a ban on the checker trusting test scripts that the agent wrote itself, and a model that can see images for the visual tasks.
+
+## A.9 Submit to the Terminal-Bench leaderboard
+
+1. Do a full run with the official harness and its required number of attempts for each task (for example `--n-attempts 5`).
+2. Follow the Terminal-Bench submission guide: open a pull request that adds your run logs to the Terminal-Bench logs repository on Hugging Face.
+3. Once the score is verified, other boards can use it. Artificial Analysis, for example, takes verified public results. It does not accept agent results sent to it directly.
 
 ---
 
@@ -437,7 +515,7 @@ task time  =  for every turn: (TTFT + output tokens / speed for one user)  +  ti
 - Before: TTFT 1.5 seconds and 60 tokens per second. The task takes about 335 seconds.
 - After (prefix caching cuts TTFT, speculative decoding and FP8 raise the speed): TTFT 0.4 seconds and 150 tokens per second. The same task takes about 182 seconds.
 
-Now remember that agent benchmarks have **time limits**. In one of my Terminal-Bench runs, more than half of the 89 tasks stopped at the 900-second limit. A faster server finishes more tasks inside the limit, so the same model gets a higher score.
+Now remember that agent benchmarks have **time limits**, and the harness grades whatever is on disk when the clock runs out (A.5, step 7). A faster server leaves time for one more attempt, one more check, or one refinement pass. So the same agent gets a higher score.
 
 Two speed changes from Part B help agents the most:
 
@@ -452,12 +530,14 @@ But keep the two reports separate. An inference engine leaderboard does not tell
 
 **For a coding agent leaderboard:**
 
-1. Write down the model version, the harness version and the benchmark version.
-2. Check the tool-call parser, the reasoning parser, the context length and the output limit.
-3. Send one test task and read the whole trajectory yourself.
-4. Run each benchmark at least three times. Report the average and the range.
-5. Keep all logs and trajectories.
-6. Read the current submission rules.
+1. Run a smoke test with the official harness: one task, watched live.
+2. Run a preflight: keys, balance, one real call to every model, Docker.
+3. Check the exact model names, the thinking flags and the effort settings (A.6).
+4. One graded answer for each task. Never merge a rerun of failed tasks into a score.
+5. Run the full set more than once. Report "out of 89" and "out of 84", and the range between runs.
+6. Read the grader output of every failed task, and sort the failures into buckets.
+7. Keep every job folder and write the experiment log.
+8. Submit the logs the way the leaderboard asks (A.9).
 
 **For an inference engine leaderboard:**
 
@@ -471,4 +551,4 @@ But keep the two reports separate. An inference engine leaderboard does not tell
 
 # Summary
 
-Start from the leaderboard you want, because it tells you what to measure and who measures it. For coding agent leaderboards, keep the harness the same, set up the parsers and the context length correctly, and run each benchmark more than once. For inference engine leaderboards, know the two kinds of TPS, calculate the ceiling, measure the way the board does, and check quality after every speed change. The two topics meet in agent task time: a faster server finishes more agent tasks inside the time limit.
+Start from the leaderboard you want, because it tells you what to measure and who measures it. For coding agent leaderboards, remember that the hidden tests are the only grader that counts: check the work by running it with a model from another family, retry from a clean copy, salvage the best attempt, protect the clock, and run more than once to beat the noise. For inference engine leaderboards, know the two kinds of TPS, calculate the ceiling, measure the way the board does, and check quality after every speed change. The two topics meet in agent task time: a faster server finishes more agent tasks inside the time limit.
