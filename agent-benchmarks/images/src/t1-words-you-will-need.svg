@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 436" width="800" height="436" role="img" aria-label="Words you will need">
+<style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  .rowa{fill:#1b2531}.rowb{fill:#161d26;stroke:#2e3a47;stroke-width:1}.c{font:400 12px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#dfe6ee}.n{font-size:12px}</style>
+<rect class="bg" width="800" height="436" rx="6"/>
+<text class="h" x="24" y="36">Words you will need</text>
+<rect class="box" x="24" y="58" width="752" height="33" rx="3"/><text class="n" x="36" y="80">Word</text><text class="n" x="227" y="80">Meaning</text><rect class="rowa" x="24" y="95" width="752" height="50" rx="3"/><text class="n" x="36" y="117">Token</text><text class="c" x="227" y="117">A small piece of text, usually a word or part of a word. Models read and write</text><text class="c" x="227" y="134">tokens. &quot;Hello world&quot; is two or three tokens.</text><rect class="rowb" x="24" y="149" width="752" height="50" rx="3"/><text class="n" x="36" y="171">Agent</text><text class="c" x="227" y="171">A model plus a harness. The harness is the program around the model. It gives the</text><text class="c" x="227" y="188">model tools (read a file, write a file, run a command) and runs the loop.</text><rect class="rowa" x="24" y="203" width="752" height="33" rx="3"/><text class="n" x="36" y="225">Turn</text><text class="c" x="227" y="225">One request to the model and one answer. An agent task has many turns.</text><rect class="rowb" x="24" y="240" width="752" height="33" rx="3"/><text class="n" x="36" y="262">pass@1</text><text class="c" x="227" y="262">The percentage of tasks that the agent solves on the first try.</text><rect class="rowa" x="24" y="277" width="752" height="33" rx="3"/><text class="n" x="36" y="299">TPS</text><text class="c" x="227" y="299">Output tokens per second. Section B.1 explains its two meanings.</text><rect class="rowb" x="24" y="314" width="752" height="50" rx="3"/><text class="n" x="36" y="336">TTFT</text><text class="c" x="227" y="336">Time to first token: how long you wait from sending the request until the first</text><text class="c" x="227" y="353">word of the answer appears.</text><rect class="rowa" x="24" y="368" width="752" height="50" rx="3"/><text class="n" x="36" y="390">Endpoint</text><text class="c" x="227" y="390">A public web address (an API) where anyone with a key can send requests to your</text><text class="c" x="227" y="407">model.</text>
+</svg>

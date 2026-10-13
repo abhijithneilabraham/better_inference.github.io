@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 220" width="800" height="220" role="img" aria-label="Inference engine leaderboards: summary">
+<style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  .rowa{fill:#1b2531}.rowb{fill:#161d26;stroke:#2e3a47;stroke-width:1}.c{font:400 12px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#dfe6ee}.n{font-size:12px}</style>
+<rect class="bg" width="800" height="220" rx="6"/>
+<text class="h" x="24" y="36">Inference engine leaderboards: summary</text>
+<rect class="box" x="24" y="58" width="752" height="33" rx="3"/><text class="n" x="36" y="80">Leaderboard</text><text class="n" x="193" y="80">Ranks</text><text class="n" x="417" y="80">Who runs it</text><text class="n" x="545" y="80">How to get on</text><rect class="rowa" x="24" y="95" width="752" height="33" rx="3"/><text class="n" x="36" y="117">Artificial Analysis</text><text class="c" x="193" y="117">speed for one user, TTFT, price</text><text class="c" x="417" y="117">the AA team</text><text class="c" x="545" y="117">public endpoint, then contact them</text><rect class="rowb" x="24" y="132" width="752" height="33" rx="3"/><text class="n" x="36" y="154">OpenRouter</text><text class="c" x="193" y="154">live speed and latency</text><text class="c" x="417" y="154">real traffic</text><text class="c" x="545" y="154">become a provider</text><rect class="rowa" x="24" y="169" width="752" height="33" rx="3"/><text class="n" x="36" y="191">MLPerf Inference</text><text class="c" x="193" y="191">total throughput</text><text class="c" x="417" y="191">you, then review</text><text class="c" x="545" y="191">submit in a round</text>
+</svg>

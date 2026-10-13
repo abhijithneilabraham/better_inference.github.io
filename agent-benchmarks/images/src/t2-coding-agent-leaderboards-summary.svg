@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 294" width="800" height="294" role="img" aria-label="Coding agent leaderboards: summary">
+<style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  .rowa{fill:#1b2531}.rowb{fill:#161d26;stroke:#2e3a47;stroke-width:1}.c{font:400 12px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#dfe6ee}.n{font-size:12px}</style>
+<rect class="bg" width="800" height="294" rx="6"/>
+<text class="h" x="24" y="36">Coding agent leaderboards: summary</text>
+<rect class="box" x="24" y="58" width="752" height="33" rx="3"/><text class="n" x="36" y="80">Leaderboard</text><text class="n" x="181" y="80">Ranks</text><text class="n" x="371" y="80">Who runs it</text><text class="n" x="535" y="80">How to get on</text><rect class="rowa" x="24" y="95" width="752" height="33" rx="3"/><text class="n" x="36" y="117">SWE-bench</text><text class="c" x="181" y="117">GitHub issues fixed</text><text class="c" x="371" y="117">you</text><text class="c" x="535" y="117">PR with logs and trajectories</text><rect class="rowb" x="24" y="132" width="752" height="33" rx="3"/><text class="n" x="36" y="154">Terminal-Bench</text><text class="c" x="181" y="154">terminal tasks solved</text><text class="c" x="371" y="154">you</text><text class="c" x="535" y="154">run the official harness, submit</text><rect class="rowa" x="24" y="169" width="752" height="33" rx="3"/><text class="n" x="36" y="191">Aider Polyglot</text><text class="c" x="181" y="191">exercises solved, cost</text><text class="c" x="371" y="191">you</text><text class="c" x="535" y="191">PR with the result file</text><rect class="rowb" x="24" y="206" width="752" height="33" rx="3"/><text class="n" x="36" y="228">LiveCodeBench</text><text class="c" x="181" y="228">new contest problems</text><text class="c" x="371" y="228">maintainers or you</text><text class="c" x="535" y="228">through the project GitHub</text><rect class="rowa" x="24" y="243" width="752" height="33" rx="3"/><text class="n" x="36" y="265">LMArena WebDev</text><text class="c" x="181" y="265">human votes</text><text class="c" x="371" y="265">users</text><text class="c" x="535" y="265">the team adds models</text>
+</svg>

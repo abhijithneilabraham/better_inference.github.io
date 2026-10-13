@@ -21,15 +21,7 @@ The rules of each leaderboard change often. This article describes them as they 
 
 ## Words you will need
 
-| Word | Meaning |
-|---|---|
-| **Token** | A small piece of text, usually a word or part of a word. Models read and write tokens. "Hello world" is two or three tokens. |
-| **Agent** | A model plus a **harness**. The harness is the program around the model. It gives the model tools (read a file, write a file, run a command) and runs the loop. |
-| **Turn** | One request to the model and one answer. An agent task has many turns. |
-| **pass@1** | The percentage of tasks that the agent solves on the first try. |
-| **TPS** | Output tokens per second. Section B.1 explains its two meanings. |
-| **TTFT** | Time to first token: how long you wait from sending the request until the first word of the answer appears. |
-| **Endpoint** | A public web address (an API) where anyone with a key can send requests to your model. |
+![Words you will need: a table with the columns Word, Meaning](images/t1-words-you-will-need.png)
 
 ---
 
@@ -141,13 +133,7 @@ On most of them, you run the benchmark yourself and send the results with all th
 
 ### Summary
 
-| Leaderboard | Ranks | Who runs it | How to get on |
-|---|---|---|---|
-| SWE-bench | GitHub issues fixed | you | PR with logs and trajectories |
-| Terminal-Bench | terminal tasks solved | you | run the official harness, submit |
-| Aider Polyglot | exercises solved, cost | you | PR with the result file |
-| LiveCodeBench | new contest problems | maintainers or you | through the project GitHub |
-| LMArena WebDev | human votes | users | the team adds models |
+![Coding agent leaderboards: summary: a table with the columns Leaderboard, Ranks, Who runs it, How to get on](images/t2-coding-agent-leaderboards-summary.png)
 
 ---
 
@@ -199,11 +185,7 @@ To prepare for any of these boards, read Part B.
 
 ### Summary
 
-| Leaderboard | Ranks | Who runs it | How to get on |
-|---|---|---|---|
-| Artificial Analysis | speed for one user, TTFT, price | the AA team | public endpoint, then contact them |
-| OpenRouter | live speed and latency | real traffic | become a provider |
-| MLPerf Inference | total throughput | you, then review | submit in a round |
+![Inference engine leaderboards: summary: a table with the columns Leaderboard, Ranks, Who runs it, How to get on](images/t3-inference-engine-leaderboards-summary.png)
 
 ---
 
@@ -215,12 +197,7 @@ Everything in this part comes from my own work on **Terminal-Bench 2.0 and 2.1**
 
 The most important idea first. When your agent works on a task, two different things judge it:
 
-| | Your agent's own checks | The benchmark's hidden tests |
-|---|---|---|
-| When | during the task | after your agent stops |
-| Job | decide "am I done, or do I try again?" | decide "is the task solved?" |
-| Sees the answer key? | no | yes, it is the task author's test suite |
-| Counts for your score? | no | **yes, this is the score** |
+![Two graders: a table with the columns Your agent's own checks, The benchmark's hidden tests](images/t4-two-graders.png)
 
 For example: the agent sets up a web server, opens the page, sees text, and says "done". The hidden test asks for the page and expects exactly `hello world`. The page says `hello world updated`. Score: 0.
 
@@ -255,23 +232,11 @@ Then run all the tasks. Two rules keep your number honest:
 
 After every run, open each failed task's grader output (in Harbor, `verifier/test-stdout.txt`). It tells you exactly what the hidden test wanted. Many "impossible" tasks turned out to be very close misses:
 
-| Task | What the grader said |
-|---|---|
-| `configure-git-webserver` | the page said `hello world updated`; the test wanted exactly `hello world` |
-| `gcode-to-text` | the answer had `gcOd3` (capital letter O); the test wanted `gc0d3` (zero) |
-| `sam-cell-seg` | overlap score 0.484; the test needed 0.5 |
-| `sanitize-git-repo` | one fake secret was still in the repo; `grep -ri` would have found it |
-| `make-doom-for-mips` | the output image was never written: the agent ran out of time |
+![What the grader said: a table with the columns Task, What the grader said](images/t5-what-the-grader-said.png)
 
 Then sort every failure into one bucket. Each bucket has a different fix:
 
-| Bucket | What happened | The fix |
-|---|---|---|
-| **False accept** | the agent's check said "done", the hidden test said no | a stricter, independent checker (A.5) |
-| **Near miss** | almost right: one character, a number just under a limit | a short refinement pass (A.5) |
-| **Timeout** | the agent was still working when the clock ran out | a time guard (A.5) |
-| **Solve wall** | no model could solve it in any run | nothing in the harness helps; a better model, or more time |
-| **Flaky environment** | the task itself fails at random, for example a download that sometimes breaks | nothing; it is a coin flip for every agent |
+![Failure buckets: a table with the columns Bucket, What happened, The fix](images/t6-failure-buckets.png)
 
 In my first full run, 9 of the 14 failures were false accepts. That told me where to work.
 
@@ -443,11 +408,7 @@ SGLang has the same kind of tool: `python -m sglang.bench_serving` with similar 
 
 Example of the cases from one of my harnesses:
 
-| Case | Prompt length | Users at the same time |
-|---|---|---|
-| short, one user | 1,000 tokens | 1 |
-| long, one user | 10,000 tokens | 1 |
-| short, busy | 1,000 tokens | 10 |
+![Speed test cases: a table with the columns Case, Prompt length, Users at the same time](images/t7-speed-test-cases.png)
 
 ## B.5 Count the tokens yourself
 
@@ -463,26 +424,13 @@ Some changes make each user faster. Others make the whole server carry more. Kno
 
 ### Make each user faster
 
-| Change | What it does, in plain words | Before and after (example) | Risk |
-|---|---|---|---|
-| **Quantization** (FP8, FP4) | Store each weight in fewer bytes. Less to read for each token, so the ceiling goes up. | A 31B model in bf16 reads 62 GB for each token. In FP8 it reads 31 GB, so the ceiling doubles. | Can lower quality. Always test (B.7). |
-| **Speculative decoding** (MTP, EAGLE, a small draft model, n-gram) | A small, fast helper guesses the next few tokens. The big model checks all the guesses in one read of its weights and keeps the correct ones. | Before: one token for each read. After: often 2 or 3 tokens for each read, so 1.5x to 3x faster for one user. | Gains drop when the guesses are often wrong. |
-| **Tensor parallel** (`-tp 2`, `-tp 4`) | Split each layer across several GPUs. Each GPU reads only its share of the weights, so they read faster together. | 2 GPUs: up to almost 2x the bandwidth for one user. | Needs fast links between the GPUs. |
-| **CUDA graphs** | Record the GPU's work for one step once, then replay it. The CPU no longer prepares each small piece every time. | Removes small CPU delays in decode, which matter most for small models. | Some kernels do not work with graphs. |
-| **Fewer users at the same time** | Let fewer requests share the GPU (`--max-num-seqs`). | Each user is faster, but the server carries less in total (B.1). | Higher cost for each token. |
+![Make each user faster: a table with the columns Change, What it does, in plain words, Before and after (example), Risk](images/t8-make-each-user-faster.png)
 
 **Why speculative decoding works so well on code.** Code repeats itself: variable names, file paths, lines from earlier in the file. Guesses are easy, so most of them are accepted. **N-gram drafting** needs no extra model at all. It looks for the last few tokens earlier in the prompt and guesses that the text continues the same way, which is very good for edits that copy existing text.
 
 ### Make the whole server carry more
 
-| Change | What it does, in plain words | Before and after (example) | Risk |
-|---|---|---|---|
-| **More users in each step** (`--max-num-seqs`, `--max-num-batched-tokens`) | One read of the weights serves every user in the step, like the bus in B.1. | 1 user: 120 tokens per second in total. 32 users: about 1,900 in total (figure in B.1). | Each user gets slower. |
-| **More memory for the KV cache** (`--gpu-memory-utilization` in vLLM, `--mem-fraction-static` in SGLang) | The **KV cache** is the memory that holds the notes for every token of every active request. More KV memory means more requests fit at the same time. | Before: room for 20 requests. After: room for 30. | Too much can run the GPU out of memory. |
-| **FP8 KV cache** (`--kv-cache-dtype fp8`) | Store those notes in 1 byte in place of 2. | About twice as many requests fit. | Small quality loss on some models. Test it. |
-| **Prefix caching** | Keep the KV notes of prompt beginnings that repeat, for example a long system prompt. Do not read them again. | A shared 5,000-token system prompt is read once, not once for every request. Much lower TTFT. | Uses memory. |
-| **Chunked prefill** | Cut a long prompt into pieces and mix them with decode work, so one long prompt does not freeze everyone else. | Steadier speed for users who are already receiving an answer. | Can raise TTFT a little for the long prompt. |
-| **More copies of the model** (data parallel) | Run several copies of the model on more GPUs, and share the users between them. | 2 copies: about 2x the total. | Needs more GPUs. |
+![Make the whole server carry more: a table with the columns Change, What it does, in plain words, Before and after (example), Risk](images/t9-make-the-server-carry-more.png)
 
 ## B.7 Check quality after every speed change
 

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 362" width="800" height="362" role="img" aria-label="Failure buckets">
+<style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  .rowa{fill:#1b2531}.rowb{fill:#161d26;stroke:#2e3a47;stroke-width:1}.c{font:400 12px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#dfe6ee}.n{font-size:12px}</style>
+<rect class="bg" width="800" height="362" rx="6"/>
+<text class="h" x="24" y="36">Failure buckets</text>
+<rect class="box" x="24" y="58" width="752" height="33" rx="3"/><text class="n" x="36" y="80">Bucket</text><text class="n" x="143" y="80">What happened</text><text class="n" x="490" y="80">The fix</text><rect class="rowa" x="24" y="95" width="752" height="50" rx="3"/><text class="n" x="36" y="117">False</text><text class="n" x="36" y="134">accept</text><text class="c" x="143" y="117">the agent&#x27;s check said &quot;done&quot;, the hidden test</text><text class="c" x="143" y="134">said no</text><text class="c" x="490" y="117">a stricter, independent checker (A.5)</text><rect class="rowb" x="24" y="149" width="752" height="50" rx="3"/><text class="n" x="36" y="171">Near miss</text><text class="c" x="143" y="171">almost right: one character, a number just under a</text><text class="c" x="143" y="188">limit</text><text class="c" x="490" y="171">a short refinement pass (A.5)</text><rect class="rowa" x="24" y="203" width="752" height="33" rx="3"/><text class="n" x="36" y="225">Timeout</text><text class="c" x="143" y="225">the agent was still working when the clock ran out</text><text class="c" x="490" y="225">a time guard (A.5)</text><rect class="rowb" x="24" y="240" width="752" height="50" rx="3"/><text class="n" x="36" y="262">Solve wall</text><text class="c" x="143" y="262">no model could solve it in any run</text><text class="c" x="490" y="262">nothing in the harness helps; a better</text><text class="c" x="490" y="279">model, or more time</text><rect class="rowa" x="24" y="294" width="752" height="50" rx="3"/><text class="n" x="36" y="316">Flaky</text><text class="n" x="36" y="333">environment</text><text class="c" x="143" y="316">the task itself fails at random, for example a</text><text class="c" x="143" y="333">download that sometimes breaks</text><text class="c" x="490" y="316">nothing; it is a coin flip for every agent</text>
+</svg>
