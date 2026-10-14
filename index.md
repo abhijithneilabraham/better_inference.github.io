@@ -31,7 +31,7 @@ A beginner's guide to vllm-metal, the plugin that runs vLLM on Apple Silicon usi
 
 ### [Sleep mode on a Mac: give the KV cache back when vLLM is idle](sleep-mode/)
 
-How vLLM's sleep mode works on Apple Silicon with vllm-metal. Explains what sleep mode does on a GPU server, why "copy the weights to the CPU" frees nothing on unified memory, and what level 1 means on a Mac instead: keep the weights, give the KV cache back to macOS, and get it back in well under a second. Walks the chain of calls from `LLM.sleep()` down to the storage that owns the memory, with the measured numbers and the one layout check that keeps the scheduler's block tables valid across a sleep.
+How vLLM's sleep mode works on Apple Silicon with vllm-metal: why "copy the weights to the CPU" frees nothing on unified memory, what level 1 does on a Mac instead (keep the weights, give the KV cache back to macOS, get it back in well under a second), the measured numbers, and the one layout check that keeps the scheduler's block tables valid across a sleep. A short read.
 
 ### [Learning Inference: A case study for beginners](learning-inference-beginners/)
 
