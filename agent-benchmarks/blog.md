@@ -191,21 +191,9 @@ To prepare for any of these boards, read Part B.
 
 # Part A: My coding agent on Terminal-Bench 2.1
 
-**Score: 86%.** My agent solved 72 of the 84 Terminal-Bench 2.1 tasks that Artificial Analysis grades (85.7%), in one full run, with one graded answer for each task (pass@1). Counting all 89 tasks, it solved 75 (84.3%).
+**Score: 86%.** My agent solved 72 of the 84 Terminal-Bench 2.1 tasks that Artificial Analysis grades (85.7%), in one full run, with one graded answer for each task (pass@1).
 
-![My Terminal-Bench 2.1 agent: GPT-5.6-sol solves, Claude Fable 5 judges, one domain-routed backup from a clean copy judged by GPT-5.6-sol, salvage of the first answer, and a time guard](images/06-my-tb21-architecture.png)
-
-**The architecture.**
-
-1. **Solve.** GPT-5.6-sol, at maximum reasoning effort, solves the task in the Terminus 2 harness. A snapshot of the clean task folder is saved first.
-2. **Judge.** Claude Fable 5 checks the work by running it (up to 8 commands) and answers PASS or FAIL. If the task is one that Fable refuses (for example security or biology tasks), Claude Opus 4.8 judges it.
-3. **PASS: ship it.** Most tasks end here, with one solve.
-4. **FAIL: one backup.** The clean snapshot is restored, and one second model solves the task again, chosen by the task type: Fable first, then Opus 4.8, then Grok 4.5. It never sees the first attempt's files.
-5. **Judge the backup.** GPT-5.6-sol checks it. If it passes, the backup ships.
-6. **Salvage.** If the backup also fails, the first answer ships. A judge's FAIL often means "I could not verify it", and the first answer was often right.
-7. **Time guard.** Past 60% of the time budget, no new backup starts. Past 90%, the agent ships what it has, so a task is never graded as an empty timeout.
-
-**Why it is built this way.** A judge from the same model family as the solver approves its own mistakes, so each judge comes from a different family. The agent decides on PASS or FAIL, not on a confidence number. A backup that starts from a clean copy does not repeat the first model's wrong approach.
+![My Terminal-Bench 2.1 agent: a main model solves, a judge from another model family checks it, one backup from a clean copy is judged the same way, the first answer is salvaged, and a time guard protects the clock](images/06-my-tb21-architecture.png)
 
 ---
 
@@ -372,4 +360,4 @@ But keep the two reports separate. An inference engine leaderboard does not tell
 
 # Summary
 
-Start from the leaderboard you want, because it tells you what to measure and who measures it. For coding agent leaderboards, my 86% on Terminal-Bench 2.1 came from one strong solver, a judge from another model family, one backup from a clean copy, salvage, and a time guard. For inference engine leaderboards, know the two kinds of TPS, calculate the ceiling, measure the way the board does, and check quality after every speed change. The two topics meet in agent task time: a faster server finishes more agent tasks inside the time limit.
+Start from the leaderboard you want, because it tells you what to measure and who measures it. For coding agent leaderboards, my agent scored 86% on Terminal-Bench 2.1 (architecture in Part A). For inference engine leaderboards, know the two kinds of TPS, calculate the ceiling, measure the way the board does, and check quality after every speed change. The two topics meet in agent task time: a faster server finishes more agent tasks inside the time limit.
