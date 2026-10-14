@@ -29,6 +29,10 @@ How to size an inference system, starting from a load test instead of a guess. C
 
 A beginner's guide to vllm-metal, the plugin that runs vLLM on Apple Silicon using MLX. Starts from what unified memory is and why vLLM does not simply run on a Mac, then follows one request through the vLLM scheduler, the Metal worker, the mlx_lm model and the paged attention kernels. Covers the paged KV cache with a worked example, how the plugin swaps attention layers without editing the model, the single kernel that handles a whole batch, how the KV cache memory budget is set, and features like prefix caching, speculative decoding, TurboQuant and running across two Macs. Twelve figures, with pointers into the source code.
 
+### [Sleep mode on a Mac: give the KV cache back when vLLM is idle](sleep-mode/)
+
+The story of one vllm-metal change, [PR #1102](https://github.com/vllm-project/vllm-metal/pull/1102), which makes vLLM's sleep mode work on Apple Silicon. Explains what sleep mode does on a GPU server, why "copy the weights to the CPU" frees nothing on unified memory, and what level 1 means on a Mac instead: keep the weights, give the KV cache back to macOS, and get it back in well under a second. Walks the chain of calls from `LLM.sleep()` down to the storage that owns the memory, with the measured numbers and the one layout check that keeps the scheduler's block tables valid across a sleep.
+
 ### [Learning Inference: A case study for beginners](learning-inference-beginners/)
 
 How to start contributing to real inference projects without a GPU. Covers vllm-metal, mlx-lm and mlx for Mac users, and VLLM's CPU backend and parsers, Sglang's router, llama.cpp, transformers, guidellm and llm-compressor for everyone else, with how to pick a first issue. Ends with how much of inference work is getting automated, and why knowing the architecture and the theory is what lets you pilot the agents instead of being replaced by them.

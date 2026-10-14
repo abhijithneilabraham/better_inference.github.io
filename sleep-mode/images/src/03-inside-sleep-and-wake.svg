@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 322" width="800" height="322" role="img" aria-label="The chain of calls inside vllm-metal for sleep and for wake, ending at the KV cache storage">
+<style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style><defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+<rect class="bg" width="800" height="322" rx="6"/>
+<text class="h" x="24" y="34">The path inside, for sleep and for wake</text>
+<text class="t" x="776" y="34" text-anchor="end">CODE</text>
+<text class="n" x="24" y="68">sleep</text><rect class="box" x="24" y="80" width="170" height="50" rx="5"/><text class="m w" x="34" y="100">LLM.sleep(level=1)</text><text class="d" x="34" y="118">what you call</text><path class="arrow" d="M194,105 L214,105"/><rect class="box" x="216" y="80" width="170" height="50" rx="5"/><text class="m w" x="226" y="100">MetalWorker.sleep</text><text class="d" x="226" y="118">level must be 1</text><path class="arrow" d="M386,105 L406,105"/><rect class="amber" x="408" y="80" width="170" height="50" rx="5"/><text class="m w" x="418" y="100">runner.release_kv_</text><text class="d" x="418" y="118">refuses mid-step</text><path class="arrow" d="M578,105 L598,105"/><rect class="good" x="600" y="80" width="176" height="50" rx="5"/><text class="m w" x="610" y="100">storage.release()</text><text class="d" x="610" y="118">buffers = [], memory freed</text><text class="n" x="24" y="176">wake</text><rect class="box" x="24" y="188" width="170" height="50" rx="5"/><text class="m w" x="34" y="208">LLM.wake_up()</text><text class="d" x="34" y="226">what you call</text><path class="arrow" d="M194,213 L214,213"/><rect class="box" x="216" y="188" width="170" height="50" rx="5"/><text class="m w" x="226" y="208">MetalWorker.wake_up</text><text class="d" x="226" y="226">tag kv_cache</text><path class="arrow" d="M386,213 L406,213"/><rect class="amber" x="408" y="188" width="170" height="50" rx="5"/><text class="m w" x="418" y="208">runner.restore_kv_</text><text class="d" x="418" y="226">same config as before</text><path class="arrow" d="M578,213 L598,213"/><rect class="good" x="600" y="188" width="176" height="50" rx="5"/><text class="m w" x="610" y="208">storage.reallocate()</text><text class="d" x="610" y="226">checks the layout is equal</text><line class="rule" x1="24" y1="262" x2="776" y2="262"/><text class="cap" x="24" y="286">The scheduler keeps its block tables through the sleep. That only works because the new pool has the same size and</text><text class="cap" x="24" y="306">the same region offsets as the old one, so block 17 still means the same place. reallocate() checks this and stops if not.</text>
+</svg>

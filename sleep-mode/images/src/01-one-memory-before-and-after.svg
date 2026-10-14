@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 408" width="800" height="408" role="img" aria-label="Unified memory of a Mac while the engine is awake, after sleep level 1, and after wake_up">
+<style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style><defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+<rect class="bg" width="800" height="408" rx="6"/>
+<text class="h" x="24" y="34">One memory, before and after sleep</text>
+<text class="t" x="776" y="34" text-anchor="end">MEMORY</text>
+<text class="m s" x="24" y="66">one Mac with 8 GB of unified memory (example; the model is Qwen3-0.6B)</text><text class="n" x="24" y="94">Awake, serving</text><rect class="box" x="24" y="104" width="300" height="44" rx="4"/><text class="n" x="34" y="123" style="font-size:12px">macOS and your other apps</text><text class="d" x="34" y="139">always there</text><rect class="blue" x="324" y="104" width="200" height="44" rx="4"/><text class="n" x="334" y="123" style="font-size:12px">model weights</text><text class="d" x="334" y="139">about 1.2 GB</text><rect class="amber" x="524" y="104" width="252" height="44" rx="4"/><text class="n" x="534" y="123" style="font-size:12px">KV cache pool</text><text class="d" x="534" y="139">grows as it is used</text><text class="n" x="24" y="184">After sleep(level=1)</text><rect class="box" x="24" y="194" width="300" height="44" rx="4"/><text class="n" x="34" y="213" style="font-size:12px">macOS and your other apps</text><text class="d" x="34" y="229">always there</text><rect class="blue" x="324" y="194" width="200" height="44" rx="4"/><text class="n" x="334" y="213" style="font-size:12px">model weights</text><text class="d" x="334" y="229">stay in place</text><rect class="good" x="524" y="194" width="252" height="44" rx="4"/><text class="n" x="534" y="213" style="font-size:12px">given back to macOS</text><text class="d" x="534" y="229">0.65 GiB freed in the test</text><text class="n" x="24" y="274">After wake_up()</text><rect class="box" x="24" y="284" width="300" height="44" rx="4"/><text class="n" x="34" y="303" style="font-size:12px">macOS and your other apps</text><text class="d" x="34" y="319">always there</text><rect class="blue" x="324" y="284" width="200" height="44" rx="4"/><text class="n" x="334" y="303" style="font-size:12px">model weights</text><text class="d" x="334" y="319">never moved</text><rect class="amber" x="524" y="284" width="252" height="44" rx="4"/><text class="n" x="534" y="303" style="font-size:12px">new, empty KV cache pool</text><text class="d" x="534" y="319">made again in 0.015 s</text><line class="rule" x1="24" y1="348" x2="776" y2="348"/><text class="cap" x="24" y="372">The weights never move, because on a Mac there is no second, cheaper memory to move them to. Only the KV</text><text class="cap" x="24" y="392">cache goes away, and it comes back empty. The first request after wake_up() has to fill it again.</text>
+</svg>
