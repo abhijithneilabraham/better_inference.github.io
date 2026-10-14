@@ -27,32 +27,6 @@
 | OpenRouter | live speed and latency | real traffic | become a provider |
 | MLPerf Inference | total throughput | you, then review | submit in a round |
 
-## t4-two-graders | Two graders
-| | Your agent's own checks | The benchmark's hidden tests |
-|---|---|---|
-| When | during the task | after your agent stops |
-| Job | decide "am I done, or do I try again?" | decide "is the task solved?" |
-| Sees the answer key? | no | yes, it is the task author's test suite |
-| Counts for your score? | no | **yes, this is the score** |
-
-## t5-what-the-grader-said | What the grader said
-| Task | What the grader said |
-|---|---|
-| `configure-git-webserver` | the page said `hello world updated`; the test wanted exactly `hello world` |
-| `gcode-to-text` | the answer had `gcOd3` (capital letter O); the test wanted `gc0d3` (zero) |
-| `sam-cell-seg` | overlap score 0.484; the test needed 0.5 |
-| `sanitize-git-repo` | one fake secret was still in the repo; `grep -ri` would have found it |
-| `make-doom-for-mips` | the output image was never written: the agent ran out of time |
-
-## t6-failure-buckets | Failure buckets
-| Bucket | What happened | The fix |
-|---|---|---|
-| **False accept** | the agent's check said "done", the hidden test said no | a stricter, independent checker (A.5) |
-| **Near miss** | almost right: one character, a number just under a limit | a short refinement pass (A.5) |
-| **Timeout** | the agent was still working when the clock ran out | a time guard (A.5) |
-| **Solve wall** | no model could solve it in any run | nothing in the harness helps; a better model, or more time |
-| **Flaky environment** | the task itself fails at random, for example a download that sometimes breaks | nothing; it is a coin flip for every agent |
-
 ## t7-speed-test-cases | Speed test cases
 | Case | Prompt length | Users at the same time |
 |---|---|---|

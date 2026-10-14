@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="800" height="480" role="img" aria-label="My Terminal-Bench 2.1 agent: GPT-5.6-sol solves, Claude Fable 5 judges, one domain-routed backup from a clean copy judged by GPT-5.6-sol, salvage of the first answer, and a time guard">
+<style>
+    .bg { fill: #161d26; }
+    .h  { font: 700 15px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .t  { font: 600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; letter-spacing: .06em; }
+    .n  { font: 700 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #dfe6ee; }
+    .d  { font: 400 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8a97a6; }
+    .m  { font: 600 11px ui-monospace, Menlo, monospace; }
+    .cap { font: 400 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #b7c2cd; }
+    .rule { stroke: #2e3a47; stroke-width: 1; }
+    .box { fill: #1b2531; stroke: #3d4956; stroke-width: 1.5; }
+    .good { fill: #14301f; stroke: #5cc48a; stroke-width: 1.8; }
+    .bad { fill: #2a1a1c; stroke: #e5646c; stroke-width: 1.8; }
+    .blue { fill: #16314a; stroke: #5aa9e6; stroke-width: 1.8; }
+    .amber { fill: #3a2c14; stroke: #f2a541; stroke-width: 1.8; }
+    .purple { fill: #2a2140; stroke: #a98be8; stroke-width: 1.8; }
+    .g { fill: #5cc48a; } .r { fill: #e5646c; } .b { fill: #5aa9e6; } .a { fill: #f2a541; } .w { fill: #dfe6ee; } .s { fill: #8a97a6; } .p { fill: #a98be8; }
+    .arrow { stroke: #8a97a6; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowb { stroke: #5aa9e6; stroke-width: 1.8; fill: none; marker-end: url(#ahb); }
+    .arrowg { stroke: #5cc48a; stroke-width: 1.8; fill: none; marker-end: url(#ahg); }
+    .arrowa { stroke: #f2a541; stroke-width: 1.8; fill: none; marker-end: url(#aha); }
+    .arrowr { stroke: #e5646c; stroke-width: 1.8; fill: none; marker-end: url(#ahr); }
+  </style><defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a97a6"/></marker>
+    <marker id="ahb" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5aa9e6"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5cc48a"/></marker>
+    <marker id="aha" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f2a541"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e5646c"/></marker>
+  </defs>
+<rect class="bg" width="800" height="480" rx="6"/>
+<text class="h" x="24" y="34">My Terminal-Bench 2.1 agent</text>
+<text class="t" x="776" y="34" text-anchor="end">86% ON TB 2.1</text>
+<text class="m s" x="24" y="66">Terminal-Bench 2.1, one graded answer per task: 86% (72 of the 84 tasks that Artificial Analysis grades)</text><rect class="box" x="250" y="84" width="300" height="50" rx="5"/><text class="n" x="400" y="106" text-anchor="middle">1. Solve: GPT-5.6-sol (max effort)</text><text class="d" x="400" y="124" text-anchor="middle">Terminus 2 harness, clean snapshot of the task</text><line class="arrow" x1="400" y1="134" x2="400" y2="156"/><rect class="purple" x="250" y="158" width="300" height="50" rx="5"/><text class="n" x="400" y="180" text-anchor="middle">2. Judge: Claude Fable 5</text><text class="d" x="400" y="198" text-anchor="middle">runs the work; Opus 4.8 if Fable refuses</text><line class="arrowg" x1="550" y1="183" x2="612" y2="183"/><text class="m g" x="560" y="176">PASS</text><rect class="good" x="616" y="158" width="160" height="50" rx="5"/><text class="n" x="696" y="180" text-anchor="middle">ship it</text><line class="arrowr" x1="400" y1="208" x2="400" y2="230"/><text class="m r" x="410" y="224">FAIL</text><rect class="amber" x="250" y="232" width="300" height="50" rx="5"/><text class="n" x="400" y="254" text-anchor="middle">3. One backup, from a clean copy</text><text class="d" x="400" y="272" text-anchor="middle">by task type: Fable, then Opus, then Grok 4.5</text><line class="arrow" x1="400" y1="282" x2="400" y2="304"/><rect class="purple" x="250" y="306" width="300" height="50" rx="5"/><text class="n" x="400" y="328" text-anchor="middle">4. Judge the backup: GPT-5.6-sol</text><text class="d" x="400" y="346" text-anchor="middle">a different family from the backup</text><line class="arrowg" x1="550" y1="331" x2="612" y2="331"/><text class="m g" x="560" y="324">PASS</text><rect class="good" x="616" y="306" width="160" height="50" rx="5"/><text class="n" x="696" y="328" text-anchor="middle">ship the backup</text><line class="arrowr" x1="400" y1="356" x2="400" y2="378"/><text class="m r" x="410" y="372">FAIL</text><rect class="blue" x="250" y="380" width="300" height="50" rx="5"/><text class="n" x="400" y="402" text-anchor="middle">5. Salvage: ship the first answer</text><text class="d" x="400" y="420" text-anchor="middle">a FAIL often means "could not verify"</text><rect class="box" x="24" y="158" width="196" height="124" rx="5"/><text class="n" x="122" y="180" text-anchor="middle">time guard</text><text class="d" x="122" y="206" text-anchor="middle">past 60% of the time:</text><text class="d" x="122" y="222" text-anchor="middle">no new backup</text><text class="d" x="122" y="246" text-anchor="middle">past 90%: ship what</text><text class="d" x="122" y="262" text-anchor="middle">is on disk</text><text class="cap" x="24" y="462">Every judge comes from a different model family than the solver it checks, and decides PASS or FAIL by running the work.</text>
+</svg>
