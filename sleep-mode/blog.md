@@ -8,7 +8,7 @@ permalink: /sleep-mode/
 
 *This article uses simple English. Each technical word gets a short explanation in brackets the first time it occurs.*
 
-This is the story of one change to [vllm-metal](https://github.com/vllm-project/vllm-metal), the plugin that runs vLLM on Apple Silicon: [PR #1102, "Support sleep mode level 1 on Metal"](https://github.com/vllm-project/vllm-metal/pull/1102). It is a small change in lines (about 280), but it touches an idea that is easy to get wrong on a Mac: what "free the memory" can even mean when the CPU and the GPU share the same memory.
+This article explains sleep mode in [vllm-metal](https://github.com/vllm-project/vllm-metal), the plugin that runs vLLM on Apple Silicon. Sleep mode lets an idle engine give memory back without a restart. On a Mac it raises a question that is easy to get wrong: what "free the memory" can even mean when the CPU and the GPU share the same memory.
 
 If you have never read about vllm-metal, the [guide from zero](../vllm-metal/) explains unified memory and the KV cache with pictures. This article only needs the short version of each, and gives it below.
 
@@ -57,15 +57,15 @@ It was built for GPU servers that take turns: for example a training loop that u
 
 Read level 1 again: "copy the weights from the GPU to CPU memory". On a Mac that copy frees nothing. The weights would go from one place in unified memory to another place in the same unified memory, and the Mac would hold two copies for a moment, then one, exactly as before.
 
-So on a Mac, level 1 can only mean one useful thing: throw the KV cache away and keep the weights where they are. That is what this PR does. Because the word "level 1" now means something different from the vLLM docs, the PR adds a table to `docs/configuration.md` so that a user who knows the upstream feature sees the difference before relying on it.
+So on a Mac, level 1 can only mean one useful thing: throw the KV cache away and keep the weights where they are. That is what vllm-metal does. Because "level 1" means something different here than in the vLLM docs, the vllm-metal docs (`docs/configuration.md`) have a table that sets the two side by side. If you know the upstream feature, read that table before you rely on it.
 
 ![What sleep level 1 and level 2 do on a GPU server and on a Mac with vllm-metal](images/02-sleep-levels.png)
 
-Level 2 is not in this PR. It needs a way to load the weights again after they are gone, and that comes as a follow-up.
+Level 2 is not supported yet. It needs a way to load the weights again after they are gone.
 
 ## Before and after
 
-**Before** the change, vllm-metal's platform class did not tell vLLM that sleep mode exists, so vLLM refused at startup:
+**Before:** if your vllm-metal is too old to have sleep mode, vLLM refuses at startup:
 
 ```
 $ python -c 'from vllm import LLM; LLM("Qwen/Qwen3-0.6B", enable_sleep_mode=True)'
@@ -73,9 +73,9 @@ pydantic_core._pydantic_core.ValidationError: 1 validation error for ModelConfig
   Value error, Sleep mode is not supported on current platform.
 ```
 
-And even if you got past that, the worker's `sleep()` and `wake_up()` only wrote a warning to the log and did nothing.
+If you see this error, upgrade vllm-metal.
 
-**After** the change, the same line starts the engine. You can then put it to sleep and wake it:
+**After:** with a version that has sleep mode, the same line starts the engine. You can then put it to sleep and wake it:
 
 ```python
 from vllm import LLM
@@ -133,11 +133,11 @@ def is_sleep_mode_available(cls) -> bool:
     return True
 ```
 
-That one method is what turns the "not supported on current platform" error off. Every other line in the PR exists so that this `True` is not a lie.
+That one method is what turns the "not supported on current platform" error off. Everything below exists so that this `True` is not a lie.
 
 ### The worker takes the call
 
-vLLM's engine talks to a worker process, and the worker on Metal is `MetalWorker`. Its `sleep()` and `wake_up()` used to be the two warnings. Now, in `vllm_metal/v1/worker.py`:
+vLLM's engine talks to a worker process, and the worker on Metal is `MetalWorker`. In `vllm_metal/v1/worker.py`:
 
 ```python
 def sleep(self, level: int = 1) -> None:
@@ -213,11 +213,11 @@ def release_kv_memory(self) -> None:
     self.storage.release()
 ```
 
-**Read it in plain words:** a hybrid model has recurrent layers. Their state (a small array for each request, for each layer) lives in the same storage as the KV blocks, and the runtime updates that state lazily: it keeps a list of "pending" updates and applies them later. If you throw the storage away but keep the pending list, then after waking, the runtime would apply stale updates into a fresh pool. The PR adds `discard_pending_state()` so the pending list is emptied with the pool. There is a test that fails if that line is removed.
+**Read it in plain words:** a hybrid model has recurrent layers. Their state (a small array for each request, for each layer) lives in the same storage as the KV blocks, and the runtime updates that state lazily: it keeps a list of "pending" updates and applies them later. If you throw the storage away but keep the pending list, then after waking, the runtime would apply stale updates into a fresh pool. So `discard_pending_state()` empties the pending list together with the pool. There is a test that fails if that line is removed.
 
 ### The storage frees and re-creates the memory
 
-The last stop is `KVCacheStorage` in `vllm_metal/attention/caches/storage.py`. This object holds the real MLX buffers of the pool. The PR moves the allocation into a `_bind()` method so that it can be run twice, and adds:
+The last stop is `KVCacheStorage` in `vllm_metal/attention/caches/storage.py`. This object holds the real MLX buffers of the pool. The allocation lives in a `_bind()` method, so it can run twice: once at startup and once at every wake. The two methods for sleep mode are:
 
 ```python
 def release(self) -> None:
@@ -272,4 +272,4 @@ Two things to plan for:
 
 ## Remember
 
-On a Mac the CPU and the GPU share one memory, so "move the weights to the CPU" frees nothing. Sleep mode on Metal therefore keeps the weights and gives back only the KV cache. That is still the right thing: the KV cache is the big, empty part of an idle engine. Waking costs almost nothing because the new pool is lazy, and the scheduler never notices, because the new pool has the same layout as the old one. The check that enforces that layout is the most important line in the PR.
+On a Mac the CPU and the GPU share one memory, so "move the weights to the CPU" frees nothing. Sleep mode on Metal therefore keeps the weights and gives back only the KV cache. That is still the right thing: the KV cache is the big, empty part of an idle engine. Waking costs almost nothing because the new pool is lazy, and the scheduler never notices, because the new pool has the same layout as the old one. The check that enforces that layout is the most important line in the whole feature.

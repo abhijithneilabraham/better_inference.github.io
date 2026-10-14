@@ -54,7 +54,7 @@ body += card(24, 190, 360, 96, "purple", "level 2", [
     "weights: thrown away",
     "KV cache: thrown away",
     "wake_up loads the weights from disk again"])
-body += card(416, 80, 360, 96, "good", "level 1  (this PR)", [
+body += card(416, 80, 360, 96, "good", "level 1", [
     "weights: stay where they are",
     "KV cache: thrown away, memory goes back to macOS",
     "wake_up makes a new empty KV cache (well under 1 s)"])
