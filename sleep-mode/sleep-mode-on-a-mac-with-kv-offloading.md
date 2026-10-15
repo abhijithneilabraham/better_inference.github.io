@@ -84,14 +84,6 @@ Here is what happens when you sleep with offloading on:
 
 ![](images/02-sleep-with-kv-offloading.png)
 
-To try both together:
-
-```
-$ VLLM_SERVER_DEV_MODE=1 vllm serve Qwen/Qwen3-0.6B --enable-sleep-mode --kv-offloading-size 2
-```
-
-The [KV offloading docs](https://github.com/vllm-project/vllm-metal/blob/main/docs/kv_offloading.md) show how to add the disk tier.
-
 ## **Try it**
 
 ```
@@ -111,6 +103,14 @@ $ VLLM_SERVER_DEV_MODE=1 vllm serve Qwen/Qwen3-0.6B --enable-sleep-mode
 $ curl -X POST 'http://localhost:8000/sleep?level=1'
 $ curl -X POST 'http://localhost:8000/wake_up'
 ```
+
+With KV offloading on as well, add a host pool size in GiB:
+
+```
+$ VLLM_SERVER_DEV_MODE=1 vllm serve Qwen/Qwen3-0.6B --enable-sleep-mode --kv-offloading-size 2
+```
+
+The [KV offloading docs](https://github.com/vllm-project/vllm-metal/blob/main/docs/kv_offloading.md) show how to add the disk tier.
 
 
 
