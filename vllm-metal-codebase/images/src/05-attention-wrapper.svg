@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="386" viewBox="0 0 960 386" role="img" aria-label="How vllm-metal replaces an mlx_lm attention layer with a paged attention wrapper"><style>.n { font: 600 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #17202b; }
+.d { font: 400 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #576375; }
+.cm { font: 500 12px ui-monospace, Menlo, Consolas, monospace; fill: #17202b; }
+.h { font: 700 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; letter-spacing: .07em; text-transform: uppercase; }
+.ar { stroke: #576375; stroke-width: 1.5; fill: none; marker-end: url(#arr); }
+.arb { stroke: #2a66c9; stroke-width: 1.8; fill: none; stroke-dasharray: 5 4; marker-end: url(#arrb); }
+.tick { stroke: #17202b; stroke-width: 1.5; }
+.badge { fill: #17202b; }
+.badge-t { font: 700 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f5f6f8; }
+.b-vllm { fill: #e5eeff; stroke: #2a66c9; stroke-width: 1.3; }
+.b-glue { fill: #efe8ff; stroke: #7448c9; stroke-width: 1.3; }
+.b-runner { fill: #fff1dc; stroke: #b56f0c; stroke-width: 1.3; }
+.b-attn { fill: #e0f4ea; stroke: #1b8455; stroke-width: 1.3; }
+.b-attn2 { fill: #eef9f3; stroke: #1b8455; stroke-width: 1.3; stroke-dasharray: 4 3; }
+.b-kern { fill: #fde8e6; stroke: #c2433a; stroke-width: 1.3; }
+.b-mlx { fill: #ddf3f5; stroke: #0d7f8c; stroke-width: 1.3; }
+.b-hw { fill: #e9edf2; stroke: #5a6577; stroke-width: 1.3; }
+.b-prog { fill: #f1f3f6; stroke: #3f4a5a; stroke-width: 1.3; }
+.b-soft { fill: #edf0f4; stroke: #c6ced9; stroke-width: 1.2; }
+[class^="lane-"] { stroke-width: 1; fill-opacity: .45; }
+.lane-vllm { fill: #e5eeff; stroke: #2a66c9; stroke-opacity: .35; }
+.lane-glue { fill: #efe8ff; stroke: #7448c9; stroke-opacity: .35; }
+.lane-runner { fill: #fff1dc; stroke: #b56f0c; stroke-opacity: .35; }
+.lane-attn { fill: #e0f4ea; stroke: #1b8455; stroke-opacity: .35; }
+.lane-kern { fill: #fde8e6; stroke: #c2433a; stroke-opacity: .35; }
+.lane-mlx { fill: #ddf3f5; stroke: #0d7f8c; stroke-opacity: .35; }
+.lane-hw { fill: #e9edf2; stroke: #5a6577; stroke-opacity: .35; }
+.lane-prog { fill: #f1f3f6; stroke: #3f4a5a; stroke-opacity: .35; }
+.k-vllm { fill: #2a66c9; } .k-glue { fill: #7448c9; } .k-runner { fill: #b56f0c; }
+.k-attn { fill: #1b8455; } .k-kern { fill: #c2433a; } .k-mlx { fill: #0d7f8c; }
+.k-hw { fill: #5a6577; } .k-prog { fill: #3f4a5a; }
+.mk { fill: #576375; } .mkb { fill: #2a66c9; }</style><defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path fill="#576375" d="M0,0 L9,4.5 L0,9 z"/></marker>
+    <marker id="arrb" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path fill="#2a66c9" d="M0,0 L9,4.5 L0,9 z"/></marker>
+  </defs><rect width="100%" height="100%" fill="#ffffff"/><text class="h k-mlx" x="20" y="30" text-anchor="start">Before: the model as mlx_lm loads it</text><rect class="lane-mlx" x="20" y="42" width="290" height="120" rx="8"/><rect class="b-mlx" x="34" y="54" width="262" height="40" rx="7"/><text class="n" x="46" y="71">DecoderLayer</text><text class="d" x="46" y="89">mlp, norms, ...</text><rect class="b-mlx" x="34" y="104" width="262" height="46" rx="7"/><text class="n" x="46" y="121">self_attn = Attention</text><text class="d" x="46" y="139">its own KV cache, one request at a time</text><text class="h k-attn" x="20" y="200" text-anchor="start">After: walk_and_wrap() swaps one attribute</text><rect class="lane-attn" x="20" y="212" width="290" height="160" rx="8"/><rect class="b-mlx" x="34" y="224" width="262" height="40" rx="7"/><text class="n" x="46" y="241">DecoderLayer</text><text class="d" x="46" y="259">unchanged</text><rect class="b-attn" x="34" y="274" width="262" height="46" rx="7"/><text class="n" x="46" y="291">self_attn = SDPA wrapper</text><text class="d" x="46" y="309">keeps the original projections</text><text class="cm" x="34" y="344" text-anchor="start">setattr(layer, &quot;self_attn&quot;, wrapper)</text><text class="d" x="34" y="362" text-anchor="start">the model file is never edited</text><rect class="b-attn" x="350" y="54" width="300" height="48" rx="7"/><text class="cm" x="362" y="71">get_context()</text><text class="d" x="362" y="89">this step&#x27;s batch metadata</text><rect class="b-attn" x="350" y="118" width="300" height="48" rx="7"/><text class="cm" x="362" y="135">prepare_sdpa_qkv()</text><text class="d" x="362" y="153">q, k, v projections, norms, RoPE per segment</text><path class="ar" d="M500,102 L500,116"/><rect class="b-kern" x="350" y="182" width="300" height="48" rx="7"/><text class="cm" x="362" y="199">reshape_and_cache()</text><text class="d" x="362" y="217">write new K and V at slot_mapping</text><path class="ar" d="M500,166 L500,180"/><rect class="b-kern" x="350" y="246" width="300" height="48" rx="7"/><text class="cm" x="362" y="263">paged_attention_primitive()</text><text class="d" x="362" y="281">read all K and V through block_tables</text><path class="ar" d="M500,230 L500,244"/><rect class="b-attn" x="350" y="310" width="300" height="48" rx="7"/><text class="cm" x="362" y="327">o_proj(out)</text><text class="d" x="362" y="345">back to the model, which never noticed</text><path class="ar" d="M500,294 L500,308"/><path class="ar" d="M296,297 C322,297 322,78 346,78"/><rect class="b-runner" x="690" y="54" width="250" height="70" rx="7"/><text class="n" x="702" y="74">PagedAttentionContext</text><text class="d" x="702" y="92">set by the runner before forward:</text><text class="d" x="702" y="107">slot_mapping, block_tables, cu_seqlens</text><path class="ar" d="M690,90 L652,80"/><rect class="b-attn" x="690" y="190" width="250" height="140" rx="7"/><text class="n" x="702" y="210">KVCacheStorage</text><text class="d" x="702" y="228">one pool, one region per layer</text><text class="d" x="702" y="243">blocks of 16 tokens, K and V</text><path class="ar" d="M650,190 C672,190 672,230 688,232"/><path class="ar" d="M688,280 C670,280 670,262 652,262"/><text class="d" x="704" y="296" text-anchor="start">write: one slot per new token</text><text class="d" x="704" y="314" text-anchor="start">read: every block in the table</text></svg>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="182" viewBox="0 0 960 182" role="img" aria-label="The propose, verify and accept loop of speculative decoding"><style>.n { font: 600 13px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #17202b; }
+.d { font: 400 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #576375; }
+.cm { font: 500 12px ui-monospace, Menlo, Consolas, monospace; fill: #17202b; }
+.h { font: 700 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; letter-spacing: .07em; text-transform: uppercase; }
+.ar { stroke: #576375; stroke-width: 1.5; fill: none; marker-end: url(#arr); }
+.arb { stroke: #2a66c9; stroke-width: 1.8; fill: none; stroke-dasharray: 5 4; marker-end: url(#arrb); }
+.tick { stroke: #17202b; stroke-width: 1.5; }
+.badge { fill: #17202b; }
+.badge-t { font: 700 11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #f5f6f8; }
+.b-vllm { fill: #e5eeff; stroke: #2a66c9; stroke-width: 1.3; }
+.b-glue { fill: #efe8ff; stroke: #7448c9; stroke-width: 1.3; }
+.b-runner { fill: #fff1dc; stroke: #b56f0c; stroke-width: 1.3; }
+.b-attn { fill: #e0f4ea; stroke: #1b8455; stroke-width: 1.3; }
+.b-attn2 { fill: #eef9f3; stroke: #1b8455; stroke-width: 1.3; stroke-dasharray: 4 3; }
+.b-kern { fill: #fde8e6; stroke: #c2433a; stroke-width: 1.3; }
+.b-mlx { fill: #ddf3f5; stroke: #0d7f8c; stroke-width: 1.3; }
+.b-hw { fill: #e9edf2; stroke: #5a6577; stroke-width: 1.3; }
+.b-prog { fill: #f1f3f6; stroke: #3f4a5a; stroke-width: 1.3; }
+.b-soft { fill: #edf0f4; stroke: #c6ced9; stroke-width: 1.2; }
+[class^="lane-"] { stroke-width: 1; fill-opacity: .45; }
+.lane-vllm { fill: #e5eeff; stroke: #2a66c9; stroke-opacity: .35; }
+.lane-glue { fill: #efe8ff; stroke: #7448c9; stroke-opacity: .35; }
+.lane-runner { fill: #fff1dc; stroke: #b56f0c; stroke-opacity: .35; }
+.lane-attn { fill: #e0f4ea; stroke: #1b8455; stroke-opacity: .35; }
+.lane-kern { fill: #fde8e6; stroke: #c2433a; stroke-opacity: .35; }
+.lane-mlx { fill: #ddf3f5; stroke: #0d7f8c; stroke-opacity: .35; }
+.lane-hw { fill: #e9edf2; stroke: #5a6577; stroke-opacity: .35; }
+.lane-prog { fill: #f1f3f6; stroke: #3f4a5a; stroke-opacity: .35; }
+.k-vllm { fill: #2a66c9; } .k-glue { fill: #7448c9; } .k-runner { fill: #b56f0c; }
+.k-attn { fill: #1b8455; } .k-kern { fill: #c2433a; } .k-mlx { fill: #0d7f8c; }
+.k-hw { fill: #5a6577; } .k-prog { fill: #3f4a5a; }
+.mk { fill: #576375; } .mkb { fill: #2a66c9; }</style><defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path fill="#576375" d="M0,0 L9,4.5 L0,9 z"/></marker>
+    <marker id="arrb" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path fill="#2a66c9" d="M0,0 L9,4.5 L0,9 z"/></marker>
+  </defs><rect width="100%" height="100%" fill="#ffffff"/><rect class="b-glue" x="20" y="30" width="280" height="74" rx="7"/><text class="n" x="32" y="50">1. propose</text><text class="d" x="32" y="68">a drafter guesses k tokens</text><text class="d" x="32" y="83">ngram, draft_model, gemma4_mtp, dflash, dspark</text><rect class="b-runner" x="340" y="30" width="280" height="74" rx="7"/><text class="n" x="352" y="50">2. verify</text><text class="d" x="352" y="68">next step packs [last, d1, d2, d3]</text><text class="d" x="352" y="83">one forward checks all guesses</text><rect class="b-attn" x="660" y="30" width="280" height="74" rx="7"/><text class="n" x="672" y="50">3. accept</text><text class="d" x="672" y="68">verify_greedy keeps the matching</text><text class="d" x="672" y="83">prefix, plus one token from the model</text><path class="ar" d="M300,67 L336,67"/><path class="ar" d="M620,67 L656,67"/><path class="ar" d="M800,104 C800,150 160,150 160,108"/><text class="d" x="480" y="168" text-anchor="middle">Greedy sampling only. Async scheduling is turned off. Hybrid models are not supported.</text></svg>
