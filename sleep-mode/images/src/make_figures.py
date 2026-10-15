@@ -38,3 +38,34 @@ body += ('<line class="rule" x1="24" y1="348" x2="776" y2="348"/>'
          '<text class="cap" x="24" y="372">The weights never move, because on a Mac there is no second, cheaper memory to move them to. Only the KV</text>'
          '<text class="cap" x="24" y="392">cache goes away, and it comes back empty. The first request after wake_up() has to fill it again.</text>')
 svg("01-one-memory-before-and-after", 800, 408, "Unified memory of a Mac while the engine is awake, after sleep level 1, and after wake_up", "One memory, before and after sleep", "MEMORY", body)
+
+# 02 sleep with KV offloading on
+def row(y, title, segs):
+    out = f'<text class="n" x="24" y="{y-10}">{title}</text>'
+    for x, w, cls, a, b, dash in segs:
+        st = ' style="stroke-dasharray:5 4"' if dash else ""
+        out += f'<rect class="{cls}" x="{x}" y="{y}" width="{w}" height="44" rx="4"{st}/>'
+        out += f'<text class="n" x="{x+10}" y="{y+19}" style="font-size:12px">{a}</text><text class="d" x="{x+10}" y="{y+35}">{b}</text>'
+    return out
+body = ('<text class="t" x="24" y="68">UNIFIED MEMORY</text><text class="t" x="600" y="68">ON DISK</text>'
+        '<line class="rule" x1="584" y1="56" x2="584" y2="352" style="stroke-dasharray:4 4"/>')
+body += row(104, "Awake, serving", [
+    (24, 150, "blue", "model weights", "in place", False),
+    (174, 190, "amber", "KV cache pool", "in use", False),
+    (364, 200, "purple", "host pool", "holds offloaded blocks", False),
+    (600, 176, "box", "disk tier (optional)", "holds offloaded blocks", False)])
+body += row(194, "After sleep(level=1)", [
+    (24, 150, "blue", "model weights", "stay in place", False),
+    (174, 190, "good", "given back to macOS", "KV cache pool freed", False),
+    (364, 200, "purple", "host pool, emptied", "its memory is still held", True),
+    (600, 176, "box", "disk tier", "keeps its blocks", False)])
+body += row(284, "After wake_up()", [
+    (24, 150, "blue", "model weights", "never moved", False),
+    (174, 190, "amber", "new, empty KV pool", "same layout as before", False),
+    (364, 200, "purple", "host pool", "fills again", False),
+    (600, 176, "box", "disk tier", "old prompts restore", False)])
+body += ('<line class="rule" x1="24" y1="352" x2="776" y2="352"/>'
+         '<text class="cap" x="24" y="376">Moving the KV cache into the host pool at sleep would free nothing: both are in the same memory.</text>'
+         '<text class="cap" x="24" y="396">Sleep empties the host pool but keeps its memory. A prompt stored before sleep still restores after</text>'
+         '<text class="cap" x="24" y="416">wake: 2,320 tokens in the test, from a 2 GiB host pool with the disk tier.</text>')
+svg("02-sleep-with-kv-offloading", 800, 432, "What happens to the KV cache pool, the offload host pool and the disk tier when vllm-metal sleeps and wakes", "Sleep with KV offloading on", "OFFLOAD", body)
